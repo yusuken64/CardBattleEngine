@@ -11,4 +11,13 @@
     <ProjectReference Include="..\..\..\..\source\repos\CardBattleEngine\CardBattleEngine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
+  </ItemGroup>
+
 </Project>

@@ -1,66 +1,5 @@
 ﻿using CardBattleEngine;
 
-public interface IGameAgent
-{
-	public IGameAction GetNextAction(GameState game);
-}
-
-public class AttackFaceAI : IGameAgent
-{
-	private readonly Player _player;
-
-	public AttackFaceAI(Player player)
-	{
-		_player = player;
-	}
-
-	public IGameAction GetNextAction(GameState game)
-	{
-		var validActions = game.GetValidActions(_player);
-		return validActions[0];
-	}
-}
-
-public class AttackMinionAI : IGameAgent
-{
-	private readonly Player _player;
-
-	public AttackMinionAI(Player player)
-	{
-		_player = player;
-	}
-
-	public IGameAction GetNextAction(GameState game)
-	{
-		var validActions = game.GetValidActions(_player);
-		return validActions.Skip(1).FirstOrDefault();
-	}
-}
-
-public class RandomAI : IGameAgent
-{
-	private readonly Player _player;
-	private readonly IRNG _rng;
-
-	public RandomAI(Player player, IRNG rng)
-	{
-		_player = player;
-		_rng = rng;
-	}
-
-	public IGameAction GetNextAction(GameState game)
-	{
-		var validActions = game.GetValidActions(_player);
-
-		return ChooseRandom(validActions);
-	}
-	public T ChooseRandom<T>(IReadOnlyList<T> options)
-	{
-		if (options.Count == 0) return default!;
-		return options[_rng.NextInt(0, options.Count)];
-	}
-}
-
 public class HumanAgent : IGameAgent
 {
 	private readonly Player _player;
@@ -123,5 +62,8 @@ public class HumanAgent : IGameAgent
 		// Move cursor below menu
 		Console.SetCursorPosition(0, optionStartTop + actions.Count);
 		return actions[selectedIndex];
+	}
+	public void OnGameEnd(GameState gamestate, bool win)
+	{
 	}
 }
