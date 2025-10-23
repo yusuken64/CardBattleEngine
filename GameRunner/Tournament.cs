@@ -19,7 +19,7 @@ internal class Tournament
 		for (int i = 0; i < runs; i++)
 		{
 			var gameState = GameFactory.CreateTestGame();
-			var engine = new GameEngine(new XorShiftRNG(1));
+			var engine = new GameEngine(new XorShiftRNG((ulong)i));
 			//engine.ActionCallback = GameEngine.PrintState;
 
 			(IGameAgent player1, IGameAgent player2) = _createAgents(engine, gameState, i);
