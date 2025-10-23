@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.36128.20
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36212.18 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardBattleEngine", "..\..\..\source\repos\CardBattleEngine\CardBattleEngine.csproj", "{11807D35-188C-4EDF-AFD7-751B60F44C4A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameRunner", "GameRunner\GameRunner.csproj", "{A6DEAB45-FEB6-4A4F-AFB5-E965C6C32364}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardBattleEngine.Test", "CardBattleEngine.Test\CardBattleEngine.Test.csproj", "{43580370-E236-4B88-9933-E7AD6C38C824}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A6DEAB45-FEB6-4A4F-AFB5-E965C6C32364}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6DEAB45-FEB6-4A4F-AFB5-E965C6C32364}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6DEAB45-FEB6-4A4F-AFB5-E965C6C32364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43580370-E236-4B88-9933-E7AD6C38C824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43580370-E236-4B88-9933-E7AD6C38C824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43580370-E236-4B88-9933-E7AD6C38C824}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43580370-E236-4B88-9933-E7AD6C38C824}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

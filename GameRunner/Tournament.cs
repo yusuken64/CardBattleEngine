@@ -1,13 +1,12 @@
 ﻿using CardBattleEngine;
-using System.Reflection.Metadata;
 
 namespace GameRunner;
 
 internal class Tournament
 {
-	private readonly Func<GameState, int, (IGameAgent player1, IGameAgent player2)> _createAgents;
+	private readonly Func<GameEngine, GameState, int, (IGameAgent player1, IGameAgent player2)> _createAgents;
 
-	public Tournament(Func<GameState, int, (IGameAgent player1, IGameAgent player2)> createAgents)
+	public Tournament(Func<GameEngine, GameState, int, (IGameAgent player1, IGameAgent player2)> createAgents)
 	{
 		_createAgents = createAgents;
 	}
@@ -23,11 +22,12 @@ internal class Tournament
 			var engine = new GameEngine(new XorShiftRNG(1));
 			//engine.ActionCallback = GameEngine.PrintState;
 
-			(IGameAgent player1, IGameAgent player2) = _createAgents(gameState, i);
+			(IGameAgent player1, IGameAgent player2) = _createAgents(engine, gameState, i);
 
 			engine.StartGame(gameState);
 			while (!gameState.IsGameOver())
 			{
+				//GameEngine.PrintState(gameState, null);
 				var currentAgent = gameState.CurrentPlayer == gameState.Players[0] ? player1 : player2;
 				var action = currentAgent.GetNextAction(gameState);
 				engine.Resolve(gameState, gameState.CurrentPlayer, gameState.OpponentPlayer, action);
@@ -47,13 +47,9 @@ internal class Tournament
 				player2.OnGameEnd(gameState, true);
 			}
 			Console.WriteLine($"Winner: {gameState.Winner?.Name}");
-
-
 		}
 
 		Console.WriteLine($"p1 Win {player1Win}, {(float)player1Win / runs}");
 		Console.WriteLine($"p2 Win {player2Win}, {(float)player2Win / runs}");
-
-
 	}
 }

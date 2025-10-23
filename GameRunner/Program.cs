@@ -2,15 +2,18 @@
 using GameRunner;
 
 MonteCarloModel model = new MonteCarloModel("../../../Data/Model");
-
-Tournament tournament = new Tournament((gameState, i) =>
+OracleAgent.OracleBrain brain = new OracleAgent.OracleBrain()
 {
-	//var player1 = new RandomAI(gameState.Players[0], new XorShiftRNG((ulong)i));
-	var player1 = new LearningAgent(model);
-	//var player2 = new RandomAI(gameState.Players[1], new XorShiftRNG((ulong)i + 1));
-	var player2 = new LearningAgent(model);
+	CardConservationWeight = 0.2f
+};
+
+Tournament tournament = new Tournament((engine, gameState, i) =>
+{
+	var player1 = new OracleAgent(engine, brain);
+	var player2 = new RandomAI(gameState.Players[1], new XorShiftRNG((ulong)i + 1));
+	//var player2 = new LearningAgent(model);
 	return (player1, player2);
 });
-tournament.Run(20000);
+tournament.Run(200);
 
 model.SaveWeights();
