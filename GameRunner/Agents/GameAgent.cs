@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 public interface IGameAgent
 {
-	public IGameAction GetNextAction(GameState game);
+	public GameActionBase GetNextAction(GameState game);
 
 	public void OnGameEnd(GameState gamestate, bool win);
 }
@@ -19,13 +19,13 @@ public class OracleAgent : IGameAgent
 		_brain = brain;
 	}
 
-	public IGameAction GetNextAction(GameState game)
+	public GameActionBase GetNextAction(GameState game)
 	{
 		var actions = game.GetValidActions(game.CurrentPlayer).ToList();
 		if (actions.Count == 0) return new EndTurnAction();
 
 		float bestScore = float.NegativeInfinity;
-		IGameAction bestAction = null;
+		GameActionBase bestAction = null;
 
 		foreach (var action in actions)
 		{
@@ -51,7 +51,7 @@ public class OracleAgent : IGameAgent
 		public float AggressionWeight { get; set; } = 1.0f;
 		public float CardConservationWeight { get; set; } = 1.0f;
 
-		public float Evaluate(GameEngine engine, GameState state, IGameAction action)
+		public float Evaluate(GameEngine engine, GameState state, GameActionBase action)
 		{
 			Player player = state.CurrentPlayer;
 			Player opponent = state.OpponentOf(player);

@@ -11,7 +11,7 @@ public class RandomAI : IGameAgent
 		_rng = rng;
 	}
 
-	public IGameAction GetNextAction(GameState game)
+	public GameActionBase GetNextAction(GameState game)
 	{
 		var validActions = game.GetValidActions(_player);
 

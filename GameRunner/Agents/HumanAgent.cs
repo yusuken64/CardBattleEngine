@@ -9,7 +9,7 @@ public class HumanAgent : IGameAgent
 		_player = player;
 	}
 
-	public IGameAction GetNextAction(GameState state)
+	public GameActionBase GetNextAction(GameState state)
 	{
 		var actions = state.GetValidActions(_player).ToList();
 		int selectedIndex = 0;

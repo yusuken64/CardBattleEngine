@@ -9,7 +9,7 @@ public class AttackMinionAI : IGameAgent
 		_player = player;
 	}
 
-	public IGameAction GetNextAction(GameState game)
+	public GameActionBase GetNextAction(GameState game)
 	{
 		var validActions = game.GetValidActions(_player);
 		return validActions.Skip(1).FirstOrDefault();

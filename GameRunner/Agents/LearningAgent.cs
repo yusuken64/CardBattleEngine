@@ -3,7 +3,7 @@
 public class LearningAgent : IGameAgent
 {
 	private MonteCarloModel _model;
-	private List<(GameState state, IGameAction action)> _history;
+	private List<(GameState state, GameActionBase action)> _history;
 
 	public LearningAgent(MonteCarloModel model)
 	{
@@ -11,9 +11,9 @@ public class LearningAgent : IGameAgent
 		_history = new();
 	}
 
-	public IGameAction GetNextAction(GameState game)
+	public GameActionBase GetNextAction(GameState game)
 	{
-		List<IGameAction> actions = game.GetValidActions(game.CurrentPlayer);
+		List<GameActionBase> actions = game.GetValidActions(game.CurrentPlayer);
 		var action = _model.ChooseAction(game, actions);
 		_history.Add((game, action));
 

@@ -16,7 +16,7 @@ public class MonteCarloModel
 	private static string MakeKey(string stateHash, string actionId)
 		=> $"{stateHash}::{actionId}";
 
-	public IGameAction ChooseAction(GameState state, List<IGameAction> actions)
+	public GameActionBase ChooseAction(GameState state, List<GameActionBase> actions)
 	{
 		string s = HashState(state);
 		var action = actions
@@ -31,7 +31,7 @@ public class MonteCarloModel
 		return action;
 	}
 
-	public void UpdateFromResult(List<(GameState state, IGameAction action)> history, bool won)
+	public void UpdateFromResult(List<(GameState state, GameActionBase action)> history, bool won)
 	{
 		foreach (var (state, action) in history)
 		{

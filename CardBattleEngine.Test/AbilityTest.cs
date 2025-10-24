@@ -16,9 +16,10 @@ public class AbilityTest
 
 		var card = new MinionCard("BattlecryMinion", cost: 1, attack: 1, health: 1);
 		card.Owner = current;
-		card.Effects.Add(new CardEffect()
+		card.TriggeredEffect.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
+			EffectTiming = EffectTiming.Post,
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>() 
 			{
@@ -50,21 +51,24 @@ public class AbilityTest
 		// Create minion with Deathrattle effect
 		var minionCard = new MinionCard("DeathrattleMinion", cost: 1, attack: 1, health: 1);
 		minionCard.Owner = current;
-		minionCard.Effects.Add(new CardEffect
+		minionCard.TriggeredEffect.Add(new TriggeredEffect
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
+			EffectTiming = EffectTiming.Post,
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>
-		{
-			new DamageAction(opponent, 1)
-		}
+			{
+				new DamageAction(opponent, 1)
+			}
 		});
+		current.Mana = 1;
+		current.Hand.Add(minionCard);
 
-		// Put minion directly on board for testing death
-		var minionEntity = new Minion(minionCard, current);
-		current.Board.Add(minionEntity);
+		IGameAction summonMinion = new PlayCardAction(minionCard);
+		engine.Resolve(state, current, opponent, summonMinion);
 
 		// Act: Kill the minion to trigger Deathrattle
+		var minionEntity = state.CurrentPlayer.Board[0];
 		var damage = new DamageAction(minionEntity, minionEntity.Health);
 		engine.Resolve(state, current, opponent, damage);
 
