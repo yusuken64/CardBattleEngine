@@ -15,7 +15,13 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\source\repos\CardBattleEngine\CardBattleEngine.csproj" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <Content Include="Data\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>

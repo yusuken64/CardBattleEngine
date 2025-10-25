@@ -1,0 +1,8 @@
+{
+  "id": "BattleCryMinion",
+  "name": "BattleCryMinion",
+  "type": "Minion",
+  "cost": 1,
+  "attack": 1,
+  "health": 1
+}
