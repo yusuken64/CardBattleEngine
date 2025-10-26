@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class SummonMinionAction : IGameAction
+internal class SummonMinionAction : GameActionBase
 {
 	private readonly MinionCard _card;
 	private readonly Player _owner;
@@ -11,7 +11,9 @@ internal class SummonMinionAction : IGameAction
 		_owner = owner;
 	}
 
-	public bool IsValid(GameState state)
+	public override EffectTrigger EffectTrigger => EffectTrigger.SummonMinion;
+
+	public override bool IsValid(GameState state)
 	{
 		// Board not full
 		if (_owner.Board.Count >= state.MaxBoardSize)
@@ -20,20 +22,16 @@ internal class SummonMinionAction : IGameAction
 		return true;
 	}
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
 	{
 		if (!IsValid(state))
 			return [];
 
 		// Create minion entity
 		var minion = new Minion(_card, _owner);
+		minion.Name = _card.Name;
 		_owner.Board.Add(minion);
 
-		var sideEffects = new List<IGameAction>
-		{
-			new MinionSummonedEventAction(minion)
-		};
-
-		return sideEffects;
+		return [];
 	}
 }

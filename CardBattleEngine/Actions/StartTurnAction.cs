@@ -2,7 +2,7 @@
 
 namespace CardBattleEngine;
 
-internal class StartTurnAction : IGameAction
+internal class StartTurnAction : GameActionBase
 {
 	private Player _currentPlayer;
 
@@ -11,9 +11,10 @@ internal class StartTurnAction : IGameAction
 		this._currentPlayer = currentPlayer;
 	}
 
-	public bool IsValid(GameState state) => true;
+	public override EffectTrigger EffectTrigger => EffectTrigger.TurnStart;
+	public override bool IsValid(GameState state) => true;
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
 	{
 		// Reset attack flags
 		foreach (var minion in _currentPlayer.Board)

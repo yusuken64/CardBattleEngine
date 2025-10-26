@@ -1,6 +1,8 @@
-﻿namespace CardBattleEngine;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public class IncreaseMaxManaAction : IGameAction
+namespace CardBattleEngine;
+
+public class IncreaseMaxManaAction : GameActionBase
 {
 	private readonly Player _player;
 	private readonly int _amount;
@@ -11,9 +13,11 @@ public class IncreaseMaxManaAction : IGameAction
 		_amount = amount;
 	}
 
-    public bool IsValid(GameState state) => _player.MaxMana < 10;
+	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player current, Player opponent)
+	public override bool IsValid(GameState state) => _player.MaxMana < 10;
+
+	public override IEnumerable<GameActionBase> Resolve(GameState state, Player current, Player opponent)
 	{
 		_player.MaxMana = Math.Min(_player.MaxMana + _amount, 10);
 		return [];

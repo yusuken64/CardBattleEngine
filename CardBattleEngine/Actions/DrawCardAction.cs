@@ -1,14 +1,16 @@
 ﻿namespace CardBattleEngine;
 
-public class DrawCardAction : IGameAction
+public class DrawCardAction : GameActionBase
 {
 	private readonly Player _player;
 
 	public DrawCardAction(Player player) => _player = player;
 
-	public bool IsValid(GameState state) => _player.Deck.Count > 0;
+	public override EffectTrigger EffectTrigger => EffectTrigger.DrawCard;
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player current, Player opponent)
+	public override bool IsValid(GameState state) => _player.Deck.Count > 0;
+
+	public override IEnumerable<GameActionBase> Resolve(GameState state, Player current, Player opponent)
 	{
 		var card = _player.Deck[0];
 		_player.Deck.RemoveAt(0);

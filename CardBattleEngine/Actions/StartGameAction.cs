@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class StartGameAction : IGameAction
+internal class StartGameAction : GameActionBase
 {
 	private Player _currentPlayer;
 	private Action<IList<Card>> _shuffleFunction;
@@ -11,9 +11,11 @@ internal class StartGameAction : IGameAction
 		this._shuffleFunction = shuffleFunction;
 	}
 
-	public bool IsValid(GameState state) => true;
+	public override EffectTrigger EffectTrigger => EffectTrigger.GameStart;
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override bool IsValid(GameState state) => true;
+
+	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
 	{
 		_shuffleFunction(_currentPlayer.Deck);
 

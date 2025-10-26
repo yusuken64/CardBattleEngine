@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class PlayCardAction : IGameAction
+public class PlayCardAction : GameActionBase
 {
 	private readonly Card _card;
 
@@ -9,7 +9,9 @@ internal class PlayCardAction : IGameAction
 		_card = card;
 	}
 
-	public bool IsValid(GameState state)
+	public override EffectTrigger EffectTrigger => EffectTrigger.OnPlay;
+
+	public override bool IsValid(GameState state)
 	{
 		var player = _card.Owner;
 		if (!player.Hand.Contains(_card))
@@ -24,7 +26,7 @@ internal class PlayCardAction : IGameAction
 		return true;
 	}
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
 	{
 		if (!IsValid(state))
 			return [];

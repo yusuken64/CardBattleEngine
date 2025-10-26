@@ -1,22 +1,24 @@
 ﻿namespace CardBattleEngine;
 
-internal class AttackAction : IGameAction
+internal class AttackAction : GameActionBase
 {
 	private IGameEntity _attacker;
 	private IGameEntity _defender;
-
+ 
 	public AttackAction(Minion attacker, IGameEntity defender)
 	{
 		this._attacker = attacker;
 		this._defender = defender;
 	}
 
-	public bool IsValid(GameState state)
+	public override EffectTrigger EffectTrigger => EffectTrigger.Attack;
+
+	public override bool IsValid(GameState state)
 	{
 		return _attacker.AttackBehavior.CanAttack(_attacker, _defender, state);
 	}
 
-	public IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
 	{
 		if (_attacker is Minion minion)
 		{
