@@ -23,7 +23,7 @@ public class AbilityTest
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>() 
 			{
-				new DamageAction(opponent, 1)
+				new DamageAction() { Target = opponent, Damage = 1 }
 			}
 		});
 
@@ -58,7 +58,7 @@ public class AbilityTest
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>
 			{
-				new DamageAction(opponent, 1)
+				new DamageAction() { Target = opponent, Damage = 1 }
 			}
 		});
 		current.Mana = 1;
@@ -69,7 +69,7 @@ public class AbilityTest
 
 		// Act: Kill the minion to trigger Deathrattle
 		var minionEntity = state.CurrentPlayer.Board[0];
-		var damage = new DamageAction(minionEntity, minionEntity.Health);
+		var damage = new DamageAction() { Target = minionEntity, Damage = minionEntity.Health };
 		engine.Resolve(state, current, opponent, damage);
 
 		// Assert

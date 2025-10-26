@@ -14,7 +14,7 @@ public class CardDBTest
 		CardDatabase cardDatabase = new(DBPath);
 
 		Player owner = new Player("Test");
-		MinionCard minion = cardDatabase.CreateMinion("", owner);
+		MinionCard minion = cardDatabase.GetMinion("TEST1", owner);
 
 		Assert.IsNotNull(minion);
 	}
@@ -42,14 +42,18 @@ public class CardDBTest
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>()
 			{
-				new DamageAction(opponent, 1)
+				new DamageAction()
+				{
+					Damage = 1,
+					Target = opponent,
+				}
 			}
 		});
 
 		CardDatabase.CreateFileFromMinionCard(card, ".\\Data\\", "BattleCryMinion");
 
 		CardDatabase testDB = new CardDatabase(".\\Data\\");
-		var loadedMinion = testDB.CreateMinion("BattleCryMinion", current);
+		var loadedMinion = testDB.GetMinion("BattleCryMinion", current);
 
 		Assert.AreEqual(1, loadedMinion.Attack);
 		Assert.AreEqual(1, loadedMinion.Health);
@@ -69,7 +73,7 @@ public class CardDBTest
 	{
 		var db = new CardDatabase(DBPath);
 		Player owner = new Player("Test");
-		var card = db.CreateMinion("BattleCryMinion", owner);
+		var card = db.GetMinion("BattleCryMinion", owner);
 
 		Assert.AreEqual(1, card.TriggeredEffect.Count, "Expected 1 triggered effect.");
 		var effect = card.TriggeredEffect[0];
