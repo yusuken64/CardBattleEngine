@@ -45,6 +45,12 @@ public class MinionCard : Card
 			foreach (var gameAction in effect.GameActions)
 				yield return (gameAction, effectContext);
 		}
+
+		SummonMinionAction summonMinionAction = new()
+		{
+			Card = this
+		};
+		yield return (summonMinionAction, context);
 	}
 
 	public override Card Clone()

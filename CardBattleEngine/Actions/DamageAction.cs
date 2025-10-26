@@ -17,14 +17,22 @@ public class DamageAction : GameActionBase
 			return [];
 
 		// Apply damage
-		actionContext.Target.Health -= Damage;
+		var target = actionContext.Target;
+		target.Health -= Damage;
 
 		var sideEffects = new List<(IGameAction, ActionContext)>();
 
 		// Check for death triggers
 		if (actionContext.Target.Health <= 0)
 		{
-			sideEffects.Add((new DeathAction(), actionContext));
+			var deathContext = new ActionContext
+			{
+				SourcePlayer = actionContext.SourcePlayer,
+				Source = target,
+				Target = target,
+				TargetSelector = actionContext.TargetSelector
+			};
+			sideEffects.Add((new DeathAction(), deathContext));
 		}
 
 		return sideEffects;

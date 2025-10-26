@@ -33,12 +33,17 @@ public class AbilityTest
 		{
 			Card = card
 		};
-		engine.Resolve(state, new ActionContext()
+		ActionContext actionContext = new ActionContext()
 		{
 			SourcePlayer = current,
-			Source = current,
-			Target = opponent
-		}, play);
+			SourceCard = card,
+			TargetSelector = (gs, player, targetType) =>
+			{
+				var validTargets = gs.GetValidTargets(player, targetType);
+				return validTargets[0];
+			}
+		};
+		engine.Resolve(state, actionContext, play);
 
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Battlecry should deal 1 damage");
 		Assert.AreEqual(1, current.Board.Count, "Minion should be summoned");
@@ -76,12 +81,24 @@ public class AbilityTest
 		{
 			Card = minionCard
 		};
-		//engine.Resolve(state, current, opponent, summonMinion);
+		engine.Resolve(state, new ActionContext()
+		{
+			SourceCard = minionCard,
+			SourcePlayer = current
+		},
+		summonMinion);
 
 		// Act: Kill the minion to trigger Deathrattle
 		var minionEntity = state.CurrentPlayer.Board[0];
 		var damage = new DamageAction() { Damage = minionEntity.Health };
-		//engine.Resolve(state, current, opponent, damage);
+		engine.Resolve(state, new ActionContext
+		{
+			Target = minionEntity,
+			TargetSelector = (s, p, t) =>
+			{
+				return s.OpponentOf(p);
+			}
+		}, damage);
 
 		// Assert
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Deathrattle should deal 1 damage");

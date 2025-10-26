@@ -21,13 +21,19 @@ internal class DeathAction : GameActionBase
 			foreach (var effect in minion.TriggeredEffects
 				.Where(x => x.EffectTrigger == EffectTrigger.Deathrattle))
 			{
-				sideEffects.AddRange(effect.GameActions.Select(x => 
-				(x, new ActionContext()
+				sideEffects.AddRange(effect.GameActions.Select(x =>
 				{
-					SourcePlayer = minion.Owner,
-					Source = minion,
-				})));
+					var target = actionContext.TargetSelector(state, minion.Owner, effect.TargetType);
+
+					return (x, new ActionContext()
+					{
+						SourcePlayer = minion.Owner,
+						Source = minion,
+						Target = target
+					});
+				}));
 			}
+			
 		}
 
 		return sideEffects;
