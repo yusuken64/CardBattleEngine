@@ -16,13 +16,19 @@ public class EventBus
 	public void RegisterTrigger(ITrigger trigger) => _triggers.Add(trigger);
 	public void UnregisterTrigger(ITrigger trigger) => _triggers.Remove(trigger);
 
-	internal IEnumerable<ITrigger> GetPreTriggers(GameState gameState, IGameAction action)
+	internal IEnumerable<IGameAction> GetPreTriggers(GameState gameState, IGameAction action)
 	{
-		return _triggers.Where(t => t.CheckCondition(gameState, action) && t is IPreTrigger);
+		return gameState.GetAllEntities()
+			.SelectMany(x => x.TriggeredEffects)
+			.Where(x => x.EffectTrigger == action.EffectTrigger) //Where matches action
+			.SelectMany(x => x.GameActions);
 	}
 
-	internal IEnumerable<ITrigger> GetPostTriggers(GameState gameState, IGameAction action)
+	internal IEnumerable<IGameAction> GetPostTriggers(GameState gameState, IGameAction action)
 	{
-		return _triggers.Where(t => t.CheckCondition(gameState, action) && t is IPostTrigger);
+		return gameState.GetAllEntities()
+			.SelectMany(x => x.TriggeredEffects)
+			.Where(x => x.EffectTrigger == action.EffectTrigger) //Where matches action
+			.SelectMany(x => x.GameActions);
 	}
 }

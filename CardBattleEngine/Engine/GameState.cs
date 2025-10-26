@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Collections.Generic;
+
+namespace CardBattleEngine;
 
 public class GameState
 {
@@ -7,8 +9,6 @@ public class GameState
 	public int MaxBoardSize { get; set; } = 7;
 	public Player[] Players { get; internal set; }
 	public Player? Winner { get; set; }
-
-	private Dictionary<Guid, int> _fatigueCounters = new Dictionary<Guid, int>();
 
 	public int maxTurns = 50;
 	public int turn = 0;
@@ -21,14 +21,14 @@ public class GameState
 		OpponentPlayer = p2;
 	}
 
-	internal Player OpponentOf(Player player)
+	public Player OpponentOf(Player player)
 	{
 		return player == Players[0] ? Players[1] : Players[0];
 	}
 
-	public List<IGameAction> GetValidActions(Player player)
+	public List<GameActionBase> GetValidActions(Player player)
 	{
-		var actions = new List<IGameAction>();
+		var actions = new List<GameActionBase>();
 
 		// Playable cards
 		foreach (var card in player.Hand)
@@ -53,7 +53,10 @@ public class GameState
 			}
 
 			var attackHeroAction = new AttackAction(attacker, OpponentOf(player));
-			actions.Add(attackHeroAction);
+			if (attackHeroAction.IsValid(this))
+			{
+				actions.Add(attackHeroAction);
+			}
 
 			foreach (var defender in OpponentOf(player).Board)
 			{
@@ -87,5 +90,46 @@ public class GameState
 		}
 
 		return false;
+	}
+
+	public int GetBoardStrength(Player currentPlayer)
+	{
+		return currentPlayer.Board.Select(x => x.Health + x.Attack).Sum();
+	}
+
+	public GameState Clone()
+	{
+		// Clone both players first
+		var p1 = Players[0].Clone();
+		var p2 = Players[1].Clone();
+
+		// Create a new game state using the cloned players
+		var clone = new GameState(p1, p2)
+		{
+			MaxBoardSize = this.MaxBoardSize,
+			maxTurns = this.maxTurns,
+			turn = this.turn,
+			Winner = this.Winner == Players[0] ? p1 :
+					 this.Winner == Players[1] ? p2 : null
+		};
+
+		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
+		clone.OpponentPlayer = this.OpponentPlayer == Players[0] ? p1 : p2;
+
+		return clone;
+	}
+
+	public IEnumerable<IGameEntity> GetAllEntities()
+	{
+		var all = new List<IGameEntity>();
+
+		foreach (var player in Players)
+		{
+			all.Add(player);
+			all.AddRange(player.Board);
+			//all.AddRange(CurrentPlayer.Hand);
+		}
+
+		return all;
 	}
 }

@@ -16,9 +16,25 @@ public class MinionCard : Card
 
 	internal override IEnumerable<IGameAction> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
 	{
-		return
-		[
-			new SummonMinionAction(this, currentPlayer)
-		];
+		// Return all effects whose trigger is OnPlay/Battlecry (or whatever you consider)
+		foreach (var effect in TriggeredEffect)
+		{
+			if (effect.EffectTrigger == EffectTrigger.Battlecry)
+			{
+				foreach (var subAction in effect.GameActions)
+					yield return subAction;
+			}
+		}
+
+		// Summon self is always first
+		yield return new SummonMinionAction(this, currentPlayer);
+	}
+
+	public override Card Clone()
+	{
+		return new MinionCard(Name, ManaCost, Attack, Health)
+		{
+			Owner = Owner
+		};
 	}
 }

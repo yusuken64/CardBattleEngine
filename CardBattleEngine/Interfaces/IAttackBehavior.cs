@@ -3,7 +3,7 @@
 public interface IAttackBehavior
 {
 	bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state);
-	IEnumerable<IGameAction> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state);
+	IEnumerable<GameActionBase> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state);
 }
 internal class MinionAttackBehavior : IAttackBehavior
 {
@@ -31,17 +31,25 @@ internal class MinionAttackBehavior : IAttackBehavior
 		return true;
 	}
 
-	public IEnumerable<IGameAction> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state)
+	public IEnumerable<GameActionBase> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state)
 	{
 		if (attacker is not Minion attackingMinion)
 			yield break;
 
 		// Attacker deals damage to target
-		yield return new DamageAction(target, attackingMinion.Attack);
+		yield return new DamageAction()
+		{
+			Target = target,
+			Damage = attackingMinion.Attack
+		};
 
 		// Defender deals retaliatory damage if possible
 		if (target is Minion defendingMinion && defendingMinion.IsAlive)
-			yield return new DamageAction(attackingMinion, defendingMinion.Attack);
+			yield return new DamageAction()
+			{
+				Target = attackingMinion,
+				Damage = defendingMinion.Attack
+			};
 		//else if (target is Player defendingHero)
 		//	yield return new DamageAction(defendingHero, attackingMinion.Attack);
 	}

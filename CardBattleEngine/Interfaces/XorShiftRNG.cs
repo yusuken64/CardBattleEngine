@@ -28,4 +28,11 @@ public sealed class XorShiftRNG : IRNG
 	{
 		return (NextULong() & (1UL << 53) - 1) / (double)(1UL << 53);
 	}
+	IRNG IRNG.Clone()
+	{
+		// Copy the internal state
+		var clone = new XorShiftRNG(1); // temporary seed doesn't matter
+		clone._state = this._state;
+		return clone;
+	}
 }

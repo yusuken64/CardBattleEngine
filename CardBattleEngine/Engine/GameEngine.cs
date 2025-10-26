@@ -1,12 +1,12 @@
-﻿using System.Text;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class GameEngine
 {
 	private readonly EventBus _eventBus;
 	private readonly Queue<IGameAction> _actionQueue = new();
 	private readonly IRNG rNG;
+
+	public Action<GameState, IGameAction> ActionCallback;
 
 	public GameEngine(IRNG rNG)
 	{
@@ -29,9 +29,13 @@ public class GameEngine
 			// Pre-resolution triggers
 			foreach (var trigger in _eventBus.GetPreTriggers(gameState, current))
 			{
-				var triggerAction = trigger.GenerateAction(gameState);
-				if (triggerAction != null)
-					_actionQueue.Enqueue(triggerAction);
+				if (trigger != null)
+					_actionQueue.Enqueue(trigger);
+			}
+
+			if (current.Canceled)
+			{
+				continue;
 			}
 
 			// Resolve action and enqueue returned side effects
@@ -45,12 +49,12 @@ public class GameEngine
 			// Post-resolution triggers
 			foreach (var trigger in _eventBus.GetPostTriggers(gameState, current))
 			{
-				var triggerAction = trigger.GenerateAction(gameState);
-				if (triggerAction != null)
-					_actionQueue.Enqueue(triggerAction);
+				if (trigger != null)
+					_actionQueue.Enqueue(trigger);
 			}
 
-			PrintState(gameState, current);
+			ActionCallback?.Invoke(gameState, current);
+			//PrintState(gameState, current);
 
 			if (gameState.IsGameOver())
 				break;
@@ -66,7 +70,7 @@ public class GameEngine
 		Resolve(gameState, p2, p1, new StartGameAction(p2, Shuffle));
 	}
 
-	private static void PrintState(GameState gameState, IGameAction current)
+	public static void PrintState(GameState gameState, GameActionBase current)
 	{
 		var p1 = gameState.Players[0];
 		var p2 = gameState.Players[1];
@@ -76,7 +80,7 @@ public class GameEngine
 		Console.WriteLine(PlayerStateInfo(p2));
 	}
 
-	private static string PlayerStateInfo(Player player)
+	public static string PlayerStateInfo(Player player)
 	{
 		var board = string.Join(",", player.Board.Select(x =>
 		{
@@ -98,5 +102,52 @@ public class GameEngine
 			int j = rNG.NextInt(0, i + 1); // same RNG as ChooseRandom
 			(list[i], list[j]) = (list[j], list[i]);
 		}
+	}
+
+	public GameEngine Clone()
+	{
+		return new GameEngine(this.rNG.Clone());
+	}
+	
+	public static List<IGameEntity> GetPotentialTargets(TargetType type, GameState state, Player owner, Player opponent)
+	{
+		var targets = new List<IGameEntity>();
+
+		switch (type)
+		{
+			case TargetType.EnemyHero:
+				targets.Add(opponent);
+				break;
+
+			case TargetType.EnemyMinion:
+				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
+				break;
+
+			case TargetType.AnyEnemy:
+				targets.Add(opponent);
+				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
+				break;
+
+			case TargetType.FriendlyHero:
+				targets.Add(owner);
+				break;
+
+			case TargetType.FriendlyMinion:
+				targets.AddRange(owner.Board.Where(m => m.IsAlive));
+				break;
+
+			case TargetType.Self:
+				if (owner != null) targets.Add(owner);
+				break;
+
+			case TargetType.Any:
+				targets.Add(owner);
+				targets.AddRange(owner.Board.Where(m => m.IsAlive));
+				targets.Add(opponent);
+				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
+				break;
+		}
+
+		return targets;
 	}
 }

@@ -13,18 +13,22 @@ public class DealDamageTrigger : IPostTrigger
 		_targetSelector = targetSelector;
 	}
 
-	public bool CheckCondition(GameState state, IGameAction action)
+	public bool CheckCondition(GameState state, GameActionBase action)
 	{
 		//return action is PlayCardAction play && play.Card.Owner == _source;
 		return true;
 	}
 
-	public IGameAction GenerateAction(GameState gameState)
+	public GameActionBase GenerateAction(GameState gameState)
 	{
 		var target = _targetSelector(gameState);
 		if (target == null) return null;
 
 		int damage = _damageCalculator(gameState);
-		return new DamageAction(target, damage);
+		return new DamageAction()
+		{
+			Target = target,
+			Damage = damage
+		};
 	}
 }

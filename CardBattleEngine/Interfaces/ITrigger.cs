@@ -2,6 +2,6 @@
 
 public interface ITrigger
 {
-	bool CheckCondition(GameState state, IGameAction action);
-	IGameAction GenerateAction(GameState gameState);
+	bool CheckCondition(GameState state, GameActionBase action);
+	GameActionBase GenerateAction(GameState gameState);
 }
