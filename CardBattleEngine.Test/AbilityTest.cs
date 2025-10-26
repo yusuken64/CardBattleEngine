@@ -33,7 +33,7 @@ public class AbilityTest
 		{
 			Card = card
 		};
-		engine.Resolve(state, current, opponent, play);
+		//engine.Resolve(state, current, opponent, play);
 
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Battlecry should deal 1 damage");
 		Assert.AreEqual(1, current.Board.Count, "Minion should be summoned");
@@ -71,12 +71,12 @@ public class AbilityTest
 		{
 			Card = minionCard
 		};
-		engine.Resolve(state, current, opponent, summonMinion);
+		//engine.Resolve(state, current, opponent, summonMinion);
 
 		// Act: Kill the minion to trigger Deathrattle
 		var minionEntity = state.CurrentPlayer.Board[0];
 		var damage = new DamageAction() { Damage = minionEntity.Health };
-		engine.Resolve(state, current, opponent, damage);
+		//engine.Resolve(state, current, opponent, damage);
 
 		// Assert
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Deathrattle should deal 1 damage");
@@ -116,7 +116,7 @@ public class AbilityTest
 		});
 
 		IGameAction playCardAction = new PlayCardAction() { Card = abusiveCard };
-		engine.Resolve(state, current, opponent, playCardAction);
+		//engine.Resolve(state, current, opponent, playCardAction);
 
 		Assert.AreEqual(3, current.Board[0].Attack);
 	}

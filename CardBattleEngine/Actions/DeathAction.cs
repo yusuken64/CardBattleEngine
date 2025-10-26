@@ -9,9 +9,9 @@ internal class DeathAction : GameActionBase
 		return actionContext.Target.IsAlive;
 	}
 
-	public override IEnumerable<IGameAction> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		var sideEffects = new List<IGameAction>();
+		var sideEffects = new List<(IGameAction, ActionContext)>();
 		actionContext.Target.IsAlive = false;
 		if (actionContext.Target is Minion minion)
 		{
@@ -21,7 +21,12 @@ internal class DeathAction : GameActionBase
 			foreach (var effect in minion.TriggeredEffects
 				.Where(x => x.EffectTrigger == EffectTrigger.Deathrattle))
 			{
-				sideEffects.AddRange(effect.GameActions);
+				sideEffects.AddRange(effect.GameActions.Select(x => 
+				(x, new ActionContext()
+				{
+					SourcePlayer = minion.Owner,
+					Source = minion,
+				})));
 			}
 		}
 

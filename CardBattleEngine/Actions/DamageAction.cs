@@ -11,7 +11,7 @@ public class DamageAction : GameActionBase
 		return actionContext.Target != null && actionContext.Target.IsAlive;
 	}
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		if (!IsValid(state, actionContext))
 			return [];
@@ -19,12 +19,12 @@ public class DamageAction : GameActionBase
 		// Apply damage
 		actionContext.Target.Health -= Damage;
 
-		var sideEffects = new List<GameActionBase>();
+		var sideEffects = new List<(IGameAction, ActionContext)>();
 
 		// Check for death triggers
 		if (actionContext.Target.Health <= 0)
 		{
-			sideEffects.Add(new DeathAction());
+			sideEffects.Add((new DeathAction(), actionContext));
 		}
 
 		return sideEffects;

@@ -7,15 +7,15 @@ internal class StartGameAction : GameActionBase
 
 	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		ShuffleFunction(actionContext.SourcePlayer.Deck);
 
 		return
 		[
-			new DrawCardAction(),
-			new DrawCardAction(),
-			new DrawCardAction(),
+			(new DrawCardAction(),actionContext),
+			(new DrawCardAction(),actionContext),
+			(new DrawCardAction(),actionContext),
 		];
 	}
 }

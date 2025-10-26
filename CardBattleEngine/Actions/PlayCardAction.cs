@@ -20,7 +20,7 @@ public class PlayCardAction : GameActionBase
 		return true;
 	}
 
-	public override IEnumerable<IGameAction> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		if (!IsValid(state, actionContext))
 			return [];

@@ -27,10 +27,10 @@ namespace CardBattleEngine.Test
 					Assert.AreEqual(orignalActions[i].ToString(), clonedActions[i].ToString());
 				}
 
-				engine.Resolve(gameState,
-					gameState.CurrentPlayer,
-					gameState.OpponentPlayer,
-					orignalActions[0]);
+				//engine.Resolve(gameState,
+				//	gameState.CurrentPlayer,
+				//	gameState.OpponentPlayer,
+				//	orignalActions[0]);
 				
 				GameEngine.PrintState(gameState, null);
 			}

@@ -9,7 +9,7 @@ internal class AttackAction : GameActionBase
 		return context.Source.AttackBehavior.CanAttack(context.Source, context.Target, state);
 	}
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext context)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
 		if (context.Source is Minion minion)
 		{

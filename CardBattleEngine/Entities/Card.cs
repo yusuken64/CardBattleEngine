@@ -10,7 +10,7 @@ public abstract class Card
 	public List<TriggeredEffect> TriggeredEffect { get; } = new();
 
 	// Every card knows how to generate its effects when played
-	internal abstract IEnumerable<IGameAction> GetPlayEffects(GameState state, Player currentPlayer, Player opponent);
+	internal abstract IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, Player currentPlayer, Player opponent);
 
 	public abstract Card Clone();
 }

@@ -10,7 +10,7 @@ internal class GainManaAction : GameActionBase
 		return true; //potentially need empty mana
 	}
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		actionContext.SourcePlayer.Mana = 
 			Math.Min(actionContext.SourcePlayer.Mana + Amount, 10);

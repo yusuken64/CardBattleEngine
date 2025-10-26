@@ -14,7 +14,7 @@ public class MinionCard : Card
 		Health = health;
 	}
 
-	internal override IEnumerable<IGameAction> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
+	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
 	{
 		// Return all effects whose trigger is OnPlay/Battlecry (or whatever you consider)
 		foreach (var effect in TriggeredEffect)
@@ -22,15 +22,22 @@ public class MinionCard : Card
 			if (effect.EffectTrigger == EffectTrigger.Battlecry)
 			{
 				foreach (var subAction in effect.GameActions)
-					yield return subAction;
+					yield return new(subAction, new()
+					{
+						SourcePlayer = currentPlayer,
+					});
 			}
 		}
 
 		// Summon self is always first
-		yield return new SummonMinionAction()
+		yield return (new SummonMinionAction()
 		{
 			Card = this
-		};
+		}, new ActionContext()
+		{
+			SourceCard = this,
+			SourcePlayer = currentPlayer,
+		});
 	}
 
 	public override Card Clone()

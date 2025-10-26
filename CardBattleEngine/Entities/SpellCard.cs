@@ -1,4 +1,5 @@
-﻿namespace CardBattleEngine;
+﻿
+namespace CardBattleEngine;
 
 public class SpellCard : Card
 {
@@ -7,7 +8,7 @@ public class SpellCard : Card
 		throw new NotImplementedException();
 	}
 
-	internal override IEnumerable<GameActionBase> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
+	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
 	{
 		throw new NotImplementedException();
 	}

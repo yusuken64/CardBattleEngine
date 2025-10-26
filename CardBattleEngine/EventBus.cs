@@ -16,19 +16,41 @@ public class EventBus
 	public void RegisterTrigger(ITrigger trigger) => _triggers.Add(trigger);
 	public void UnregisterTrigger(ITrigger trigger) => _triggers.Remove(trigger);
 
-	internal IEnumerable<IGameAction> GetPreTriggers(GameState gameState, IGameAction action)
+	internal IEnumerable<(IGameAction action, ActionContext context)> GetPreTriggers(GameState gameState, IGameAction action)
 	{
 		return gameState.GetAllEntities()
 			.SelectMany(x => x.TriggeredEffects)
-			.Where(x => x.EffectTrigger == action.EffectTrigger) //Where matches action
-			.SelectMany(x => x.GameActions);
+			.Where(te => te.EffectTrigger == action.EffectTrigger &&
+						 te.EffectTiming == EffectTiming.Pre) //Where matches action
+			.SelectMany(te => te.GameActions.Select(ga =>
+			(
+				ga,
+				new ActionContext
+				{
+					//Source = te.Owner,
+					//SourcePlayer = te.Owner.Player,
+					//TriggeringAction = triggeringAction
+				}
+			)
+		));
 	}
 
-	internal IEnumerable<IGameAction> GetPostTriggers(GameState gameState, IGameAction action)
+	internal IEnumerable<(IGameAction action, ActionContext context)> GetPostTriggers(GameState gameState, IGameAction action)
 	{
 		return gameState.GetAllEntities()
 			.SelectMany(x => x.TriggeredEffects)
-			.Where(x => x.EffectTrigger == action.EffectTrigger) //Where matches action
-			.SelectMany(x => x.GameActions);
+			.Where(te => te.EffectTrigger == action.EffectTrigger &&
+						te.EffectTiming == EffectTiming.Post)
+			.SelectMany(te => te.GameActions.Select(ga =>
+			(
+				ga,
+				new ActionContext
+				{
+					//Source = te.Owner,
+					//SourcePlayer = te.Owner.Player,
+					//TriggeringAction = triggeringAction
+				}
+			)
+		));
 	}
 }

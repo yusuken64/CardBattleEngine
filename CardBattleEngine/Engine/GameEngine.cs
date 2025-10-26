@@ -3,7 +3,7 @@
 public class GameEngine
 {
 	private readonly EventBus _eventBus;
-	private readonly Queue<IGameAction> _actionQueue = new();
+	private readonly Queue<(IGameAction, ActionContext)> _actionQueue = new();
 	private readonly IRNG rNG;
 
 	public Action<GameState, IGameAction> ActionCallback;
@@ -14,38 +14,31 @@ public class GameEngine
 		_eventBus = new();
 	}
 	
-	public void Resolve(GameState gameState, ActionContext context, IGameAction action)
+	public void Resolve(GameState gameState, ActionContext actionContext, IGameAction action)
 	{
-		Resolve(gameState, context.SourcePlayer, gameState.OpponentOf(context.SourcePlayer), action);
-	}
-
-	public void Resolve(GameState gameState, Player currentPlayer, Player opponent, IGameAction action)
-	{
-		_actionQueue.Enqueue(action);
+		_actionQueue.Enqueue((action, actionContext));
 
 		while (_actionQueue.Count > 0)
 		{
-			var current = _actionQueue.Dequeue();
+			(IGameAction action, ActionContext context) current = _actionQueue.Dequeue();
 
 			// Check if action is still valid
-			ActionContext context = new ActionContext() { Source = currentPlayer };
-			if (!current.IsValid(gameState, context))
+			if (!current.action.IsValid(gameState, current.context))
 				continue;
 
 			// Pre-resolution triggers
-			foreach (var trigger in _eventBus.GetPreTriggers(gameState, current))
+			foreach (var trigger in _eventBus.GetPreTriggers(gameState, current.action))
 			{
-				if (trigger != null)
-					_actionQueue.Enqueue(trigger);
+				_actionQueue.Enqueue(trigger);
 			}
 
-			if (current.Canceled)
+			if (current.action.Canceled)
 			{
 				continue;
 			}
 
 			// Resolve action and enqueue returned side effects
-			var sideEffects = current.Resolve(gameState, context);
+			var sideEffects = current.action.Resolve(gameState, current.context);
 			if (sideEffects != null)
 			{
 				foreach (var effect in sideEffects)
@@ -53,13 +46,12 @@ public class GameEngine
 			}
 
 			// Post-resolution triggers
-			foreach (var trigger in _eventBus.GetPostTriggers(gameState, current))
+			foreach (var trigger in _eventBus.GetPostTriggers(gameState, current.action))
 			{
-				if (trigger != null)
-					_actionQueue.Enqueue(trigger);
+				_actionQueue.Enqueue(trigger);
 			}
 
-			ActionCallback?.Invoke(gameState, current);
+			ActionCallback?.Invoke(gameState, current.action);
 			//PrintState(gameState, current);
 
 			if (gameState.IsGameOver())
@@ -72,8 +64,8 @@ public class GameEngine
 		var p1 = gameState.Players[0];
 		var p2 = gameState.Players[1];
 
-		Resolve(gameState, p1, p2, new StartGameAction() { ShuffleFunction = Shuffle});
-		Resolve(gameState, p2, p1, new StartGameAction() { ShuffleFunction = Shuffle });
+		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction() { ShuffleFunction = Shuffle});
+		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction() { ShuffleFunction = Shuffle });
 	}
 
 	public static void PrintState(GameState gameState, GameActionBase current)

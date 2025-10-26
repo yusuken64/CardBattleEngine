@@ -14,7 +14,7 @@ internal class SummonMinionAction : GameActionBase
 		return true;
 	}
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		if (!IsValid(state, actionContext))
 			return [];

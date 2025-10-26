@@ -16,7 +16,7 @@ public class HeroAttackBehavior : IAttackBehavior
 		return true; // Could also enforce taunt, special hero rules, etc.
 	}
 
-	public IEnumerable<GameActionBase> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state)
+	public IEnumerable<(IGameAction, ActionContext)> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state)
 	{
 		if (attacker is not Player hero || target == null)
 			return [];
@@ -25,10 +25,12 @@ public class HeroAttackBehavior : IAttackBehavior
 
 		return
 		[
-			new DamageAction()
+			new (new DamageAction()
 			{
 				Damage = target.Attack
-			}
+			}, new ActionContext(){
+				Target = target,
+			})
         ];
 	}
 }

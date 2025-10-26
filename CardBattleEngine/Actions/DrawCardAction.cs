@@ -6,7 +6,7 @@ public class DrawCardAction : GameActionBase
 
 	public override bool IsValid(GameState state, ActionContext actionContext) => actionContext.SourcePlayer.Deck.Count > 0;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		var card = actionContext.SourcePlayer.Deck[0];
 		actionContext.SourcePlayer.Deck.RemoveAt(0);

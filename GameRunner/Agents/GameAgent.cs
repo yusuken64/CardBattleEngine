@@ -68,7 +68,7 @@ public class OracleAgent : IGameAgent
 
 			Player simulatedPlayer = simulated.CurrentPlayer;
 			Player simulatedOpponent = simulated.OpponentOf(simulatedPlayer);
-			engineCopy.Resolve(simulated, simulatedPlayer, simulatedOpponent, clonedAction);
+			//engineCopy.Resolve(simulated, simulatedPlayer, simulatedOpponent, clonedAction);
 
 			float score = 0;
 

@@ -8,7 +8,7 @@ public class IncreaseMaxManaAction : GameActionBase
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 	public override bool IsValid(GameState state, ActionContext actionContext) => actionContext.SourcePlayer.MaxMana < 10;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		actionContext.SourcePlayer.MaxMana = 
 			Math.Min(actionContext.SourcePlayer.MaxMana + Amount, 10);

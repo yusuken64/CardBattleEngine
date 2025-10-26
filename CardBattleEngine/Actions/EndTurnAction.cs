@@ -6,7 +6,7 @@ public class EndTurnAction : GameActionBase
 
 	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<IGameAction> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		// Increment turn, switch current player
 		var temp = state.CurrentPlayer;
@@ -16,9 +16,12 @@ public class EndTurnAction : GameActionBase
 		state.turn++;
 
 		// Queue start-of-turn effects
-		return new GameActionBase[]
+		return new (IGameAction, ActionContext)[]
 		{
-			new StartTurnAction()
+			(new StartTurnAction(), new ActionContext()
+			{
+				SourcePlayer = state.CurrentPlayer
+			})
 		};
 	}
 }

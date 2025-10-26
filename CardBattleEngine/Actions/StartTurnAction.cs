@@ -7,7 +7,7 @@ internal class StartTurnAction : GameActionBase
 	public override EffectTrigger EffectTrigger => EffectTrigger.TurnStart;
 	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		// Reset attack flags
 		foreach (var minion in actionContext.SourcePlayer.Board)
@@ -18,9 +18,9 @@ internal class StartTurnAction : GameActionBase
 
 		return
 		[
-			new IncreaseMaxManaAction() { Amount = 1 },
-			new RefillManaAction(),
-			new DrawCardAction()
+			(new IncreaseMaxManaAction() { Amount = 1 }, actionContext),
+			(new RefillManaAction(), actionContext),
+			(new DrawCardAction(), actionContext)
 		];
 	}
 }
