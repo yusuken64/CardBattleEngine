@@ -4,22 +4,14 @@ namespace CardBattleEngine;
 
 public class IncreaseMaxManaAction : GameActionBase
 {
-	private readonly Player _player;
-	private readonly int _amount;
-
-	public IncreaseMaxManaAction(Player player, int amount)
-	{
-		_player = player;
-		_amount = amount;
-	}
-
+	public int Amount { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
+	public override bool IsValid(GameState state, ActionContext actionContext) => actionContext.SourcePlayer.MaxMana < 10;
 
-	public override bool IsValid(GameState state) => _player.MaxMana < 10;
-
-	public override IEnumerable<GameActionBase> Resolve(GameState state, Player current, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
 	{
-		_player.MaxMana = Math.Min(_player.MaxMana + _amount, 10);
+		actionContext.SourcePlayer.MaxMana = 
+			Math.Min(actionContext.SourcePlayer.MaxMana + Amount, 10);
 		return [];
 	}
 }

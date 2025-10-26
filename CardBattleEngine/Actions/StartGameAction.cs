@@ -2,28 +2,20 @@
 
 internal class StartGameAction : GameActionBase
 {
-	private Player _currentPlayer;
-	private Action<IList<Card>> _shuffleFunction;
-
-	public StartGameAction(Player currentPlayer, Action<IList<Card>> shuffleFunction)
-	{
-		this._currentPlayer = currentPlayer;
-		this._shuffleFunction = shuffleFunction;
-	}
-
+	public Action<IList<Card>> ShuffleFunction;
 	public override EffectTrigger EffectTrigger => EffectTrigger.GameStart;
 
-	public override bool IsValid(GameState state) => true;
+	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
 	{
-		_shuffleFunction(_currentPlayer.Deck);
+		ShuffleFunction(actionContext.SourcePlayer.Deck);
 
 		return
 		[
-			new DrawCardAction(_currentPlayer),
-			new DrawCardAction(_currentPlayer),
-			new DrawCardAction(_currentPlayer),
+			new DrawCardAction(),
+			new DrawCardAction(),
+			new DrawCardAction(),
 		];
 	}
 }

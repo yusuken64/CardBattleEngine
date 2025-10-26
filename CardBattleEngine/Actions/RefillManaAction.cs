@@ -2,17 +2,13 @@
 
 public class RefillManaAction : GameActionBase
 {
-	private readonly Player _player;
-
-	public RefillManaAction(Player player) => _player = player;
-
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState state) => true;
+	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, Player current, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
 	{
-		_player.Mana = _player.MaxMana;
+		actionContext.SourcePlayer.Mana = actionContext.SourcePlayer.MaxMana;
 		return [];
 	}
 }

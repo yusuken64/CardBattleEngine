@@ -39,7 +39,6 @@ internal class MinionAttackBehavior : IAttackBehavior
 		// Attacker deals damage to target
 		yield return new DamageAction()
 		{
-			Target = target,
 			Damage = attackingMinion.Attack
 		};
 
@@ -47,7 +46,6 @@ internal class MinionAttackBehavior : IAttackBehavior
 		if (target is Minion defendingMinion && defendingMinion.IsAlive)
 			yield return new DamageAction()
 			{
-				Target = attackingMinion,
 				Damage = defendingMinion.Attack
 			};
 		//else if (target is Player defendingHero)

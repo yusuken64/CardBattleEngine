@@ -2,25 +2,18 @@
 
 internal class DeathAction : GameActionBase
 {
-	private readonly IGameEntity _target;
-
-	public DeathAction(IGameEntity target)
-	{
-		_target = target;
-	}
-
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDeath;
 
-	public override bool IsValid(GameState state)
+	public override bool IsValid(GameState state, ActionContext actionContext)
 	{
-		return _target.IsAlive;
+		return actionContext.Target.IsAlive;
 	}
 
-	public override IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<IGameAction> Resolve(GameState state, ActionContext actionContext)
 	{
 		var sideEffects = new List<IGameAction>();
-		_target.IsAlive = false;
-		if (_target is Minion minion)
+		actionContext.Target.IsAlive = false;
+		if (actionContext.Target is Minion minion)
 		{
 			minion.Owner.Board.Remove(minion);
 			minion.Owner.Graveyard.Add(minion);

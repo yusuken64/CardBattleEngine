@@ -27,7 +27,10 @@ public class MinionCard : Card
 		}
 
 		// Summon self is always first
-		yield return new SummonMinionAction(this, currentPlayer);
+		yield return new SummonMinionAction()
+		{
+			Card = this
+		};
 	}
 
 	public override Card Clone()

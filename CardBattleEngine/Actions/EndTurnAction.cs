@@ -4,9 +4,9 @@ public class EndTurnAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnTurnEnd;
 
-	public override bool IsValid(GameState state) => true;
+	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<IGameAction> Resolve(GameState state, ActionContext actionContext)
 	{
 		// Increment turn, switch current player
 		var temp = state.CurrentPlayer;
@@ -18,7 +18,7 @@ public class EndTurnAction : GameActionBase
 		// Queue start-of-turn effects
 		return new GameActionBase[]
 		{
-			new StartTurnAction(state.CurrentPlayer)
+			new StartTurnAction()
 		};
 	}
 }

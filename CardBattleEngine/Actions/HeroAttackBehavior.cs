@@ -27,7 +27,6 @@ public class HeroAttackBehavior : IAttackBehavior
 		[
 			new DamageAction()
 			{
-				Target = attacker,
 				Damage = target.Attack
 			}
         ];

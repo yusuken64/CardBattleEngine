@@ -2,25 +2,18 @@
 
 internal class GainManaAction : GameActionBase
 {
-	private readonly Player _player;
-	private readonly int _amount;
-
-	public GainManaAction(Player player, int amount)
-	{
-		_player = player;
-		_amount = amount;
-	}
-	
+	public int Amount { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState gameState)
+	public override bool IsValid(GameState gameState, ActionContext actionContext)
 	{
 		return true; //potentially need empty mana
 	}
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
 	{
-		_player.Mana = Math.Min(_player.Mana + _amount, 10);
+		actionContext.SourcePlayer.Mana = 
+			Math.Min(actionContext.SourcePlayer.Mana + Amount, 10);
 		return [];
 	}
 }

@@ -13,7 +13,7 @@ card.TriggeredEffect.Add(new TriggeredEffect()
 	TargetType = TargetType.AnyEnemy,
 	GameActions = new List<IGameAction>()
 	{
-		new DamageAction() { Target = opponent, Damage = 1 }
+		new DamageAction() { Damage = 1 }
 	}
 });
 

@@ -27,7 +27,6 @@ public class DealDamageTrigger : IPostTrigger
 		int damage = _damageCalculator(gameState);
 		return new DamageAction()
 		{
-			Target = target,
 			Damage = damage
 		};
 	}

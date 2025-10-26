@@ -14,6 +14,11 @@ public class GameEngine
 		_eventBus = new();
 	}
 	
+	public void Resolve(GameState gameState, ActionContext context, IGameAction action)
+	{
+		Resolve(gameState, context.SourcePlayer, gameState.OpponentOf(context.SourcePlayer), action);
+	}
+
 	public void Resolve(GameState gameState, Player currentPlayer, Player opponent, IGameAction action)
 	{
 		_actionQueue.Enqueue(action);
@@ -23,7 +28,8 @@ public class GameEngine
 			var current = _actionQueue.Dequeue();
 
 			// Check if action is still valid
-			if (!current.IsValid(gameState))
+			ActionContext context = new ActionContext() { Source = currentPlayer };
+			if (!current.IsValid(gameState, context))
 				continue;
 
 			// Pre-resolution triggers
@@ -39,7 +45,7 @@ public class GameEngine
 			}
 
 			// Resolve action and enqueue returned side effects
-			var sideEffects = current.Resolve(gameState, currentPlayer, opponent);
+			var sideEffects = current.Resolve(gameState, context);
 			if (sideEffects != null)
 			{
 				foreach (var effect in sideEffects)
@@ -66,8 +72,8 @@ public class GameEngine
 		var p1 = gameState.Players[0];
 		var p2 = gameState.Players[1];
 
-		Resolve(gameState, p1, p2, new StartGameAction(p1, Shuffle));
-		Resolve(gameState, p2, p1, new StartGameAction(p2, Shuffle));
+		Resolve(gameState, p1, p2, new StartGameAction() { ShuffleFunction = Shuffle});
+		Resolve(gameState, p2, p1, new StartGameAction() { ShuffleFunction = Shuffle });
 	}
 
 	public static void PrintState(GameState gameState, GameActionBase current)

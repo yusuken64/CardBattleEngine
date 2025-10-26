@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class GameState
 {
@@ -28,6 +26,11 @@ public class GameState
 
 	public List<GameActionBase> GetValidActions(Player player)
 	{
+		var actionContext = new ActionContext()
+		{
+			Source = player,
+			SourcePlayer = player
+		};
 		var actions = new List<GameActionBase>();
 
 		// Playable cards
@@ -35,8 +38,9 @@ public class GameState
 		{
 			if (card.ManaCost <= player.Mana)
 			{
-				var playCardAction = new PlayCardAction(card);
-				if (playCardAction.IsValid(this))
+				var playCardAction = new PlayCardAction() { Card = card };
+				;
+				if (playCardAction.IsValid(this, actionContext))
 				{
 					actions.Add(playCardAction);
 				}
@@ -52,16 +56,29 @@ public class GameState
 				continue;
 			}
 
-			var attackHeroAction = new AttackAction(attacker, OpponentOf(player));
-			if (attackHeroAction.IsValid(this))
+			var attackHeroAction = new AttackAction();
+			if (attackHeroAction.IsValid(this, new ActionContext()
+			{
+				Source = attacker,
+				SourcePlayer = player,
+				Target = OpponentOf(player)
+			}))
 			{
 				actions.Add(attackHeroAction);
 			}
 
 			foreach (var defender in OpponentOf(player).Board)
 			{
-				var attackAction = new AttackAction(attacker, defender);
-				if (attackAction.IsValid(this))
+				var attackAction = new AttackAction();
+				if (attackAction.IsValid(
+					this,
+					new ActionContext()
+					{
+						Source = attacker,
+						SourcePlayer = player,
+						Target = defender
+					}
+					))
 				{
 					actions.Add(attackAction);
 				}

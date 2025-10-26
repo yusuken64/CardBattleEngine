@@ -23,13 +23,16 @@ public class AbilityTest
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>() 
 			{
-				new DamageAction() { Target = opponent, Damage = 1 }
+				new DamageAction() { Damage = 1 }
 			}
 		});
 
 		current.Hand.Add(card);
 
-		var play = new PlayCardAction(card);
+		var play = new PlayCardAction()
+		{
+			Card = card
+		};
 		engine.Resolve(state, current, opponent, play);
 
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Battlecry should deal 1 damage");
@@ -58,22 +61,63 @@ public class AbilityTest
 			TargetType = TargetType.AnyEnemy,
 			GameActions = new List<IGameAction>
 			{
-				new DamageAction() { Target = opponent, Damage = 1 }
+				new DamageAction() { Damage = 1 }
 			}
 		});
 		current.Mana = 1;
 		current.Hand.Add(minionCard);
 
-		IGameAction summonMinion = new PlayCardAction(minionCard);
+		IGameAction summonMinion = new PlayCardAction()
+		{
+			Card = minionCard
+		};
 		engine.Resolve(state, current, opponent, summonMinion);
 
 		// Act: Kill the minion to trigger Deathrattle
 		var minionEntity = state.CurrentPlayer.Board[0];
-		var damage = new DamageAction() { Target = minionEntity, Damage = minionEntity.Health };
+		var damage = new DamageAction() { Damage = minionEntity.Health };
 		engine.Resolve(state, current, opponent, damage);
 
 		// Assert
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Deathrattle should deal 1 damage");
 		Assert.IsFalse(current.Board.Contains(minionEntity), "Minion should be removed from board");
+	}
+
+	[TestMethod]
+	public void BattleBuffMinion()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		current.Mana = 1;
+		var opponent = state.OpponentPlayer;
+		int initialHealth = opponent.Health;
+
+		CardDatabase cardDatabase = new(CardDBTest.DBPath);
+		var testCard = cardDatabase.GetMinion("TestMinion", current); // 1/1
+
+		current.Board.Add(new Minion(testCard, current));
+
+		var abusiveCard = new MinionCard("AbusiveSergeant", 1, 1, 1);
+		abusiveCard.TriggeredEffect.Add(new TriggeredEffect()
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.Battlecry,
+			TargetType = TargetType.FriendlyMinion,
+			GameActions = new List<IGameAction>
+			{
+				new ModifyStatsAction()
+				{
+					Target = current.Board[0],
+					AttackChange = 2,
+				}
+			}
+		});
+
+		IGameAction playCardAction = new PlayCardAction() { Card = abusiveCard };
+		engine.Resolve(state, current, opponent, playCardAction);
+
+		Assert.AreEqual(3, current.Board[0].Attack);
 	}
 }

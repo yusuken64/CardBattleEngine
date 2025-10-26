@@ -2,30 +2,29 @@
 
 public class DamageAction : GameActionBase
 {
-	public IGameEntity Target { get; set; }
 	public int Damage { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDamage;
 	
-	public override bool IsValid(GameState state)
+	public override bool IsValid(GameState state, ActionContext actionContext)
 	{
 		// Valid if target is still alive / on board
-		return Target != null && Target.IsAlive;
+		return actionContext.Target != null && actionContext.Target.IsAlive;
 	}
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
 	{
-		if (!IsValid(state))
+		if (!IsValid(state, actionContext))
 			return [];
 
 		// Apply damage
-		Target.Health -= Damage;
+		actionContext.Target.Health -= Damage;
 
 		var sideEffects = new List<GameActionBase>();
 
 		// Check for death triggers
-		if (Target.Health <= 0)
+		if (actionContext.Target.Health <= 0)
 		{
-			sideEffects.Add(new DeathAction(Target));
+			sideEffects.Add(new DeathAction());
 		}
 
 		return sideEffects;

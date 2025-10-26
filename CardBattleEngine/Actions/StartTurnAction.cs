@@ -4,20 +4,13 @@ namespace CardBattleEngine;
 
 internal class StartTurnAction : GameActionBase
 {
-	private Player _currentPlayer;
-
-	public StartTurnAction(Player currentPlayer)
-	{
-		this._currentPlayer = currentPlayer;
-	}
-
 	public override EffectTrigger EffectTrigger => EffectTrigger.TurnStart;
-	public override bool IsValid(GameState state) => true;
+	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
-	public override IEnumerable<GameActionBase> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<GameActionBase> Resolve(GameState state, ActionContext actionContext)
 	{
 		// Reset attack flags
-		foreach (var minion in _currentPlayer.Board)
+		foreach (var minion in actionContext.SourcePlayer.Board)
 		{
 			minion.HasAttackedThisTurn = false;
 			minion.HasSummoningSickness = false;
@@ -25,9 +18,9 @@ internal class StartTurnAction : GameActionBase
 
 		return
 		[
-			new IncreaseMaxManaAction(_currentPlayer, 1),
-			new RefillManaAction(_currentPlayer),
-			new DrawCardAction(_currentPlayer)
+			new IncreaseMaxManaAction() { Amount = 1 },
+			new RefillManaAction(),
+			new DrawCardAction()
 		];
 	}
 }

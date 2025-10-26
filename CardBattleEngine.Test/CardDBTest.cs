@@ -6,7 +6,7 @@ namespace CardBattleEngine.Test;
 public class CardDBTest
 {
 	//public string DBPath = "C:\\Users\\yusuk\\source\\repos\\CardBattleEngine\\Data\\";
-	public string DBPath = Path.Combine(AppContext.BaseDirectory, "Data");
+	public static string DBPath = Path.Combine(AppContext.BaseDirectory, "Data");
 
 	[TestMethod]
 	public void LoadDBTest()
@@ -45,7 +45,6 @@ public class CardDBTest
 				new DamageAction()
 				{
 					Damage = 1,
-					Target = opponent,
 				}
 			}
 		});

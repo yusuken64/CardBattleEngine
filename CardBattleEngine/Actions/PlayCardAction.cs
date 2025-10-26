@@ -2,48 +2,45 @@
 
 public class PlayCardAction : GameActionBase
 {
-	private readonly Card _card;
-
-	public PlayCardAction(Card card)
-	{
-		_card = card;
-	}
-
+	public Card Card;
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnPlay;
 
-	public override bool IsValid(GameState state)
+	public override bool IsValid(GameState state, ActionContext actionContext)
 	{
-		var player = _card.Owner;
-		if (!player.Hand.Contains(_card))
+		var player = Card.Owner;
+		if (!player.Hand.Contains(Card))
 			return false;
 
-		if (_card.ManaCost > player.Mana)
+		if (Card.ManaCost > player.Mana)
 			return false;
 
-		if (_card is MinionCard minionCard && player.Board.Count >= state.MaxBoardSize)
+		if (Card is MinionCard minionCard && player.Board.Count >= state.MaxBoardSize)
 			return false;
 
 		return true;
 	}
 
-	public override IEnumerable<IGameAction> Resolve(GameState state, Player currentPlayer, Player opponent)
+	public override IEnumerable<IGameAction> Resolve(GameState state, ActionContext actionContext)
 	{
-		if (!IsValid(state))
+		if (!IsValid(state, actionContext))
 			return [];
 
-		_card.Owner.Mana -= _card.ManaCost;
-		_card.Owner.Hand.Remove(_card);
+		Card.Owner.Mana -=Card.ManaCost;
+		Card.Owner.Hand.Remove(Card);
 
-		var effects = _card.GetPlayEffects(state, currentPlayer, opponent).ToList();
+		var effects = Card.GetPlayEffects(
+			state,
+			actionContext.SourcePlayer,
+			state.OpponentOf(actionContext.SourcePlayer)).ToList();
 
 		return effects;
 	}
 
 	public override string ToString()
 	{
-		if (_card is MinionCard minionCard)
+		if (Card is MinionCard minionCard)
 		{
-			return $"Playcard {_card.Name} ({_card.ManaCost}){minionCard.Attack}/{minionCard.Health}";
+			return $"Playcard {Card.Name} ({Card.ManaCost}){minionCard.Attack}/{minionCard.Health}";
 		}
 
 		return base.ToString();
