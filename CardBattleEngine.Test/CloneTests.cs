@@ -15,7 +15,7 @@ namespace CardBattleEngine.Test
 
 			while (!gameState.IsGameOver())
 			{
-				var orignalActions = gameState.GetValidActions(gameState.CurrentPlayer);
+				List<(IGameAction, ActionContext)> orignalActions = gameState.GetValidActions(gameState.CurrentPlayer);
 
 				var clonedGameState = gameState.Clone();
 				var clonedActions = clonedGameState.GetValidActions(clonedGameState.CurrentPlayer);
@@ -27,11 +27,13 @@ namespace CardBattleEngine.Test
 					Assert.AreEqual(orignalActions[i].ToString(), clonedActions[i].ToString());
 				}
 
-				//engine.Resolve(gameState,
-				//	gameState.CurrentPlayer,
-				//	gameState.OpponentPlayer,
-				//	orignalActions[0]);
+				orignalActions[0].Item2.TargetSelector = (gs, player, targetType) =>
+				{
+					return gs.GetValidTargets(player, targetType)[0];
+				};
 				
+				engine.Resolve(gameState, orignalActions[0].Item2, orignalActions[0].Item1);
+
 				GameEngine.PrintState(gameState, null);
 			}
 		}

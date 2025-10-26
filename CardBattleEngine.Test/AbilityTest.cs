@@ -16,7 +16,7 @@ public class AbilityTest
 
 		var card = new MinionCard("BattlecryMinion", cost: 1, attack: 1, health: 1);
 		card.Owner = current;
-		card.TriggeredEffect.Add(new TriggeredEffect()
+		card.TriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
@@ -33,7 +33,12 @@ public class AbilityTest
 		{
 			Card = card
 		};
-		//engine.Resolve(state, current, opponent, play);
+		engine.Resolve(state, new ActionContext()
+		{
+			SourcePlayer = current,
+			Source = current,
+			Target = opponent
+		}, play);
 
 		Assert.AreEqual(initialHealth - 1, opponent.Health, "Battlecry should deal 1 damage");
 		Assert.AreEqual(1, current.Board.Count, "Minion should be summoned");
@@ -54,7 +59,7 @@ public class AbilityTest
 		// Create minion with Deathrattle effect
 		var minionCard = new MinionCard("DeathrattleMinion", cost: 1, attack: 1, health: 1);
 		minionCard.Owner = current;
-		minionCard.TriggeredEffect.Add(new TriggeredEffect
+		minionCard.TriggeredEffects.Add(new TriggeredEffect
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
@@ -100,7 +105,7 @@ public class AbilityTest
 		current.Board.Add(new Minion(testCard, current));
 
 		var abusiveCard = new MinionCard("AbusiveSergeant", 1, 1, 1);
-		abusiveCard.TriggeredEffect.Add(new TriggeredEffect()
+		abusiveCard.TriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
@@ -114,9 +119,21 @@ public class AbilityTest
 				}
 			}
 		});
+		abusiveCard.Owner = current;
+		current.Hand.Add(abusiveCard);
 
 		IGameAction playCardAction = new PlayCardAction() { Card = abusiveCard };
-		//engine.Resolve(state, current, opponent, playCardAction);
+		ActionContext actionContext = new ActionContext()
+		{
+			SourcePlayer = current,
+			SourceCard = abusiveCard,
+			TargetSelector = (gs, player, targetType) =>
+			{
+				var validTargets = gs.GetValidTargets(player, targetType);
+				return validTargets[0];
+			}
+		};
+		engine.Resolve(state, actionContext, playCardAction);
 
 		Assert.AreEqual(3, current.Board[0].Attack);
 	}

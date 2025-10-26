@@ -1,8 +1,21 @@
 {
-  "id": "BattleCryMinion",
-  "name": "BattleCryMinion",
-  "type": "Minion",
-  "cost": 1,
-  "attack": 1,
-  "health": 1
+  "Id": "BattleCryMinion",
+  "Name": "BattlecryMinion",
+  "Cost": 1,
+  "Attack": 1,
+  "Health": 1,
+  "Tribe": null,
+  "TriggeredEffectDefinitions": [
+    {
+      "EffectTiming": 1,
+      "EffectTrigger": 1,
+      "TargetType": 5,
+      "ActionDefintion": {
+        "GameActionTypeName": "DamageAction",
+        "Params": {
+          "Damage": 1
+        }
+      }
+    }
+  ]
 }

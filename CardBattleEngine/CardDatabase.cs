@@ -23,7 +23,7 @@ public class CardDatabase
 		}
 	}
 
-	public static void CreateFileFromMinionCard(MinionCard card, string directory, string cardName)
+	public static string CreateFileFromMinionCard(MinionCard card, string directory, string cardName)
 	{
 		Directory.CreateDirectory(directory);
 		var path = Path.Combine(directory, $"{cardName}.json");
@@ -39,7 +39,7 @@ public class CardDatabase
 			Cost = card.ManaCost,
 			Attack = card.Attack,
 			Health = card.Health,
-			TriggeredEffectDefinitionss = card.TriggeredEffect.Select(x => new TriggeredEffectDefinition()
+			TriggeredEffectDefinitions = card.TriggeredEffects.Select(x => new TriggeredEffectDefinition()
 			{
 				EffectTiming = x.EffectTiming,
 				EffectTrigger = x.EffectTrigger,
@@ -58,6 +58,8 @@ public class CardDatabase
 		});
 
 		File.WriteAllText(path, json);
+
+		return json;
 	}
 
 	protected void LoadAll(string directory)
@@ -82,7 +84,7 @@ public class CardDatabase
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
 
-		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitionss)
+		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitions)
 		{
 			ActionDefinition actionDefintion = triggeredEffectDefinition.ActionDefintion;
 			var action = CreateFromDefinition(
@@ -95,7 +97,7 @@ public class CardDatabase
 				TargetType = triggeredEffectDefinition.TargetType,
 				GameActions = [action],
 			};
-			card.TriggeredEffect.Add(effect);
+			card.TriggeredEffects.Add(effect);
 		}
 
 		return card;
@@ -122,7 +124,7 @@ public class CardDefinition
 	public int Attack { get; set; }
 	public int Health { get; set; }
 	public string Tribe { get; set; }
-	public List<TriggeredEffectDefinition> TriggeredEffectDefinitionss { get; set; } = new();
+	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
 }
 
 public class TriggeredEffectDefinition

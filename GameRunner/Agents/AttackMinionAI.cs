@@ -12,7 +12,7 @@ public class AttackMinionAI : IGameAgent
 	public GameActionBase GetNextAction(GameState game)
 	{
 		var validActions = game.GetValidActions(_player);
-		return validActions.Skip(1).FirstOrDefault();
+		return (GameActionBase)validActions.Skip(1).FirstOrDefault().Item1;
 	}
 	public void OnGameEnd(GameState gamestate, bool win)
 	{

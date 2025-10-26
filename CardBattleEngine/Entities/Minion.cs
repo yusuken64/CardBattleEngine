@@ -40,7 +40,7 @@ public class Minion : IGameEntity
 		IsAlive = true;
 		TriggeredEffects = new();
 
-		foreach (var effect in card.TriggeredEffect)
+		foreach (var effect in card.TriggeredEffects)
 		{
 			var instance = effect.CloneFor(this);
 			TriggeredEffects.Add(instance);

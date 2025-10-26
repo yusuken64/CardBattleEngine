@@ -15,7 +15,7 @@ public class RandomAI : IGameAgent
 	{
 		var validActions = game.GetValidActions(_player);
 
-		return ChooseRandom(validActions);
+		return (GameActionBase)ChooseRandom(validActions).Item1;
 	}
 	public T ChooseRandom<T>(IReadOnlyList<T> options)
 	{

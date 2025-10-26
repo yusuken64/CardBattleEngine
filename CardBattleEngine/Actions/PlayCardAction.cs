@@ -1,9 +1,12 @@
-﻿namespace CardBattleEngine;
+﻿using System.Security.Principal;
+
+namespace CardBattleEngine;
 
 public class PlayCardAction : GameActionBase
 {
 	public Card Card;
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnPlay;
+	public Func<GameState, Player, TriggeredEffect, IEnumerable<IGameEntity>, Task<IGameEntity?>>? TargetSelector { get; set; }
 
 	public override bool IsValid(GameState state, ActionContext actionContext)
 	{
@@ -25,13 +28,12 @@ public class PlayCardAction : GameActionBase
 		if (!IsValid(state, actionContext))
 			return [];
 
-		Card.Owner.Mana -=Card.ManaCost;
+		Card.Owner.Mana -= Card.ManaCost;
 		Card.Owner.Hand.Remove(Card);
 
 		var effects = Card.GetPlayEffects(
 			state,
-			actionContext.SourcePlayer,
-			state.OpponentOf(actionContext.SourcePlayer)).ToList();
+			actionContext);
 
 		return effects;
 	}

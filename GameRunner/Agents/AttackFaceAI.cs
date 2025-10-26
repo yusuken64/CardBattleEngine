@@ -12,7 +12,7 @@ public class AttackFaceAI : IGameAgent
 	public GameActionBase GetNextAction(GameState game)
 	{
 		var validActions = game.GetValidActions(_player);
-		return validActions[0];
+		return (GameActionBase)validActions[0].Item1;
 	}
 
 	public void OnGameEnd(GameState gamestate, bool win)

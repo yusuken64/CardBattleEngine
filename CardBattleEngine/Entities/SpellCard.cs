@@ -8,7 +8,7 @@ public class SpellCard : Card
 		throw new NotImplementedException();
 	}
 
-	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
+	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext actionContext)
 	{
 		throw new NotImplementedException();
 	}

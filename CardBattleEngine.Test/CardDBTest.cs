@@ -35,7 +35,7 @@ public class CardDBTest
 
 		var card = new MinionCard("BattlecryMinion", cost: 1, attack: 1, health: 1);
 		card.Owner = current;
-		card.TriggeredEffect.Add(new TriggeredEffect()
+		card.TriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
@@ -57,14 +57,14 @@ public class CardDBTest
 		Assert.AreEqual(1, loadedMinion.Attack);
 		Assert.AreEqual(1, loadedMinion.Health);
 		Assert.AreEqual(1, loadedMinion.ManaCost);
-		Assert.AreEqual(1, loadedMinion.TriggeredEffect.Count());
-		Assert.AreEqual(EffectTrigger.Battlecry, loadedMinion.TriggeredEffect[0].EffectTrigger);
-		Assert.AreEqual(EffectTiming.Post, loadedMinion.TriggeredEffect[0].EffectTiming);
-		Assert.AreEqual(TargetType.AnyEnemy, loadedMinion.TriggeredEffect[0].TargetType);
-		Assert.AreEqual(TargetType.AnyEnemy, loadedMinion.TriggeredEffect[0].TargetType);
-		Assert.AreEqual(1, loadedMinion.TriggeredEffect[0].GameActions.Count());
-		Assert.IsInstanceOfType(loadedMinion.TriggeredEffect[0].GameActions[0], typeof(DamageAction));
-		Assert.AreEqual(1, ((DamageAction)loadedMinion.TriggeredEffect[0].GameActions[0]).Damage);
+		Assert.AreEqual(1, loadedMinion.TriggeredEffects.Count());
+		Assert.AreEqual(EffectTrigger.Battlecry, loadedMinion.TriggeredEffects[0].EffectTrigger);
+		Assert.AreEqual(EffectTiming.Post, loadedMinion.TriggeredEffects[0].EffectTiming);
+		Assert.AreEqual(TargetType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
+		Assert.AreEqual(TargetType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
+		Assert.AreEqual(1, loadedMinion.TriggeredEffects[0].GameActions.Count());
+		Assert.IsInstanceOfType(loadedMinion.TriggeredEffects[0].GameActions[0], typeof(DamageAction));
+		Assert.AreEqual(1, ((DamageAction)loadedMinion.TriggeredEffects[0].GameActions[0]).Damage);
 	}
 
 	[TestMethod]
@@ -74,8 +74,8 @@ public class CardDBTest
 		Player owner = new Player("Test");
 		var card = db.GetMinion("BattleCryMinion", owner);
 
-		Assert.AreEqual(1, card.TriggeredEffect.Count, "Expected 1 triggered effect.");
-		var effect = card.TriggeredEffect[0];
+		Assert.AreEqual(1, card.TriggeredEffects.Count, "Expected 1 triggered effect.");
+		var effect = card.TriggeredEffects[0];
 		Assert.AreEqual(EffectTrigger.Battlecry, effect.EffectTrigger);
 		Assert.AreEqual(EffectTiming.Post, effect.EffectTiming);
 		Assert.AreEqual(TargetType.AnyEnemy, effect.TargetType);

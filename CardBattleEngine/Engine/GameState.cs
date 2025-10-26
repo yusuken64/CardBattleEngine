@@ -24,14 +24,9 @@ public class GameState
 		return player == Players[0] ? Players[1] : Players[0];
 	}
 
-	public List<GameActionBase> GetValidActions(Player player)
+	public List<(IGameAction, ActionContext)> GetValidActions(Player player)
 	{
-		var actionContext = new ActionContext()
-		{
-			Source = player,
-			SourcePlayer = player
-		};
-		var actions = new List<GameActionBase>();
+		var actions = new List<(IGameAction, ActionContext)>();
 
 		// Playable cards
 		foreach (var card in player.Hand)
@@ -39,10 +34,16 @@ public class GameState
 			if (card.ManaCost <= player.Mana)
 			{
 				var playCardAction = new PlayCardAction() { Card = card };
-				;
+
+				ActionContext actionContext = new()
+				{
+					SourcePlayer = player,
+					SourceCard = card,
+				};
+
 				if (playCardAction.IsValid(this, actionContext))
 				{
-					actions.Add(playCardAction);
+					actions.Add((playCardAction, actionContext));
 				}
 			}
 		}
@@ -57,36 +58,43 @@ public class GameState
 			}
 
 			var attackHeroAction = new AttackAction();
-			if (attackHeroAction.IsValid(this, new ActionContext()
+			ActionContext attackGeroActionContext = new()
 			{
 				Source = attacker,
 				SourcePlayer = player,
 				Target = OpponentOf(player)
-			}))
+			};
+			if (attackHeroAction.IsValid(this, attackGeroActionContext))
 			{
-				actions.Add(attackHeroAction);
+				actions.Add((attackHeroAction, attackGeroActionContext));
 			}
 
 			foreach (var defender in OpponentOf(player).Board)
 			{
 				var attackAction = new AttackAction();
+				ActionContext attackActionContext = new()
+				{
+					Source = attacker,
+					SourcePlayer = player,
+					Target = defender
+				};
 				if (attackAction.IsValid(
 					this,
-					new ActionContext()
-					{
-						Source = attacker,
-						SourcePlayer = player,
-						Target = defender
-					}
+					attackActionContext
 					))
 				{
-					actions.Add(attackAction);
+					actions.Add((attackAction, attackActionContext));
 				}
 			}
 		}
 
 		// Always can end turn
-		actions.Add(new EndTurnAction());
+		actions.Add((
+			new EndTurnAction(),
+			new ()
+			{
+				SourcePlayer = player,
+			}));
 
 		return actions;
 	}
@@ -148,5 +156,48 @@ public class GameState
 		}
 
 		return all;
+	}
+
+	public List<IGameEntity> GetValidTargets(Player owner, TargetType type)
+	{
+		var targets = new List<IGameEntity>();
+		var opponent = OpponentOf(owner);
+
+		switch (type)
+		{
+			case TargetType.EnemyHero:
+				targets.Add(opponent);
+				break;
+
+			case TargetType.EnemyMinion:
+				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
+				break;
+
+			case TargetType.AnyEnemy:
+				targets.Add(opponent);
+				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
+				break;
+
+			case TargetType.FriendlyHero:
+				targets.Add(owner);
+				break;
+
+			case TargetType.FriendlyMinion:
+				targets.AddRange(owner.Board.Where(m => m.IsAlive));
+				break;
+
+			case TargetType.Self:
+				if (owner != null) targets.Add(owner);
+				break;
+
+			case TargetType.Any:
+				targets.Add(owner);
+				targets.AddRange(owner.Board.Where(m => m.IsAlive));
+				targets.Add(opponent);
+				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
+				break;
+		}
+
+		return targets;
 	}
 }

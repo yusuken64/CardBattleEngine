@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Security.Principal;
+
+namespace CardBattleEngine;
 
 public class MinionCard : Card
 {
@@ -14,30 +16,35 @@ public class MinionCard : Card
 		Health = health;
 	}
 
-	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, Player currentPlayer, Player opponent)
+	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext context)
 	{
-		// Return all effects whose trigger is OnPlay/Battlecry (or whatever you consider)
-		foreach (var effect in TriggeredEffect)
+		foreach (var effect in TriggeredEffects)
 		{
-			if (effect.EffectTrigger == EffectTrigger.Battlecry)
-			{
-				foreach (var subAction in effect.GameActions)
-					yield return new(subAction, new()
-					{
-						SourcePlayer = currentPlayer,
-					});
-			}
-		}
+			if (effect.EffectTrigger != EffectTrigger.OnPlay &&
+				effect.EffectTrigger != EffectTrigger.Battlecry)
+				continue;
 
-		// Summon self is always first
-		yield return (new SummonMinionAction()
-		{
-			Card = this
-		}, new ActionContext()
-		{
-			SourceCard = this,
-			SourcePlayer = currentPlayer,
-		});
+			IGameEntity? target = null;
+			// If this play action provided a selector, ask it for a target
+			if (context.TargetSelector != null)
+			{
+				target = context.TargetSelector(state, context.SourcePlayer, effect.TargetType);
+			}
+			else
+			{
+				throw new Exception($"Target selector not set for effect {effect}");
+			}
+
+			var effectContext = new ActionContext
+			{
+				SourceCard = this,
+				SourcePlayer = context.SourcePlayer,
+				Target = target
+			};
+
+			foreach (var gameAction in effect.GameActions)
+				yield return (gameAction, effectContext);
+		}
 	}
 
 	public override Card Clone()

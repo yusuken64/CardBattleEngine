@@ -61,7 +61,7 @@ public class HumanAgent : IGameAgent
 
 		// Move cursor below menu
 		Console.SetCursorPosition(0, optionStartTop + actions.Count);
-		return actions[selectedIndex];
+		return (GameActionBase)actions[selectedIndex].Item1;
 	}
 	public void OnGameEnd(GameState gamestate, bool win)
 	{

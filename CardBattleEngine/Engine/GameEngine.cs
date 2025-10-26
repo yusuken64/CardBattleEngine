@@ -106,46 +106,4 @@ public class GameEngine
 	{
 		return new GameEngine(this.rNG.Clone());
 	}
-	
-	public static List<IGameEntity> GetPotentialTargets(TargetType type, GameState state, Player owner, Player opponent)
-	{
-		var targets = new List<IGameEntity>();
-
-		switch (type)
-		{
-			case TargetType.EnemyHero:
-				targets.Add(opponent);
-				break;
-
-			case TargetType.EnemyMinion:
-				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
-				break;
-
-			case TargetType.AnyEnemy:
-				targets.Add(opponent);
-				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
-				break;
-
-			case TargetType.FriendlyHero:
-				targets.Add(owner);
-				break;
-
-			case TargetType.FriendlyMinion:
-				targets.AddRange(owner.Board.Where(m => m.IsAlive));
-				break;
-
-			case TargetType.Self:
-				if (owner != null) targets.Add(owner);
-				break;
-
-			case TargetType.Any:
-				targets.Add(owner);
-				targets.AddRange(owner.Board.Where(m => m.IsAlive));
-				targets.Add(opponent);
-				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
-				break;
-		}
-
-		return targets;
-	}
 }

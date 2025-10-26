@@ -1,4 +1,5 @@
 ﻿
+
 namespace CardBattleEngine;
 
 // Basic effect/action that can be executed on a GameState
@@ -34,4 +35,6 @@ public class ActionContext
 	public Card SourceCard;
 	public IGameEntity Source;
 	public IGameEntity Target;
+
+	public Func<GameState, Player, TargetType, IGameEntity> TargetSelector;
 }

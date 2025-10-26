@@ -29,11 +29,11 @@ public class OracleAgent : IGameAgent
 
 		foreach (var action in actions)
 		{
-			float score = _brain.Evaluate(_engine, game, action);
+			float score = _brain.Evaluate(_engine, game, (GameActionBase)action.Item1);
 			if (score > bestScore)
 			{
 				bestScore = score;
-				bestAction = action;
+				bestAction = (GameActionBase)action.Item1;
 			}
 		}
 
