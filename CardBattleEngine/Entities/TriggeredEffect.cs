@@ -1,6 +1,4 @@
-﻿
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class TriggeredEffect
 {
@@ -8,6 +6,7 @@ public class TriggeredEffect
 	public EffectTiming EffectTiming { get; set; }
 	public TargetType TargetType { get; set; }
 	public List<IGameAction> GameActions { get; set; } = new();
+	public ITriggerCondition Condition { get; set; }
 
 	internal TriggeredEffect CloneFor(Minion minion)
 	{

@@ -4,6 +4,7 @@ public class MinionCard : Card
 {
 	public int Attack { get; private set; }
 	public int Health { get; private set; }
+	public MinionTribe MinionTribe { get; set; }
 	public bool IsStealth { get; set; }
 	public bool HasCharge { get; set; }
 	public bool HasDivineShield { get; set; }
@@ -60,6 +61,7 @@ public class MinionCard : Card
 			HasCharge = HasCharge,
 			HasDivineShield = HasDivineShield,
 			HasPoisonous = HasPoisonous,
+			MinionTribe = MinionTribe,
 		};
 	}
 }

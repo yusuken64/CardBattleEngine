@@ -6,20 +6,29 @@ public class CardDatabase
 {
 	private readonly Dictionary<string, CardDefinition> _minions = new();
 
+	private readonly Dictionary<string, Type> _actions = new();
+	private readonly Dictionary<string, Type> _triggerConditions = new();
+
+
 	public CardDatabase(string path)
 	{
 		LoadAll(path);
-
 		RegisterGameActions();
 	}
 
-	private static void RegisterGameActions()
+	private void RegisterGameActions()
 	{
 		// register automatically
 		foreach (var t in typeof(IGameAction).Assembly.GetTypes())
 		{
 			if (typeof(IGameAction).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
 				_actions[t.Name] = t;
+		}
+
+		foreach (var t in typeof(ITriggerCondition).Assembly.GetTypes())
+		{
+			if (typeof(ITriggerCondition).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+				_triggerConditions[t.Name] = t;
 		}
 	}
 
@@ -39,16 +48,32 @@ public class CardDatabase
 			Cost = card.ManaCost,
 			Attack = card.Attack,
 			Health = card.Health,
-			TriggeredEffectDefinitions = card.TriggeredEffects.Select(x => new TriggeredEffectDefinition()
+			Tribe = card.MinionTribe,
+			TriggeredEffectDefinitions = card.TriggeredEffects.Select(x =>
 			{
-				EffectTiming = x.EffectTiming,
-				EffectTrigger = x.EffectTrigger,
-				TargetType = x.TargetType,
-				ActionDefintion = new()
+				TriggerConditionDefinition conditionDef = null;
+				
+				if (x.Condition != null)
 				{
-					GameActionTypeName = x.GameActions[0].GetType().Name,
-					Params = x.GameActions[0].EmitParams()
+					conditionDef = new TriggerConditionDefinition
+					{
+						ConditionTypeName = x.Condition.GetType().Name,
+						Params = x.Condition.EmitParams()
+					};
 				}
+
+				return new TriggeredEffectDefinition()
+				{
+					EffectTiming = x.EffectTiming,
+					EffectTrigger = x.EffectTrigger,
+					TargetType = x.TargetType,
+					TriggerConditionDefintion = conditionDef,
+					ActionDefintion = new()
+					{
+						GameActionTypeName = x.GameActions[0].GetType().Name,
+						Params = x.GameActions[0].EmitParams()
+					}
+				};
 			}).ToList(),
 		};
 
@@ -69,7 +94,8 @@ public class CardDatabase
 			var json = File.ReadAllText(file);
 			var card = JsonConvert.DeserializeObject<CardDefinition>(json, new JsonSerializerSettings
 			{
-				TypeNameHandling = TypeNameHandling.Auto
+				TypeNameHandling = TypeNameHandling.Auto,
+				NullValueHandling = NullValueHandling.Ignore
 			});
 			if (card != null)
 				_minions[card.Id] = card;
@@ -87,14 +113,21 @@ public class CardDatabase
 		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitions)
 		{
 			ActionDefinition actionDefintion = triggeredEffectDefinition.ActionDefintion;
-			var action = CreateFromDefinition(
+			var action = CreateGameActionFromDefinition(
 				actionDefintion.GameActionTypeName,
 				actionDefintion.Params);
+
+			TriggerConditionDefinition triggerConditionDefintion = triggeredEffectDefinition.TriggerConditionDefintion;
+			var condition = CreateTriggerConditionFromDefinition(
+				triggerConditionDefintion?.ConditionTypeName,
+				triggerConditionDefintion?.Params);
+
 			TriggeredEffect effect = new()
 			{
 				EffectTiming = triggeredEffectDefinition.EffectTiming,
 				EffectTrigger = triggeredEffectDefinition.EffectTrigger,
 				TargetType = triggeredEffectDefinition.TargetType,
+				Condition = condition,
 				GameActions = [action],
 			};
 			card.TriggeredEffects.Add(effect);
@@ -103,16 +136,26 @@ public class CardDatabase
 		return card;
 	}
 
-	private static readonly Dictionary<string, Type> _actions = new();
-
-	public static IGameAction CreateFromDefinition(string typeName, Dictionary<string, object> paramObj)
+	public IGameAction CreateGameActionFromDefinition(string typeName, Dictionary<string, object> paramObj)
 	{
 		if (!_actions.TryGetValue(typeName, out var t))
-			throw new Exception($"Unknown action: {typeName}");
+			throw new Exception($"Unknown triggerCondition: {typeName}");
 
 		var action = (IGameAction)Activator.CreateInstance(t)!;
 		action.ConsumeParams(paramObj);
 		return action;
+	}
+
+	public ITriggerCondition CreateTriggerConditionFromDefinition(string typeName, Dictionary<string, object> paramObj)
+	{
+		if (typeName == null) { return null; }
+
+		if (!_triggerConditions.TryGetValue(typeName, out var t))
+			throw new Exception($"Unknown triggerCondition: {typeName}");
+
+		var triggerCondition = (ITriggerCondition)Activator.CreateInstance(t)!;
+		triggerCondition.ConsumeParams(paramObj);
+		return triggerCondition;
 	}
 }
 
@@ -123,7 +166,7 @@ public class CardDefinition
 	public int Cost { get; set; }
 	public int Attack { get; set; }
 	public int Health { get; set; }
-	public string Tribe { get; set; }
+	public MinionTribe Tribe { get; set; }
 	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
 }
 
@@ -135,6 +178,7 @@ public class TriggeredEffectDefinition
 	public EffectTiming EffectTiming { get; set; }
 	public EffectTrigger EffectTrigger { get; set; }
 	public TargetType TargetType { get; set; }
+	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
 	public ActionDefinition ActionDefintion { get; set; }
 }
 
@@ -144,6 +188,8 @@ public class ActionDefinition
 	public Dictionary<string, object> Params { get; set; }
 }
 
-//public class ConditionDefinition
-//{
-//}
+public class TriggerConditionDefinition
+{
+	public string ConditionTypeName { get; set; }
+	public Dictionary<string, object> Params { get; set; }
+}

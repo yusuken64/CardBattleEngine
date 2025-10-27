@@ -431,4 +431,118 @@ public class AbilityTest
 
 		Assert.AreEqual(1, divineMinion.Health, "Second hit should reduce health after Divine Shield is gone.");
 	}
+
+	[TestMethod]
+	public void PoisonMinion()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		// Create a Poisonous minion in hand
+		var poisonCard = new MinionCard("PoisonMinion", 1, 1, 2);
+		poisonCard.HasPoisonous = true;
+		poisonCard.HasCharge = true;
+		poisonCard.Owner = current;
+
+		current.Mana = 1;
+		current.Hand.Add(poisonCard);
+
+		// Play the Poisonous minion
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+				SourceCard = poisonCard,
+			},
+			new PlayCardAction() { Card = poisonCard });
+
+		var poisonMinion = current.Board[0];
+
+		// Create a target minion for the poison minion to attack
+		var targetCard = new MinionCard("TargetDummy", 1, 3, 3);
+		targetCard.Owner = opponent;
+		var targetMinion = new Minion(targetCard, opponent);
+		opponent.Board.Add(targetMinion);
+
+		// Act: poison minion attacks target minion
+		var attackAction = new AttackAction();
+		var attackContext = new ActionContext
+		{
+			Source = poisonMinion,
+			Target = targetMinion,
+			SourcePlayer = current
+		};
+
+		engine.Resolve(state, attackContext, attackAction);
+
+		// Assert: both should die (since the poison minion also takes damage)
+		Assert.IsFalse(state.GetAllMinions().Contains(targetMinion), "Target should die instantly due to poison.");
+		Assert.IsFalse(state.GetAllMinions().Contains(poisonMinion), "Poison minion should die from combat damage.");
+	}
+
+	[TestMethod]
+	public void MurlocSynergy()
+	{
+		// Arrange
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		CardDatabase cardDatabase = new(CardDBTest.DBPath);
+
+		// Get two different Murlocs to summon
+		var firstMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
+		var secondMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
+
+		current.Mana = 2; // enough to play both
+
+		current.Hand.Add(firstMurlocCard);
+		current.Hand.Add(secondMurlocCard);
+
+		// Act 1: Play the first Murloc
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = current,
+			SourceCard = firstMurlocCard
+		}, new PlayCardAction { Card = firstMurlocCard });
+
+		var firstMurloc = current.Board[0];
+
+		// Assert 1: First Murloc has base attack
+		Assert.AreEqual(1, firstMurloc.Attack, "First Murloc should have base attack 1.");
+
+		// Act 2: Play the second Murloc
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = current,
+			SourceCard = secondMurlocCard
+		}, new PlayCardAction { Card = secondMurlocCard });
+
+		var secondMurloc = current.Board[1];
+
+		// Assert 2: Both Murlocs got buffed by the triggered effect
+		Assert.AreEqual(2, firstMurloc.Attack, "First Murloc should gain +1 attack from second Murloc summon.");
+		Assert.AreEqual(1, secondMurloc.Attack, "Second Murloc should have base attack 1 initially.");
+
+		// Act 3: Play a third Murloc
+		var thirdMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
+		current.Hand.Add(thirdMurlocCard);
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = current,
+			SourceCard = thirdMurlocCard
+		}, new PlayCardAction { Card = thirdMurlocCard });
+
+		var thirdMurloc = current.Board[2];
+
+		// Assert 3: All Murlocs on board have been buffed correctly
+		Assert.AreEqual(3, firstMurloc.Attack, "First Murloc should now have +2 attack from subsequent Murloc summons.");
+		Assert.AreEqual(2, secondMurloc.Attack, "Second Murloc should now have +1 attack from third Murloc summon.");
+		Assert.AreEqual(1, thirdMurloc.Attack, "Third Murloc should have base attack 1.");
+	}
 }

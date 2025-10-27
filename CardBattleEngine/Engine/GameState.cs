@@ -159,7 +159,7 @@ public class GameState
 		return all;
 	}
 
-	internal IEnumerable<Minion> GetAllMinions()
+	public IEnumerable<Minion> GetAllMinions()
 	{
 		var all = new List<Minion>();
 

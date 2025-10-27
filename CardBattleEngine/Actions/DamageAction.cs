@@ -16,35 +16,41 @@ public class DamageAction : GameActionBase
 		if (!IsValid(state, actionContext))
 			return [];
 
-		if (actionContext.Target is Minion minion)
+		var source = actionContext.Source;
+		var target = actionContext.Target;
+
+		// Divine Shield negates damage completely
+		if (target is Minion targetMinion && targetMinion.HasDivineShield)
 		{
-			if (minion.HasDivineShield)
-			{
-				minion.HasDivineShield = false;
-				return [];
-			}
+			targetMinion.HasDivineShield = false;
+			return [];
 		}
 
 		// Apply damage
-		var target = actionContext.Target;
 		target.Health -= Damage;
 
-		var sideEffects = new List<(IGameAction, ActionContext)>();
+		bool shouldDie = false;
 
-		// Check for death triggers
-		if (actionContext.Target.Health <= 0)
+		// Check lethal HP
+		if (target.Health <= 0)
+			shouldDie = true;
+
+		// Check poisonous damage
+		if (source is Minion attacker && attacker.HasPoisonous && target is Minion && Damage > 0)
+			shouldDie = true;
+
+		if (shouldDie)
 		{
-			var deathContext = new ActionContext
+			return [(new DeathAction(), new ActionContext
 			{
 				SourcePlayer = actionContext.SourcePlayer,
 				Source = target,
 				Target = target,
 				TargetSelector = actionContext.TargetSelector
-			};
-			sideEffects.Add((new DeathAction(), deathContext));
+			})];
 		}
 
-		return sideEffects;
+		return [];
 	}
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)

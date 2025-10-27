@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Diagnostics.Tracing;
+
+namespace CardBattleEngine;
 
 public class Minion : IGameEntity
 {
@@ -8,6 +10,7 @@ public class Minion : IGameEntity
 	public string TemplateName { get; set; }
 	public int Attack { get; set; }
 	public int Health { get; set; }
+	public List<MinionTribe> Tribes { get; set; }
 	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
 	public bool HasSummoningSickness { get; internal set; }
@@ -32,7 +35,6 @@ public class Minion : IGameEntity
 			}
 		}
 	}
-
 	public List<TriggeredEffect> TriggeredEffects { get; }
 
 	private IAttackBehavior _attackBehavior;
@@ -61,6 +63,7 @@ public class Minion : IGameEntity
 		Name = card.Name;
 		Attack = card.Attack;
 		Health = card.Health;
+		Tribes = new List<MinionTribe>() { card.MinionTribe };
 
 		_attackBehavior = new MinionAttackBehavior();
 		HasAttackedThisTurn = false;
@@ -136,4 +139,11 @@ public class Minion : IGameEntity
 	{
 		return _modifiers.Contains(modifier);
 	}
+}
+
+public enum MinionTribe
+{
+	None,
+	All,
+	Murloc
 }
