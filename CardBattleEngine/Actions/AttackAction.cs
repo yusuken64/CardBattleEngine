@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32.SafeHandles;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class AttackAction : GameActionBase
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
-namespace CardBattleEngine.Test;
+﻿namespace CardBattleEngine.Test;
 
 [TestClass]
 public class CardDBTest
@@ -14,7 +12,7 @@ public class CardDBTest
 		CardDatabase cardDatabase = new(DBPath);
 
 		Player owner = new Player("Test");
-		MinionCard minion = cardDatabase.GetMinion("TestMinion", owner);
+		MinionCard minion = cardDatabase.GetMinionCard("TestMinion", owner);
 
 		Assert.IsNotNull(minion);
 	}
@@ -52,7 +50,7 @@ public class CardDBTest
 		CardDatabase.CreateFileFromMinionCard(card, ".\\Data\\", "BattleCryMinion");
 
 		CardDatabase testDB = new CardDatabase(".\\Data\\");
-		var loadedMinion = testDB.GetMinion("BattleCryMinion", current);
+		var loadedMinion = testDB.GetMinionCard("BattleCryMinion", current);
 
 		Assert.AreEqual(1, loadedMinion.Attack);
 		Assert.AreEqual(1, loadedMinion.Health);
@@ -72,7 +70,7 @@ public class CardDBTest
 	{
 		var db = new CardDatabase(DBPath);
 		Player owner = new Player("Test");
-		var card = db.GetMinion("BattleCryMinion", owner);
+		var card = db.GetMinionCard("BattleCryMinion", owner);
 
 		Assert.AreEqual(1, card.TriggeredEffects.Count, "Expected 1 triggered effect.");
 		var effect = card.TriggeredEffects[0];

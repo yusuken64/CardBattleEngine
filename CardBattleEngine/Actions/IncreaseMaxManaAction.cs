@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class IncreaseMaxManaAction : GameActionBase
 {

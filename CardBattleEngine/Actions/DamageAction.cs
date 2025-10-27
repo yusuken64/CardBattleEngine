@@ -16,6 +16,15 @@ public class DamageAction : GameActionBase
 		if (!IsValid(state, actionContext))
 			return [];
 
+		if (actionContext.Target is Minion minion)
+		{
+			if (minion.HasDivineShield)
+			{
+				minion.HasDivineShield = false;
+				return [];
+			}
+		}
+
 		// Apply damage
 		var target = actionContext.Target;
 		target.Health -= Damage;

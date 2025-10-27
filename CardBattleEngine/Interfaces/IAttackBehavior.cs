@@ -32,8 +32,10 @@ internal class MinionAttackBehavior : IAttackBehavior
 		if (!AttackRules.MustAttackTaunt(attacker, target, state))
 			return false;
 
-		// Check for exhaustion or summoning sickness
-		if (attackingMinion.HasSummoningSickness || attackingMinion.HasAttackedThisTurn)
+		if (attackingMinion.HasAttackedThisTurn)
+			return false;
+
+		if (attackingMinion.HasSummoningSickness && !attackingMinion.HasCharge)
 			return false;
 
 		return true;

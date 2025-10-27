@@ -1,12 +1,13 @@
-﻿using System.Security.Principal;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class MinionCard : Card
 {
 	public int Attack { get; private set; }
 	public int Health { get; private set; }
 	public bool IsStealth { get; set; }
+	public bool HasCharge { get; set; }
+	public bool HasDivineShield { get; set; }
+	public bool HasPoisonous { get; set; }
 
 	public MinionCard(string name, int cost, int attack, int health)
 	{
@@ -55,7 +56,10 @@ public class MinionCard : Card
 		return new MinionCard(Name, ManaCost, Attack, Health)
 		{
 			Owner = Owner,
-			IsStealth = IsStealth
+			IsStealth = IsStealth,
+			HasCharge = HasCharge,
+			HasDivineShield = HasDivineShield,
+			HasPoisonous = HasPoisonous,
 		};
 	}
 }

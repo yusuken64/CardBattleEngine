@@ -4,7 +4,7 @@
 public class AbilityTest
 {
 	[TestMethod]
-	public void BattlecryMinion_Deals1DamageOnPlay()
+	public void Battlecry_Deals1DamageOnPlay()
 	{
 		var state = GameFactory.CreateTestGame();
 		var engine = new GameEngine(new XorShiftRNG(1));
@@ -106,7 +106,7 @@ public class AbilityTest
 	}
 
 	[TestMethod]
-	public void BattleBuffMinion()
+	public void BattleCry_BuffMinion()
 	{
 		var state = GameFactory.CreateTestGame();
 		var engine = new GameEngine(new XorShiftRNG(1));
@@ -117,7 +117,7 @@ public class AbilityTest
 		int initialHealth = opponent.Health;
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
-		var testCard = cardDatabase.GetMinion("TestMinion", current); // 1/1
+		var testCard = cardDatabase.GetMinionCard("TestMinion", current); // 1/1
 
 		current.Board.Add(new Minion(testCard, current));
 
@@ -160,7 +160,7 @@ public class AbilityTest
 	}
 
 	[TestMethod]
-	public void AddMinionToHand()
+	public void BattleCry_AddMinionToHand()
 	{
 		var state = GameFactory.CreateTestGame();
 		var engine = new GameEngine(new XorShiftRNG(1));
@@ -212,7 +212,7 @@ public class AbilityTest
 	}
 
 	[TestMethod]
-	public void BattlecryMinion_Freeze()
+	public void BattleCry_Freeze()
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
@@ -326,5 +326,109 @@ public class AbilityTest
 
 		// Assert: attacking minion loses stealth
 		Assert.IsFalse(stealthMinion.IsStealth, "Stealth should be removed after minion attacks");
+	}
+	
+	[TestMethod]
+	public void ChargeMinion()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		// Create a Charge minion in hand
+		var chargeMinionCard = new MinionCard("ChargeMinion", 1, 1, 1);
+		chargeMinionCard.HasCharge = true;
+		chargeMinionCard.Owner = current;
+
+		current.Mana = 1;
+		current.Hand.Add(chargeMinionCard);
+
+		// Play the Charge minion
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+				SourceCard = chargeMinionCard,
+			},
+			new PlayCardAction() { Card = chargeMinionCard });
+
+		var chargeMinion = current.Board[0];
+
+		// Assert: Charge minion can attack immediately
+		Assert.IsTrue(chargeMinion.CanAttack(), "Charge minion should be able to attack immediately");
+
+		// Attempt attack
+		var attackAction = new AttackAction();
+		var attackContext = new ActionContext
+		{
+			Source = chargeMinion,
+			Target = opponent,
+			SourcePlayer = current
+		};
+		Assert.IsTrue(attackAction.IsValid(state, attackContext), "Charge minion attack should be valid");
+
+		// Resolve the attack (optional)
+		engine.Resolve(state, attackContext, attackAction);
+
+		// Assert: minion has attacked
+		Assert.IsTrue(chargeMinion.HasAttackedThisTurn, "Charge minion should have attacked");
+	}
+
+	[TestMethod]
+	public void DivineShieldMinion()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		// Create a Charge minion in hand
+		var divineShieldCard = new MinionCard("DivineShieldMinion", 1, 1, 2);
+		divineShieldCard.HasDivineShield = true;
+		divineShieldCard.Owner = current;
+
+		current.Mana = 1;
+		current.Hand.Add(divineShieldCard);
+
+		// Play the Charge minion
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+				SourceCard = divineShieldCard,
+			},
+			new PlayCardAction() { Card = divineShieldCard });
+
+		var divineMinion = current.Board[0];
+
+		// Verify it entered with shield
+		Assert.IsTrue(divineMinion.HasDivineShield, "Minion should have Divine Shield initially.");
+		Assert.AreEqual(2, divineMinion.Health, "Health should be full before damage.");
+
+		// Deal 1 damage (should pop the shield)
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = opponent,
+				Target = divineMinion
+			},
+			new DamageAction() { Damage = 1 });
+
+		Assert.IsFalse(divineMinion.HasDivineShield, "First hit should remove Divine Shield.");
+		Assert.AreEqual(2, divineMinion.Health, "Health should remain unchanged after Divine Shield absorbed damage.");
+
+		// Deal 1 damage again (should now lose health)
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = opponent,
+				Target = divineMinion
+			},
+			new DamageAction() { Damage = 1 });
+
+		Assert.AreEqual(1, divineMinion.Health, "Second hit should reduce health after Divine Shield is gone.");
 	}
 }

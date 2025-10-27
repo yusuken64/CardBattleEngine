@@ -49,18 +49,27 @@ public class Minion : IGameEntity
 	public bool IsFrozen { get; internal set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
 	public bool IsStealth { get; internal set; }
+	public bool HasCharge { get; internal set; }
+	public bool HasDivineShield { get; internal set; }
+	public bool HasPoisonous { get; internal set; }
 
 	public Minion(MinionCard card, Player owner)
 	{
 		this.card = card;
 		Owner = owner;
 
+		Name = card.Name;
 		Attack = card.Attack;
 		Health = card.Health;
 
 		_attackBehavior = new MinionAttackBehavior();
 		HasAttackedThisTurn = false;
 		HasSummoningSickness = true;
+		IsStealth = card.IsStealth;
+		HasCharge = card.HasCharge;
+		HasDivineShield = card.HasDivineShield;
+		HasPoisonous = card.HasPoisonous;
+
 		IsAlive = true;
 		TriggeredEffects = new();
 
@@ -73,7 +82,7 @@ public class Minion : IGameEntity
 
 	public bool CanAttack()
 	{
-		return !HasSummoningSickness && !HasAttackedThisTurn;
+		return HasCharge || (!HasSummoningSickness && !HasAttackedThisTurn);
 	}
 
 	internal Minion Clone()

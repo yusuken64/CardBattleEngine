@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
-namespace CardBattleEngine.Test
+﻿namespace CardBattleEngine.Test
 {
 	[TestClass]
 	public sealed class CloneTests

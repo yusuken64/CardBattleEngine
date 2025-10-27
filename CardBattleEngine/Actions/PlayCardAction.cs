@@ -1,6 +1,4 @@
-﻿using System.Security.Principal;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class PlayCardAction : GameActionBase
 {

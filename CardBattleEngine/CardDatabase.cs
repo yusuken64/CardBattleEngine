@@ -76,7 +76,7 @@ public class CardDatabase
 		}
 	}
 
-	public MinionCard GetMinion(string id, Player owner)
+	public MinionCard GetMinionCard(string id, Player owner)
 	{
 		if (!_minions.TryGetValue(id, out var def))
 			throw new KeyNotFoundException($"Unknown minion id '{id}'");
