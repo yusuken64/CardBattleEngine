@@ -48,6 +48,7 @@ public class Minion : IGameEntity
 	public bool IsAlive{ get; set; }
 	public bool IsFrozen { get; internal set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
+	public bool IsStealth { get; internal set; }
 
 	public Minion(MinionCard card, Player owner)
 	{

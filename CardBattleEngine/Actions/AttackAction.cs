@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using Microsoft.Win32.SafeHandles;
+
+namespace CardBattleEngine;
 
 public class AttackAction : GameActionBase
 {
@@ -15,6 +17,7 @@ public class AttackAction : GameActionBase
 		{
 			minion.HasAttackedThisTurn = true;
 			minion.HasSummoningSickness = false;
+			minion.IsStealth = false;
 		}
 
 		return context.Source.AttackBehavior.GenerateDamageActions(context.Source, context.Target, state);

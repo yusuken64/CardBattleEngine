@@ -1,9 +1,9 @@
 ﻿namespace CardBattleEngine;
 
-public class FreezeAction : IGameAction
+public class StealthAction : IGameAction
 {
 	public bool Canceled { get; set; } = false;
-	public EffectTrigger EffectTrigger => EffectTrigger.OnFreeze;
+	public EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public bool IsValid(GameState gameState, ActionContext context)
 	{
@@ -16,15 +16,9 @@ public class FreezeAction : IGameAction
 		if (!IsValid(state, context))
 			yield break;
 
-		// Apply freeze
 		if (context.Target is Minion minion)
 		{
-			minion.IsFrozen = true;
-			minion.MissedAttackFromFrozen = false;
-		}
-		else if (context.Target is Player hero)
-		{
-			hero.IsFrozen = true;
+			minion.IsStealth = true;
 		}
 
 		yield break; // no side-effects

@@ -259,4 +259,72 @@ public class AbilityTest
 			"FrostMage should be on the board after being played");
 		Assert.IsFalse(current.Hand.Contains(freezeMinionCard), "FrostMage should be removed from hand");
 	}
+
+	[TestMethod]
+	public void StealthMinion()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		// Create a stealth minion in hand
+		var stealthMinionCard = new MinionCard("StealthMinion", 1, 2, 1);
+		stealthMinionCard.IsStealth = true;
+		stealthMinionCard.Owner = current;
+
+		current.Mana = 1;
+		current.Hand.Add(stealthMinionCard);
+
+		// Play the stealth minion
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+				SourceCard = stealthMinionCard,
+			},
+			new PlayCardAction() { Card = stealthMinionCard });
+
+		var stealthMinion = current.Board[0];
+
+		// Assert: minion is on board and has stealth
+		Assert.IsTrue(stealthMinion.IsStealth, "Minion should have stealth after being played");
+
+		// Attempt to attack the stealth minion with opponent minions
+		foreach (var attacker in opponent.Board)
+		{
+			var attackAction = new AttackAction();
+			var context = new ActionContext
+			{
+				Source = attacker,
+				Target = stealthMinion,
+				SourcePlayer = opponent
+			};
+
+			Assert.IsFalse(attackAction.IsValid(state, context),
+				"Opponent should not be able to attack a stealth minion");
+		}
+
+		// Stealth ends when the minion attacks
+		var attackContext = new ActionContext
+		{
+			Source = stealthMinion,
+			Target = opponent,
+			SourcePlayer = current
+		};
+		var attack = new AttackAction();
+
+		engine.Resolve(state, new ActionContext()
+		{
+			SourcePlayer = current
+		}, new StartTurnAction());
+
+		Assert.IsTrue(attack.IsValid(state, attackContext), "Stealth minion should be able to attack normally");
+
+		engine.Resolve(state, attackContext, attack);
+
+		// Assert: attacking minion loses stealth
+		Assert.IsFalse(stealthMinion.IsStealth, "Stealth should be removed after minion attacks");
+	}
 }

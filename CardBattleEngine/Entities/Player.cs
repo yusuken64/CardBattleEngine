@@ -25,6 +25,7 @@ public class Player : IGameEntity
 	public bool IsFrozen { get; internal set; }
 	public bool HasAttackedThisTurn { get; internal set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
+	public bool IsStealth { get; internal set; }
 
 	public Player(string name) 
 	{

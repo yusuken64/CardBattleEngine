@@ -1,8 +1,6 @@
-﻿using System.Numerics;
+﻿namespace CardBattleEngine;
 
-namespace CardBattleEngine;
-
-internal class StartTurnAction : GameActionBase
+public class StartTurnAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.TurnStart;
 	public override bool IsValid(GameState state, ActionContext actionContext) => true;

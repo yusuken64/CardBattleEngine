@@ -21,6 +21,9 @@ internal class MinionAttackBehavior : IAttackBehavior
 			return false;
 		}
 
+		if (target is Minion targetMinion && targetMinion.IsStealth)
+			return false; // cannot attack stealth minions
+
 		// Can't attack dead targets
 		if (!target.IsAlive)
 			return false;
