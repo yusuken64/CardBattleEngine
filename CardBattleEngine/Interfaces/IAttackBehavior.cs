@@ -16,6 +16,11 @@ internal class MinionAttackBehavior : IAttackBehavior
 		if (attackingMinion.Owner == target.Owner)
 			return false;
 
+		if (attackingMinion.IsFrozen)
+		{
+			return false;
+		}
+
 		// Can't attack dead targets
 		if (!target.IsAlive)
 			return false;

@@ -1,4 +1,5 @@
-﻿namespace CardBattleEngine;
+﻿
+namespace CardBattleEngine;
 
 public class GameState
 {
@@ -153,6 +154,18 @@ public class GameState
 			all.Add(player);
 			all.AddRange(player.Board);
 			//all.AddRange(CurrentPlayer.Hand);
+		}
+
+		return all;
+	}
+
+	internal IEnumerable<Minion> GetAllMinions()
+	{
+		var all = new List<Minion>();
+
+		foreach (var player in Players)
+		{
+			all.AddRange(player.Board);
 		}
 
 		return all;

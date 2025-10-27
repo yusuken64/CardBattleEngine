@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class AttackAction : GameActionBase
+public class AttackAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.Attack;
 

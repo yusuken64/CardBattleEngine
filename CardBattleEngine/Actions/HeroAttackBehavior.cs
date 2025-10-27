@@ -7,6 +7,11 @@ public class HeroAttackBehavior : IAttackBehavior
 		if (attacker is not Player hero || !hero.CanAttack) // weapon, cooldown, etc.
 			return false;
 
+		if (hero.IsFrozen)
+		{
+			return false;
+		}
+
 		if (target == null || !target.IsAlive)
 			return false;
 

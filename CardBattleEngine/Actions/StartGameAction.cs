@@ -13,9 +13,9 @@ internal class StartGameAction : GameActionBase
 
 		return
 		[
-			(new DrawCardAction(),actionContext),
-			(new DrawCardAction(),actionContext),
-			(new DrawCardAction(),actionContext),
+			(new DrawCardFromDeckAction(),actionContext),
+			(new DrawCardFromDeckAction(),actionContext),
+			(new DrawCardFromDeckAction(),actionContext),
 		];
 	}
 }

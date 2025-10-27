@@ -29,12 +29,14 @@ public abstract class GameActionBase : IGameAction
 	}
 }
 
+//TODO make different implementations for context for each action??
 public class ActionContext
 {
 	public Player SourcePlayer;
 	public Card SourceCard;
 	public IGameEntity Source;
 	public IGameEntity Target;
+	public StatModifier Modifier;
 
 	public Func<GameState, Player, TargetType, IGameEntity> TargetSelector;
 }

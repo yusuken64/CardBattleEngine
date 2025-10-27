@@ -11,7 +11,6 @@ public class TriggeredEffect
 
 	internal TriggeredEffect CloneFor(Minion minion)
 	{
-		//TODO don't transer card only effects
 		return new TriggeredEffect()
 		{
 			EffectTiming = this.EffectTiming,
@@ -47,6 +46,7 @@ public enum EffectTrigger
 	GameStart,
 	TurnStart,
 	OnTurnEnd,
+	OnFreeze,
 } //TODO standardize naming
 
 public enum EffectTiming

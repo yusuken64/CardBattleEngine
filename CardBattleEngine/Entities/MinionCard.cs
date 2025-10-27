@@ -30,10 +30,6 @@ public class MinionCard : Card
 			{
 				target = context.TargetSelector(state, context.SourcePlayer, effect.TargetType);
 			}
-			else
-			{
-				throw new Exception($"Target selector not set for effect {effect}");
-			}
 
 			var effectContext = new ActionContext
 			{

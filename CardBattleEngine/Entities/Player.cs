@@ -22,6 +22,9 @@ public class Player : IGameEntity
 
 	public bool IsAlive { get; set; }
 	public List<TriggeredEffect> TriggeredEffects { get; }
+	public bool IsFrozen { get; internal set; }
+	public bool HasAttackedThisTurn { get; internal set; }
+	public bool MissedAttackFromFrozen { get; internal set; }
 
 	public Player(string name) 
 	{

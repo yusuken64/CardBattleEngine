@@ -129,10 +129,10 @@ public class AbilityTest
 			TargetType = TargetType.FriendlyMinion,
 			GameActions = new List<IGameAction>
 			{
-				new ModifyStatsAction()
+				new AddStatModifierAction()
 				{
-					Target = current.Board[0],
 					AttackChange = 2,
+					Duration = EffectDuration.UntilEndOfTurn
 				}
 			}
 		});
@@ -153,5 +153,110 @@ public class AbilityTest
 		engine.Resolve(state, actionContext, playCardAction);
 
 		Assert.AreEqual(3, current.Board[0].Attack);
+
+		engine.Resolve(state, new ActionContext { SourcePlayer = current }, new EndTurnAction());
+
+		Assert.AreEqual(1, current.Board[0].Attack);
+	}
+
+	[TestMethod]
+	public void AddMinionToHand()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		current.Mana = 1;
+		var opponent = state.OpponentPlayer;
+		int initialHealth = opponent.Health;
+
+		var elemental = new MinionCard("Elemental", 1, 1, 2);
+
+		var firefly = new MinionCard("FireFly", 1, 1, 2);
+		firefly.TriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.Battlecry,
+			TargetType = TargetType.FriendlyHero,
+			GameActions = new List<IGameAction>
+			{
+				new GainCardAction()
+				{
+					Card = elemental
+				}
+			}
+		});
+		firefly.Owner = current;
+		current.Hand.Add(firefly);
+
+		IGameAction playCardAction = new PlayCardAction() { Card = firefly };
+		ActionContext actionContext = new ActionContext()
+		{
+			SourcePlayer = current,
+			SourceCard = firefly,
+		};
+		engine.Resolve(state, actionContext, playCardAction);
+
+		// The FireFly should have been played and removed from hand
+		Assert.IsFalse(current.Hand.Contains(firefly), "FireFly should be removed from hand after being played");
+
+		// FireFly should now be on the board
+		Assert.IsTrue(current.Board.Contains(current.Board.FirstOrDefault(m => m.Name == "FireFly")),
+			"FireFly should be on the board after being played");
+
+		// The Battlecry should have added the Elemental card to the player's hand
+		Assert.IsTrue(current.Hand.Contains(elemental), "Elemental should be added to hand by FireFly Battlecry");
+
+		// The opponent's health should be unchanged
+		Assert.AreEqual(initialHealth, opponent.Health, "Opponent health should remain unchanged");
+	}
+
+	[TestMethod]
+	public void BattlecryMinion_Freeze()
+	{
+		// Arrange
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		// Create a minion on opponent's board to freeze
+		var enemyMinionCard = new MinionCard("EnemyMinion", 1, 2, 2);
+		var enemyMinion = new Minion(enemyMinionCard, opponent);
+		opponent.Board.Add(enemyMinion);
+
+		// Create the Battlecry minion with Freeze effect
+		var freezeMinionCard = new MinionCard("FrostMage", 2, 2, 3);
+		freezeMinionCard.TriggeredEffects.Add(new TriggeredEffect
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.Battlecry,
+			TargetType = TargetType.EnemyMinion,
+			GameActions = new List<IGameAction>
+		{
+			new FreezeAction() // assumed to exist
+        }
+		});
+		freezeMinionCard.Owner = current;
+		current.Hand.Add(freezeMinionCard);
+		current.Mana = 2;
+
+		var playAction = new PlayCardAction { Card = freezeMinionCard };
+		var context = new ActionContext
+		{
+			SourcePlayer = current,
+			SourceCard = freezeMinionCard,
+			TargetSelector = (gs, player, targetType) => enemyMinion // pick enemy minion
+		};
+
+		// Act
+		engine.Resolve(state, context, playAction);
+
+		// Assert
+		Assert.IsTrue(enemyMinion.IsFrozen, "Enemy minion should be frozen by Battlecry");
+		Assert.IsTrue(current.Board.Contains(current.Board.First(m => m.Name == "FrostMage")),
+			"FrostMage should be on the board after being played");
+		Assert.IsFalse(current.Hand.Contains(freezeMinionCard), "FrostMage should be removed from hand");
 	}
 }

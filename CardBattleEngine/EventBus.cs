@@ -2,55 +2,53 @@
 
 public class EventBus
 {
-	private readonly List<Action<IGameEvent>> _subs = new();
-	private readonly List<ITrigger> _triggers = new();
-	public void Subscribe(Action<IGameEvent> handler) => _subs.Add(handler);
-	public void Unsubscribe(Action<IGameEvent> handler) => _subs.Remove(handler);
-	public void Raise(IGameEvent ev)
+	/// <summary>
+	/// Returns all triggers for a given action, filtered by timing (Pre/Post/Other),
+	/// including both normal triggered effects and modifier-triggered effects.
+	/// </summary>
+	internal IEnumerable<(IGameAction action, ActionContext context)> GetTriggers(
+		GameState gameState,
+		IGameAction triggeringAction,
+		EffectTiming timing)
 	{
-		// copy to avoid modification during enumeration
-		var copy = _subs.ToArray();
-		foreach (var s in copy) s(ev);
-	}
-
-	public void RegisterTrigger(ITrigger trigger) => _triggers.Add(trigger);
-	public void UnregisterTrigger(ITrigger trigger) => _triggers.Remove(trigger);
-
-	internal IEnumerable<(IGameAction action, ActionContext context)> GetPreTriggers(GameState gameState, IGameAction action)
-	{
-		return gameState.GetAllEntities()
-			.SelectMany(x => x.TriggeredEffects)
-			.Where(te => te.EffectTrigger == action.EffectTrigger &&
-						 te.EffectTiming == EffectTiming.Pre) //Where matches action
-			.SelectMany(te => te.GameActions.Select(ga =>
-			(
-				ga,
-				new ActionContext
+		// Normal card effects
+		foreach (var entity in gameState.GetAllEntities())
+		{
+			foreach (var effect in entity.TriggeredEffects
+				.Where(te => te.EffectTrigger == triggeringAction.EffectTrigger &&
+							 te.EffectTiming == timing))
+			{
+				foreach (var action in effect.GameActions)
 				{
-					//Source = te.Owner,
-					//SourcePlayer = te.Owner.Player,
-					//TriggeringAction = triggeringAction
+					yield return (action, new ActionContext
+					{
+						Source = entity,
+						SourcePlayer = entity.Owner,
+						TargetSelector = null // engine injects default/random if needed
+					});
 				}
-			)
-		));
-	}
+			}
+		}
 
-	internal IEnumerable<(IGameAction action, ActionContext context)> GetPostTriggers(GameState gameState, IGameAction action)
-	{
-		return gameState.GetAllEntities()
-			.SelectMany(x => x.TriggeredEffects)
-			.Where(te => te.EffectTrigger == action.EffectTrigger &&
-						te.EffectTiming == EffectTiming.Post)
-			.SelectMany(te => te.GameActions.Select(ga =>
-			(
-				ga,
-				new ActionContext
+		// Modifier-triggered effects
+		foreach (var minion in gameState.GetAllMinions())
+		{
+			foreach (var effect in minion.ModifierTriggeredEffects
+				.Where(te => te.Item1.EffectTrigger == triggeringAction.EffectTrigger &&
+							 te.Item1.EffectTiming == timing))
+			{
+				foreach (IGameAction action in effect.Item1.GameActions)
 				{
-					//Source = te.Owner,
-					//SourcePlayer = te.Owner.Player,
-					//TriggeringAction = triggeringAction
+					yield return (action, new ActionContext
+					{
+						Source = minion,
+						SourcePlayer = minion.Owner,
+						Target = minion,
+						Modifier = effect.Item2,
+						TargetSelector = null
+					});
 				}
-			)
-		));
+			}
+		}
 	}
 }

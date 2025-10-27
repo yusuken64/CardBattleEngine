@@ -1,5 +1,4 @@
-﻿
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class Minion : IGameEntity
 {
@@ -13,6 +12,27 @@ public class Minion : IGameEntity
 	public bool Taunt { get; set; }
 	public bool HasSummoningSickness { get; internal set; }
 	public bool HasAttackedThisTurn { get; internal set; }
+	public IEnumerable<(TriggeredEffect, StatModifier)> ModifierTriggeredEffects
+	{
+		get
+		{
+			// Also return a triggered effect for each temporary modifier
+			foreach (var mod in _modifiers.Where(m => m.Duration == EffectDuration.UntilEndOfTurn))
+			{
+				yield return (new TriggeredEffect
+				{
+					EffectTrigger = EffectTrigger.OnTurnEnd,
+					EffectTiming = EffectTiming.Pre,
+					TargetType = TargetType.Self,
+					GameActions = new List<IGameAction>
+					{
+						new RemoveModifierAction()
+					}
+				}, mod);
+			}
+		}
+	}
+
 	public List<TriggeredEffect> TriggeredEffects { get; }
 
 	private IAttackBehavior _attackBehavior;
@@ -23,8 +43,11 @@ public class Minion : IGameEntity
 			return _attackBehavior;
 		}
 	}
+	private readonly List<StatModifier> _modifiers = new();
 
 	public bool IsAlive{ get; set; }
+	public bool IsFrozen { get; internal set; }
+	public bool MissedAttackFromFrozen { get; internal set; }
 
 	public Minion(MinionCard card, Player owner)
 	{
@@ -65,5 +88,42 @@ public class Minion : IGameEntity
 			HasSummoningSickness = this.HasSummoningSickness,
 			HasAttackedThisTurn = this.HasAttackedThisTurn
 		};
+	}
+	internal void AddModifier(StatModifier modifier)
+	{
+		_modifiers.Add(modifier);
+		RecalculateStats();
+	}
+
+	internal void RemoveModifier(StatModifier modifier)
+	{
+		_modifiers.Remove(modifier);
+		RecalculateStats();
+	}
+
+	private void RecalculateStats()
+	{
+		Attack = card.Attack;
+		Health = card.Health;
+
+		foreach (var mod in _modifiers)
+		{
+			Attack += mod.AttackChange;
+			Health += mod.HealthChange;
+		}
+
+		Attack = Math.Max(0, Attack);
+		Health = Math.Max(0, Health);
+	}
+
+	internal void RemoveExpiredModifiers()
+	{
+		_modifiers.RemoveAll(m => m.Duration == EffectDuration.UntilEndOfTurn);
+		RecalculateStats();
+	}
+
+	internal bool HasModifier(StatModifier modifier)
+	{
+		return _modifiers.Contains(modifier);
 	}
 }

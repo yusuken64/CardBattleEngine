@@ -14,7 +14,7 @@ public class CardDBTest
 		CardDatabase cardDatabase = new(DBPath);
 
 		Player owner = new Player("Test");
-		MinionCard minion = cardDatabase.GetMinion("TEST1", owner);
+		MinionCard minion = cardDatabase.GetMinion("TestMinion", owner);
 
 		Assert.IsNotNull(minion);
 	}

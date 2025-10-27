@@ -27,7 +27,7 @@ public class GameEngine
 				continue;
 
 			// Pre-resolution triggers
-			foreach (var trigger in _eventBus.GetPreTriggers(gameState, current.action))
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, EffectTiming.Pre))
 			{
 				_actionQueue.Enqueue(trigger);
 			}
@@ -42,11 +42,13 @@ public class GameEngine
 			if (sideEffects != null)
 			{
 				foreach (var effect in sideEffects)
-					_actionQueue.Enqueue(effect);
+				{
+					_actionQueue.Enqueue((effect.Item1, EnsureSelector(effect.Item2)));
+				}
 			}
 
 			// Post-resolution triggers
-			foreach (var trigger in _eventBus.GetPostTriggers(gameState, current.action))
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, EffectTiming.Post))
 			{
 				_actionQueue.Enqueue(trigger);
 			}
@@ -57,6 +59,25 @@ public class GameEngine
 			if (gameState.IsGameOver())
 				break;
 		}
+	}
+	private ActionContext EnsureSelector(ActionContext ctx)
+	{
+		if (ctx.TargetSelector == null)
+			ctx.TargetSelector = CreateRandomTargetSelector();
+		return ctx;
+	}
+
+	private Func<GameState, Player, TargetType, IGameEntity> CreateRandomTargetSelector()
+	{
+		return (gameState, player, targetType) =>
+		{
+			var validTargets = gameState.GetValidTargets(player, targetType);
+			if (validTargets.Count == 0)
+				return null;
+
+			int index = rNG.NextInt(validTargets.Count);
+			return validTargets[index];
+		};
 	}
 
 	public void StartGame(GameState gameState)
