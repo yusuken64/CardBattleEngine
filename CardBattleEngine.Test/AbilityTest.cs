@@ -499,7 +499,7 @@ public class AbilityTest
 		var firstMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
 		var secondMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
 
-		current.Mana = 2; // enough to play both
+		current.Mana = 3; // enough to play both
 
 		current.Hand.Add(firstMurlocCard);
 		current.Hand.Add(secondMurlocCard);

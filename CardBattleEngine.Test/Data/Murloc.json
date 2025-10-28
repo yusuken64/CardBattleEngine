@@ -7,13 +7,14 @@
   "Tribe": 2,
   "TriggeredEffectDefinitions": [
     {
-      "EffectTiming": 1,
+      "EffectTiming": 0,
       "EffectTrigger": 4,
-      "TargetType": 5,
+      "TargetType": 6,
       "TriggerConditionDefintion": {
         "ConditionTypeName": "SummonedMinionTribeCondition",
         "Params": {
-          "MinionTribe": "Murloc"
+          "MinionTribe": "Murloc",
+          "MinionToMinionRelationship": "Friendly"
         }
       },
       "ActionDefintion": {

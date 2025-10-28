@@ -16,5 +16,6 @@ public abstract class TriggerConditionBase : ITriggerCondition
 
 public class EffectContext
 {
+	public IGameEntity EffectOwner { get; internal set; }
 	public Minion SummonedUnit { get; set; }
 }

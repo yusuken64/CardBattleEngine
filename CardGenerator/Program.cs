@@ -11,11 +11,12 @@ card.MinionTribe = MinionTribe.Murloc;
 card.TriggeredEffects.Add(new TriggeredEffect()
 {
 	EffectTrigger = EffectTrigger.SummonMinion,
-	EffectTiming = EffectTiming.Post,
-	TargetType = TargetType.AnyEnemy,
+	EffectTiming = EffectTiming.Pre,
+	TargetType = TargetType.Self,
 	Condition = new SummonedMinionTribeCondition()
 	{
-		MinionTribe = MinionTribe.Murloc
+		MinionTribe = MinionTribe.Murloc,
+		MinionToMinionRelationship = MinionToMinionRelationship.Friendly
 	},
 	GameActions = new List<IGameAction>()
 	{

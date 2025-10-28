@@ -27,7 +27,7 @@ public class GameEngine
 				continue;
 
 			// Pre-resolution triggers
-			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, EffectTiming.Pre))
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre, ChooseRandom))
 			{
 				_actionQueue.Enqueue(trigger);
 			}
@@ -48,7 +48,7 @@ public class GameEngine
 			}
 
 			// Post-resolution triggers
-			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, EffectTiming.Post))
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Post, ChooseRandom))
 			{
 				_actionQueue.Enqueue(trigger);
 			}

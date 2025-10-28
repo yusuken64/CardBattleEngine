@@ -171,10 +171,10 @@ public class GameState
 		return all;
 	}
 
-	public List<IGameEntity> GetValidTargets(Player owner, TargetType type)
+	public List<IGameEntity> GetValidTargets(IGameEntity entity, TargetType type)
 	{
 		var targets = new List<IGameEntity>();
-		var opponent = OpponentOf(owner);
+		var opponent = OpponentOf(entity.Owner);
 
 		switch (type)
 		{
@@ -192,20 +192,20 @@ public class GameState
 				break;
 
 			case TargetType.FriendlyHero:
-				targets.Add(owner);
+				targets.Add(entity);
 				break;
 
 			case TargetType.FriendlyMinion:
-				targets.AddRange(owner.Board.Where(m => m.IsAlive));
+				targets.AddRange(entity.Owner.Board.Where(m => m.IsAlive));
 				break;
 
 			case TargetType.Self:
-				if (owner != null) targets.Add(owner);
+				if (entity != null) targets.Add(entity);
 				break;
 
 			case TargetType.Any:
-				targets.Add(owner);
-				targets.AddRange(owner.Board.Where(m => m.IsAlive));
+				targets.Add(entity);
+				targets.AddRange(entity.Owner.Board.Where(m => m.IsAlive));
 				targets.Add(opponent);
 				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
 				break;
