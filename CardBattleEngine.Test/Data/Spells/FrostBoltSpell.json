@@ -1,0 +1,23 @@
+﻿{
+	"SpellCastEffectDefinitions": [
+		{
+			"TargetType": 5,
+			"ActionDefintions": [
+				{
+					"GameActionTypeName": "DamageAction",
+					"Params": {
+						"Damage": 3
+					}
+				},
+				{
+					"GameActionTypeName": "FreezeAction",
+					"Params": {}
+				}
+			]
+		}
+	],
+	"Type": "Spell",
+	"Id": "FrostBolt",
+	"Name": "FrostBolt",
+	"Cost": 1
+}

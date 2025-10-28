@@ -1,0 +1,25 @@
+﻿{
+	"SpellCastEffectDefinitions": [
+		{
+			"TargetType": 7,
+			"ActionDefintions": [
+				{
+					"GameActionTypeName": "DrawCardFromDeckAction",
+					"Params": {}
+				},
+				{
+					"GameActionTypeName": "DrawCardFromDeckAction",
+					"Params": {}
+				},
+				{
+					"GameActionTypeName": "DrawCardFromDeckAction",
+					"Params": {}
+				}
+			]
+		}
+	],
+	"Type": "Spell",
+	"Id": "DrawCardSpell",
+	"Name": "DrawCardSpell",
+	"Cost": 1
+}

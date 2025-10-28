@@ -2,7 +2,7 @@
 
 public class PlayCardAction : GameActionBase
 {
-	public Card Card;
+	public Card Card; //TODO use card from context;
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnPlay;
 	public Func<GameState, Player, TriggeredEffect, IEnumerable<IGameEntity>, Task<IGameEntity?>>? TargetSelector { get; set; }
 

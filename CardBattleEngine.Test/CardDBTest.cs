@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine.Test;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CardBattleEngine.Test;
 
 [TestClass]
 public class CardDBTest
@@ -96,7 +98,7 @@ public class CardDBTest
 		var effect = card.TriggeredEffects[0];
 
 		// Assert: Effect timing and trigger type are correct
-		Assert.AreEqual(EffectTiming.Post, effect.EffectTiming, "Unexpected effect timing.");
+		Assert.AreEqual(EffectTiming.Pre, effect.EffectTiming, "Unexpected effect timing.");
 		Assert.AreEqual(EffectTrigger.SummonMinion, effect.EffectTrigger, "Unexpected effect trigger.");
 
 		// Assert: Trigger condition is not null and is correct type
@@ -118,5 +120,45 @@ public class CardDBTest
 		var damageParam = action.EmitParams();
 		Assert.AreEqual(1, damageParam["AttackChange"], "Expected +1 attack from triggered effect.");
 		Assert.AreEqual(0, damageParam["HealthChange"], "Expected 0 health change from triggered effect.");
+	}
+
+
+	[TestMethod]
+	public void CreateSpellDefinitionTest()
+	{
+		SpellCard card = new SpellCard("TestSpell_DrawCards", 1);
+		card.SpellCastEffects.Add(new SpellCastEffect());
+
+		card.SpellCastEffects[0] = new SpellCastEffect()
+		{
+			TargetType = TargetType.None,
+			GameActions = new()
+			{
+				new DrawCardFromDeckAction(),
+				new DrawCardFromDeckAction(),
+				new DrawCardFromDeckAction(),
+			}
+		};
+		var json = CardDatabase.CreateFileFromSpellCard(card, DBPath, "SaveTestSpell");
+		Console.WriteLine(json);
+	}
+
+	[TestMethod]
+	public void CreateTargetedSpellDefinitionTest()
+	{
+		SpellCard card = new SpellCard("TestSpell_DealDamage", 1);
+		card.SpellCastEffects.Add(new SpellCastEffect());
+
+		card.SpellCastEffects[0] = new SpellCastEffect()
+		{
+			TargetType = TargetType.AnyEnemy,
+			GameActions = new()
+			{
+				new DamageAction() { Damage = 3 },
+				new FreezeAction(),
+			}
+		};
+		var json = CardDatabase.CreateFileFromSpellCard(card, DBPath, "SaveTestSpell");
+		Console.WriteLine(json);
 	}
 }

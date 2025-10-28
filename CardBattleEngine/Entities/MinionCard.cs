@@ -2,6 +2,7 @@
 
 public class MinionCard : Card
 {
+	public override CardType Type => CardType.Minion;
 	public int Attack { get; private set; }
 	public int Health { get; private set; }
 	public MinionTribe MinionTribe { get; set; }
@@ -14,7 +15,6 @@ public class MinionCard : Card
 	{
 		Name = name;
 		ManaCost = cost;
-		Type = CardType.Minion;
 		Attack = attack;
 		Health = health;
 	}

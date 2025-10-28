@@ -1,21 +1,34 @@
-﻿namespace CardBattleEngine;
+﻿
+namespace CardBattleEngine;
 
-//public class CastSpellAction : IGameAction
-//{
-//	private readonly Player _player;
+public class CastSpellAction : IGameAction
+{
+	public bool Canceled { get; set; }
 
-//	public void Execute(GameState state)
-//	{
-//		throw new NotImplementedException();
-//	}
+	public EffectTrigger EffectTrigger => EffectTrigger.SpellCast;
 
-//	public bool IsValid(GameState gameState)
-//	{
-//		throw new NotImplementedException();
-//	}
+	public void ConsumeParams(Dictionary<string, object> actionParam)
+	{
+	}
 
-//	public void Resolve(GameState state, Player currentPlayer, Player opponent)
-//	{
-//		throw new NotImplementedException();
-//	}
-//}
+	public Dictionary<string, object> EmitParams()
+	{
+		return new();
+	}
+
+	public bool IsValid(GameState gameState, ActionContext context)
+	{
+		return true;
+	}
+
+	public IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
+	{
+		if (context.SourceCard is SpellCard spellcard) {
+			foreach (var action in spellcard.SpellCastEffects
+									.SelectMany(x => x.GameActions))
+			{
+				yield return (action, context);
+			}
+		}
+	}
+}

@@ -1,13 +1,14 @@
 {
   "Id": "Murloc",
   "Name": "Murloc",
+  "Type": "Minion",
   "Cost": 1,
   "Attack": 1,
   "Health": 1,
   "Tribe": 2,
   "TriggeredEffectDefinitions": [
     {
-      "EffectTiming": 0,
+      "EffectTiming": "Pre",
       "EffectTrigger": 4,
       "TargetType": 6,
       "TriggerConditionDefintion": {

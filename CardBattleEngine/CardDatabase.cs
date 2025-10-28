@@ -1,14 +1,15 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CardBattleEngine;
 
 public class CardDatabase
 {
-	private readonly Dictionary<string, CardDefinition> _minions = new();
+	private readonly Dictionary<string, MinionCardDefinition> _minions = new();
+	private readonly Dictionary<string, SpellCardDefinition> _spells = new();
 
 	private readonly Dictionary<string, Type> _actions = new();
 	private readonly Dictionary<string, Type> _triggerConditions = new();
-
 
 	public CardDatabase(string path)
 	{
@@ -41,7 +42,7 @@ public class CardDatabase
 		if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
 		// Convert MinionCard -> CardDefinition for serialization
-		var def = new CardDefinition
+		var def = new MinionCardDefinition
 		{
 			Id = cardName,
 			Name = card.Name,
@@ -87,18 +88,108 @@ public class CardDatabase
 		return json;
 	}
 
+	public static string CreateFileFromSpellCard(SpellCard card, string directory, string cardName)
+	{
+		Directory.CreateDirectory(directory);
+		var path = Path.Combine(directory, $"{cardName}.json");
+
+		if (card == null) throw new ArgumentNullException(nameof(card));
+		if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
+
+		// Convert MinionCard -> CardDefinition for serialization
+		var def = new SpellCardDefinition
+		{
+			Id = cardName,
+			Name = card.Name,
+			Cost = card.ManaCost,
+			SpellCastEffectDefinitions = card.SpellCastEffects.Select(x =>
+			{
+				return new SpellCastEffectDefinition()
+				{
+					TargetType = x.TargetType,
+					ActionDefintions = x.GameActions.Select(ga =>
+					{
+						return new ActionDefinition()
+						{
+							GameActionTypeName = ga.GetType().Name,
+							Params = ga.EmitParams()
+						};
+					}).ToList(),
+				};
+			}).ToList()
+		};
+
+		var json = JsonConvert.SerializeObject(def, Formatting.Indented, new JsonSerializerSettings
+		{
+			TypeNameHandling = TypeNameHandling.Auto,
+		});
+
+		File.WriteAllText(path, json);
+
+		return json;
+	}
+
 	protected void LoadAll(string directory)
 	{
-		foreach (var file in Directory.GetFiles(directory, "*.json"))
+		foreach (var file in Directory.GetFiles(directory, "*.json", SearchOption.AllDirectories))
 		{
 			var json = File.ReadAllText(file);
-			var card = JsonConvert.DeserializeObject<CardDefinition>(json, new JsonSerializerSettings
+
+			// Parse the JSON into a JObject to inspect CardType
+			JObject jObject;
+			try
 			{
-				TypeNameHandling = TypeNameHandling.Auto,
-				NullValueHandling = NullValueHandling.Ignore
-			});
-			if (card != null)
-				_minions[card.Id] = card;
+				jObject = JObject.Parse(json);
+			}
+			catch (JsonException ex)
+			{
+				Console.WriteLine($"Failed to parse JSON file {file}: {ex.Message}");
+				continue;
+			}
+
+			// Read CardType
+			if (!Enum.TryParse(jObject["Type"]?.ToString(), out CardType cardType))
+			{
+				Console.WriteLine($"Missing or invalid CardType in file: {Path.GetFileName(file)}");
+				continue;
+			}
+
+			// Deserialize into the concrete subclass based on CardType
+			try
+			{
+				switch (cardType)
+				{
+					case CardType.Minion:
+						{
+							var minion = jObject.ToObject<MinionCardDefinition>(JsonSerializer.Create(new JsonSerializerSettings
+							{
+								NullValueHandling = NullValueHandling.Ignore
+							}));
+							if (minion != null)
+								_minions[minion.Id] = minion;
+							break;
+						}
+
+					case CardType.Spell:
+						{
+							var spell = jObject.ToObject<SpellCardDefinition>(JsonSerializer.Create(new JsonSerializerSettings
+							{
+								NullValueHandling = NullValueHandling.Ignore
+							}));
+							if (spell != null)
+								_spells[spell.Id] = spell;
+							break;
+						}
+
+					default:
+						Console.WriteLine($"Unknown CardType in file: {Path.GetFileName(file)}");
+						break;
+				}
+			}
+			catch (JsonException ex)
+			{
+				Console.WriteLine($"Failed to deserialize card in file {file}: {ex.Message}");
+			}
 		}
 	}
 
@@ -135,6 +226,33 @@ public class CardDatabase
 
 		return card;
 	}
+	public SpellCard GetSpellCard(string id, Player owner)
+	{
+		if (!_spells.TryGetValue(id, out var def))
+			throw new KeyNotFoundException($"Unknown spell id '{id}'");
+
+		var card = new SpellCard(def.Name, def.Cost);
+		card.Owner = owner;
+
+		foreach (var spellCastEffectDefinitions in def.SpellCastEffectDefinitions)
+		{
+			IEnumerable<IGameAction> gameActions = 
+				spellCastEffectDefinitions.ActionDefintions
+				.Select(x => CreateGameActionFromDefinition(
+						x.GameActionTypeName,
+						x.Params)
+				);
+
+			SpellCastEffect effect = new()
+			{
+				TargetType = spellCastEffectDefinitions.TargetType,
+				GameActions = gameActions.ToList(),
+			};
+			card.SpellCastEffects.Add(effect);
+		}
+
+		return card;
+	}
 
 	public IGameAction CreateGameActionFromDefinition(string typeName, Dictionary<string, object> paramObj)
 	{
@@ -159,11 +277,27 @@ public class CardDatabase
 	}
 }
 
-public class CardDefinition
+public abstract class CardDefinition
 {
+	public CardType Type { get; set; }
 	public string Id { get; set; }
 	public string Name { get; set; }
 	public int Cost { get; set; }
+}
+
+public class SpellCardDefinition : CardDefinition
+{
+	public List<SpellCastEffectDefinition> SpellCastEffectDefinitions { get; set; }
+}
+
+public class SpellCastEffectDefinition
+{
+	public TargetType TargetType { get; set; }
+	public List<ActionDefinition> ActionDefintions { get; set; } = new();
+}
+
+public class MinionCardDefinition : CardDefinition
+{
 	public int Attack { get; set; }
 	public int Health { get; set; }
 	public MinionTribe Tribe { get; set; }
@@ -172,9 +306,6 @@ public class CardDefinition
 
 public class TriggeredEffectDefinition
 {
-	//public string Trigger { get; set; } // e.g. Battlecry
-	//public ConditionDefinition Condition { get; set; }
-	//public ActionDefinition Action { get; set; }
 	public EffectTiming EffectTiming { get; set; }
 	public EffectTrigger EffectTrigger { get; set; }
 	public TargetType TargetType { get; set; }

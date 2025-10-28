@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Text.Json.Serialization;
+
+namespace CardBattleEngine;
 
 public class TriggeredEffect
 {
@@ -19,6 +21,8 @@ public class TriggeredEffect
 		};
 	}
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum TargetType
 {
 	Any,
@@ -27,9 +31,12 @@ public enum TargetType
 	EnemyMinion,
 	EnemyHero,
 	AnyEnemy,
-	Self
+	Self,
+	None, //Spell with not target
+	AnyMinion,
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum EffectTrigger
 {
 	None,
@@ -46,8 +53,10 @@ public enum EffectTrigger
 	TurnStart,
 	OnTurnEnd,
 	OnFreeze,
+	SpellCast,
 } //TODO standardize naming
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum EffectTiming
 {
 	Pre,
