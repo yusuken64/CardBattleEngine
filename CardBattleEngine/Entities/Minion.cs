@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Tracing;
+using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
 
@@ -26,7 +27,7 @@ public class Minion : IGameEntity
 				{
 					EffectTrigger = EffectTrigger.OnTurnEnd,
 					EffectTiming = EffectTiming.Pre,
-					TargetType = TargetType.Self,
+					TargetType = TargetingType.Self,
 					GameActions = new List<IGameAction>
 					{
 						new RemoveModifierAction()
@@ -141,6 +142,7 @@ public class Minion : IGameEntity
 	}
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MinionTribe
 {
 	None,

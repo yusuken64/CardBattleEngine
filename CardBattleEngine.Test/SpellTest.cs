@@ -60,4 +60,44 @@ public class SpellTest
 		Assert.AreEqual(2, opponent.Board[0].Health, "Frostbolt should deal 3 damage.");
 		Assert.IsTrue(opponent.Board[0].IsFrozen, "Frostbolt should freeze the target.");
 	}
+
+	[TestMethod]
+	public void FlamestrikeSpellTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		current.Mana = 7; // Assume Flamestrike costs 7
+		var opponent = state.OpponentPlayer;
+
+		CardDatabase cardDatabase = new(CardDBTest.DBPath);
+		var spellCard = cardDatabase.GetSpellCard("FlameStrike", current);
+		current.Hand.Add(spellCard);
+
+		// Create multiple enemy minions with varying health
+		for (int i = 0; i < 5; i++)
+		{
+			var card = cardDatabase.GetMinionCard("TestMinion", opponent);
+			var enemyMinion = new Minion(card, opponent)
+			{
+				Health = 6
+			};
+			opponent.Board.Add(enemyMinion);
+		}
+
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = current,
+			SourceCard = spellCard,
+			Target = null,
+		}, new PlayCardAction { Card = spellCard });
+
+		// Assert - All enemy minions should have taken 5 damage
+		foreach (var minion in opponent.Board)
+		{
+			Assert.AreEqual(1, minion.Health, "Flamestrike should deal 5 damage to all enemy minions.");
+		}
+	}
+
 }

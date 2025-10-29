@@ -1,5 +1,4 @@
-﻿
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class CastSpellAction : IGameAction
 {
@@ -18,16 +17,34 @@ public class CastSpellAction : IGameAction
 
 	public bool IsValid(GameState gameState, ActionContext context)
 	{
-		return true;
+		return context.SourceCard is SpellCard spellcard;
 	}
 
 	public IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
+		if (!IsValid(state, context)) {	yield break; }
+
 		if (context.SourceCard is SpellCard spellcard) {
-			foreach (var action in spellcard.SpellCastEffects
-									.SelectMany(x => x.GameActions))
+			foreach (SpellCastEffect spellCastEffect in spellcard.SpellCastEffects)
 			{
-				yield return (action, context);
+				var targets = spellCastEffect.AffectedEntitySelector.Select(state, context);
+
+				foreach (var target in targets)
+				{
+					ActionContext spellActionContext = new()
+					{
+						SourcePlayer = context.SourcePlayer,
+						Source = context.Source,
+						Target = target,
+						SourceCard = context.SourceCard,
+						AffectedEntitySelector = spellCastEffect.AffectedEntitySelector,
+					};
+
+					foreach (var action in spellCastEffect.GameActions)
+					{
+						yield return (action, spellActionContext);
+					}
+				}
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
 
@@ -10,26 +12,26 @@ public class CardDatabase
 
 	private readonly Dictionary<string, Type> _actions = new();
 	private readonly Dictionary<string, Type> _triggerConditions = new();
+	private readonly Dictionary<string, Type> _affectedEntitySelectors = new();
 
 	public CardDatabase(string path)
 	{
 		LoadAll(path);
-		RegisterGameActions();
+		RegisterTypes<IGameAction>(_actions);
+		RegisterTypes<ITriggerCondition>(_triggerConditions);
+		RegisterTypes<IAffectedEntitySelector>(_affectedEntitySelectors);
 	}
 
-	private void RegisterGameActions()
+	private void RegisterTypes<T>(Dictionary<string, Type> targetDictionary)
 	{
-		// register automatically
-		foreach (var t in typeof(IGameAction).Assembly.GetTypes())
-		{
-			if (typeof(IGameAction).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-				_actions[t.Name] = t;
-		}
+		var assembly = typeof(T).Assembly;
 
-		foreach (var t in typeof(ITriggerCondition).Assembly.GetTypes())
+		foreach (var type in assembly.GetTypes())
 		{
-			if (typeof(ITriggerCondition).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-				_triggerConditions[t.Name] = t;
+			if (typeof(T).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+			{
+				targetDictionary[type.Name] = type;
+			}
 		}
 	}
 
@@ -102,11 +104,17 @@ public class CardDatabase
 			Id = cardName,
 			Name = card.Name,
 			Cost = card.ManaCost,
+			Type = card.Type,
+			TargetingType = card.TargetingType,
 			SpellCastEffectDefinitions = card.SpellCastEffects.Select(x =>
 			{
 				return new SpellCastEffectDefinition()
 				{
-					TargetType = x.TargetType,
+					AffectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition()
+					{
+						EntitySelectorTypeName = x.AffectedEntitySelector.GetType().Name,
+						Params = x.AffectedEntitySelector.EmitParams(),
+					},
 					ActionDefintions = x.GameActions.Select(ga =>
 					{
 						return new ActionDefinition()
@@ -122,6 +130,7 @@ public class CardDatabase
 		var json = JsonConvert.SerializeObject(def, Formatting.Indented, new JsonSerializerSettings
 		{
 			TypeNameHandling = TypeNameHandling.Auto,
+			Converters = { new StringEnumConverter() }
 		});
 
 		File.WriteAllText(path, json);
@@ -233,25 +242,41 @@ public class CardDatabase
 
 		var card = new SpellCard(def.Name, def.Cost);
 		card.Owner = owner;
+		card.TargetingType = def.TargetingType;
 
-		foreach (var spellCastEffectDefinitions in def.SpellCastEffectDefinitions)
+		foreach (var spellCastEffectDefinition in def.SpellCastEffectDefinitions)
 		{
 			IEnumerable<IGameAction> gameActions = 
-				spellCastEffectDefinitions.ActionDefintions
+				spellCastEffectDefinition.ActionDefintions
 				.Select(x => CreateGameActionFromDefinition(
 						x.GameActionTypeName,
 						x.Params)
 				);
 
+			IAffectedEntitySelector affectedEntitySelector =
+				CreateAffectedEntitySelectorFromDefinintion(
+					spellCastEffectDefinition.AffectedEntitySelectorDefinition.EntitySelectorTypeName,
+					spellCastEffectDefinition.AffectedEntitySelectorDefinition.Params
+				);
 			SpellCastEffect effect = new()
 			{
-				TargetType = spellCastEffectDefinitions.TargetType,
 				GameActions = gameActions.ToList(),
+				AffectedEntitySelector = affectedEntitySelector
 			};
 			card.SpellCastEffects.Add(effect);
 		}
 
 		return card;
+	}
+
+	private IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinintion(string entitySelectorTypeName, Dictionary<string, object> paramObj)
+	{
+		if (!_affectedEntitySelectors.TryGetValue(entitySelectorTypeName, out var t))
+			throw new Exception($"Unknown triggerCondition: {entitySelectorTypeName}");
+
+		var instance = (IAffectedEntitySelector)Activator.CreateInstance(t)!;
+		instance.ConsumeParams(paramObj);
+		return instance;
 	}
 
 	public IGameAction CreateGameActionFromDefinition(string typeName, Dictionary<string, object> paramObj)
@@ -287,13 +312,14 @@ public abstract class CardDefinition
 
 public class SpellCardDefinition : CardDefinition
 {
+	public TargetingType TargetingType { get; set; }
 	public List<SpellCastEffectDefinition> SpellCastEffectDefinitions { get; set; }
 }
 
 public class SpellCastEffectDefinition
 {
-	public TargetType TargetType { get; set; }
 	public List<ActionDefinition> ActionDefintions { get; set; } = new();
+	public AffectedEntitySelectorDefinition AffectedEntitySelectorDefinition { get; set; }
 }
 
 public class MinionCardDefinition : CardDefinition
@@ -308,7 +334,7 @@ public class TriggeredEffectDefinition
 {
 	public EffectTiming EffectTiming { get; set; }
 	public EffectTrigger EffectTrigger { get; set; }
-	public TargetType TargetType { get; set; }
+	public TargetingType TargetType { get; set; }
 	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
 	public ActionDefinition ActionDefintion { get; set; }
 }
@@ -322,5 +348,11 @@ public class ActionDefinition
 public class TriggerConditionDefinition
 {
 	public string ConditionTypeName { get; set; }
+	public Dictionary<string, object> Params { get; set; }
+}
+
+public class AffectedEntitySelectorDefinition
+{
+	public string EntitySelectorTypeName { get; set; }
 	public Dictionary<string, object> Params { get; set; }
 }

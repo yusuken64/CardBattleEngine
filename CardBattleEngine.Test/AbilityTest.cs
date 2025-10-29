@@ -20,7 +20,7 @@ public class AbilityTest
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetType.AnyEnemy,
+			TargetType = TargetingType.AnyEnemy,
 			GameActions = new List<IGameAction>() 
 			{
 				new DamageAction() { Damage = 1 }
@@ -37,11 +37,11 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = card,
-			TargetSelector = (gs, player, targetType) =>
-			{
-				var validTargets = gs.GetValidTargets(player, targetType);
-				return validTargets[0];
-			}
+			//AffectedEntitySelector = (gs, player, targetType) =>
+			//{
+			//	var validTargets = gs.GetValidTargets(player, targetType);
+			//	return validTargets[0];
+			//}
 		};
 		engine.Resolve(state, actionContext, play);
 
@@ -68,7 +68,7 @@ public class AbilityTest
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetType.AnyEnemy,
+			TargetType = TargetingType.AnyEnemy,
 			GameActions = new List<IGameAction>
 			{
 				new DamageAction() { Damage = 1 }
@@ -94,10 +94,10 @@ public class AbilityTest
 		engine.Resolve(state, new ActionContext
 		{
 			Target = minionEntity,
-			TargetSelector = (s, p, t) =>
-			{
-				return s.OpponentOf(p);
-			}
+			//AffectedEntitySelector = (s, p, t) =>
+			//{
+			//	return s.OpponentOf(p);
+			//}
 		}, damage);
 
 		// Assert
@@ -126,7 +126,7 @@ public class AbilityTest
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
-			TargetType = TargetType.FriendlyMinion,
+			TargetType = TargetingType.FriendlyMinion,
 			GameActions = new List<IGameAction>
 			{
 				new AddStatModifierAction()
@@ -144,11 +144,11 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = abusiveCard,
-			TargetSelector = (gs, player, targetType) =>
-			{
-				var validTargets = gs.GetValidTargets(player, targetType);
-				return validTargets[0];
-			}
+			//AffectedEntitySelector = (gs, player, targetType) =>
+			//{
+			//	var validTargets = gs.GetValidTargets(player, targetType);
+			//	return validTargets[0];
+			//}
 		};
 		engine.Resolve(state, actionContext, playCardAction);
 
@@ -177,7 +177,7 @@ public class AbilityTest
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
-			TargetType = TargetType.FriendlyHero,
+			TargetType = TargetingType.FriendlyHero,
 			GameActions = new List<IGameAction>
 			{
 				new GainCardAction()
@@ -232,7 +232,7 @@ public class AbilityTest
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
-			TargetType = TargetType.EnemyMinion,
+			TargetType = TargetingType.EnemyMinion,
 			GameActions = new List<IGameAction>
 		{
 			new FreezeAction() // assumed to exist
@@ -247,7 +247,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = freezeMinionCard,
-			TargetSelector = (gs, player, targetType) => enemyMinion // pick enemy minion
+			//AffectedEntitySelector = (gs, player, targetType) => enemyMinion // pick enemy minion
 		};
 
 		// Act

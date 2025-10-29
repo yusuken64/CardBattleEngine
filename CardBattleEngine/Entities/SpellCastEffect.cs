@@ -2,6 +2,6 @@
 
 public class SpellCastEffect
 {
-	public TargetType TargetType { get; set; }
+	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
 	public List<IGameAction> GameActions { get; set; } = new();
 }

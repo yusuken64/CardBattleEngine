@@ -62,12 +62,12 @@ public class GameEngine
 	}
 	private ActionContext EnsureSelector(ActionContext ctx)
 	{
-		if (ctx.TargetSelector == null)
-			ctx.TargetSelector = CreateRandomTargetSelector();
+		//if (ctx.TargetSelector == null)
+		//	ctx.TargetSelector = CreateRandomTargetSelector();
 		return ctx;
 	}
 
-	private Func<GameState, Player, TargetType, IGameEntity> CreateRandomTargetSelector()
+	private Func<GameState, Player, TargetingType, IGameEntity> CreateRandomTargetSelector()
 	{
 		return (gameState, player, targetType) =>
 		{

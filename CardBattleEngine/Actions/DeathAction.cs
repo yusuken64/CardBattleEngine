@@ -23,13 +23,13 @@ internal class DeathAction : GameActionBase
 			{
 				sideEffects.AddRange(effect.GameActions.Select(x =>
 				{
-					var target = actionContext.TargetSelector(state, minion.Owner, effect.TargetType);
+					var target = actionContext.AffectedEntitySelector.Select(state, actionContext);
 
 					return (x, new ActionContext()
 					{
 						SourcePlayer = minion.Owner,
 						Source = minion,
-						Target = target
+						//Target = x.Af //TODO get selector from deathrattle
 					});
 				}));
 			}

@@ -1,0 +1,26 @@
+﻿{
+	"TargetingType": "None",
+	"SpellCastEffectDefinitions": [
+		{
+			"ActionDefintions": [
+				{
+					"GameActionTypeName": "DamageAction",
+					"Params": {
+						"Damage": 5
+					}
+				}
+			],
+			"AffectedEntitySelectorDefinition": {
+				"EntitySelectorTypeName": "BoardEntitySelector",
+				"Params": {
+					"Side": "Enemy",
+					"Group": "Minions"
+				}
+			}
+		}
+	],
+	"Type": "Spell",
+	"Id": "FlameStrike",
+	"Name": "FlameStrike",
+	"Cost": 1
+}

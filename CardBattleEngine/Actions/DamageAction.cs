@@ -17,37 +17,49 @@ public class DamageAction : GameActionBase
 			return [];
 
 		var source = actionContext.Source;
-		var target = actionContext.Target;
 
-		// Divine Shield negates damage completely
-		if (target is Minion targetMinion && targetMinion.HasDivineShield)
+		IEnumerable<IGameEntity> targets = new List<IGameEntity>();
+		if (actionContext.AffectedEntitySelector != null)
 		{
-			targetMinion.HasDivineShield = false;
-			return [];
+			targets = actionContext.AffectedEntitySelector.Select(state, actionContext);
+		}
+		else
+		{
+			targets = [actionContext.Target];
 		}
 
-		// Apply damage
-		target.Health -= Damage;
-
-		bool shouldDie = false;
-
-		// Check lethal HP
-		if (target.Health <= 0)
-			shouldDie = true;
-
-		// Check poisonous damage
-		if (source is Minion attacker && attacker.HasPoisonous && target is Minion && Damage > 0)
-			shouldDie = true;
-
-		if (shouldDie)
+		foreach (var target in targets)
 		{
-			return [(new DeathAction(), new ActionContext
+			// Divine Shield negates damage completely
+			if (target is Minion targetMinion && targetMinion.HasDivineShield)
+			{
+				targetMinion.HasDivineShield = false;
+				return [];
+			}
+
+			// Apply damage
+			target.Health -= Damage;
+
+			bool shouldDie = false;
+
+			// Check lethal HP
+			if (target.Health <= 0)
+				shouldDie = true;
+
+			// Check poisonous damage
+			if (source is Minion attacker && attacker.HasPoisonous && target is Minion && Damage > 0)
+				shouldDie = true;
+
+			if (shouldDie)
+			{
+				return [(new DeathAction(), new ActionContext
 			{
 				SourcePlayer = actionContext.SourcePlayer,
 				Source = target,
 				Target = target,
-				TargetSelector = actionContext.TargetSelector
+				AffectedEntitySelector = actionContext.AffectedEntitySelector
 			})];
+			}
 		}
 
 		return [];

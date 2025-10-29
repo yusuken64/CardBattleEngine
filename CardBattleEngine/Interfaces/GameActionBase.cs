@@ -1,6 +1,4 @@
-﻿
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 // Basic effect/action that can be executed on a GameState
 public interface IGameAction
@@ -38,5 +36,5 @@ public class ActionContext
 	public IGameEntity Target;
 	public StatModifier Modifier;
 
-	public Func<GameState, Player, TargetType, IGameEntity> TargetSelector;
+	public IAffectedEntitySelector AffectedEntitySelector;
 }

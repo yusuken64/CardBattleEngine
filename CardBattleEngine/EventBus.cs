@@ -40,7 +40,7 @@ public class EventBus
 						Source = entity,
 						SourcePlayer = entity.Owner,
 						Target = target,
-						TargetSelector = null // engine injects default/random if needed
+						AffectedEntitySelector = null // engine injects default/random if needed
 					});
 				}
 			}
@@ -61,7 +61,7 @@ public class EventBus
 						SourcePlayer = minion.Owner,
 						Target = minion,
 						Modifier = effect.Item2,
-						TargetSelector = null
+						AffectedEntitySelector = null
 					});
 				}
 			}

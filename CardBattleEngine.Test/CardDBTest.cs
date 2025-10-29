@@ -39,7 +39,7 @@ public class CardDBTest
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetType.AnyEnemy,
+			TargetType = TargetingType.AnyEnemy,
 			GameActions = new List<IGameAction>()
 			{
 				new DamageAction()
@@ -60,8 +60,8 @@ public class CardDBTest
 		Assert.AreEqual(1, loadedMinion.TriggeredEffects.Count());
 		Assert.AreEqual(EffectTrigger.Battlecry, loadedMinion.TriggeredEffects[0].EffectTrigger);
 		Assert.AreEqual(EffectTiming.Post, loadedMinion.TriggeredEffects[0].EffectTiming);
-		Assert.AreEqual(TargetType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
-		Assert.AreEqual(TargetType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
+		Assert.AreEqual(TargetingType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
+		Assert.AreEqual(TargetingType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
 		Assert.AreEqual(1, loadedMinion.TriggeredEffects[0].GameActions.Count());
 		Assert.IsInstanceOfType(loadedMinion.TriggeredEffects[0].GameActions[0], typeof(DamageAction));
 		Assert.AreEqual(1, ((DamageAction)loadedMinion.TriggeredEffects[0].GameActions[0]).Damage);
@@ -78,7 +78,7 @@ public class CardDBTest
 		var effect = card.TriggeredEffects[0];
 		Assert.AreEqual(EffectTrigger.Battlecry, effect.EffectTrigger);
 		Assert.AreEqual(EffectTiming.Post, effect.EffectTiming);
-		Assert.AreEqual(TargetType.AnyEnemy, effect.TargetType);
+		Assert.AreEqual(TargetingType.AnyEnemy, effect.TargetType);
 		Assert.AreEqual(1, effect.GameActions.Count);
 		Assert.IsInstanceOfType(effect.GameActions[0], typeof(DamageAction));
 	}
@@ -127,11 +127,11 @@ public class CardDBTest
 	public void CreateSpellDefinitionTest()
 	{
 		SpellCard card = new SpellCard("TestSpell_DrawCards", 1);
+		card.TargetingType = TargetingType.None;
 		card.SpellCastEffects.Add(new SpellCastEffect());
 
 		card.SpellCastEffects[0] = new SpellCastEffect()
 		{
-			TargetType = TargetType.None,
 			GameActions = new()
 			{
 				new DrawCardFromDeckAction(),
@@ -144,14 +144,39 @@ public class CardDBTest
 	}
 
 	[TestMethod]
+	public void CreateSpellDefinitionTest2()
+	{
+		SpellCard card = new SpellCard("TestSpell_AOEDamage", 1);
+		card.TargetingType = TargetingType.None;
+
+		card.SpellCastEffects.Add(new SpellCastEffect()
+		{
+			AffectedEntitySelector = new BoardEntitySelector()
+			{
+				Side = TargetSide.Enemy,
+				Group = TargetGroup.Minions,
+			},
+			GameActions = new()
+			{
+				new DamageAction()
+				{
+					Damage = 5,
+				}
+			}
+		});
+		var json = CardDatabase.CreateFileFromSpellCard(card, DBPath, "SaveTestSpell");
+		Console.WriteLine(json);
+	}
+
+	[TestMethod]
 	public void CreateTargetedSpellDefinitionTest()
 	{
 		SpellCard card = new SpellCard("TestSpell_DealDamage", 1);
 		card.SpellCastEffects.Add(new SpellCastEffect());
+		card.TargetingType = TargetingType.Any;
 
 		card.SpellCastEffects[0] = new SpellCastEffect()
 		{
-			TargetType = TargetType.AnyEnemy,
 			GameActions = new()
 			{
 				new DamageAction() { Damage = 3 },

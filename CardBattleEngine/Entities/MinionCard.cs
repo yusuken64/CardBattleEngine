@@ -29,9 +29,10 @@ public class MinionCard : Card
 
 			IGameEntity? target = null;
 			// If this play action provided a selector, ask it for a target
-			if (context.TargetSelector != null)
+			if (context.AffectedEntitySelector != null)
 			{
-				target = context.TargetSelector(state, context.SourcePlayer, effect.TargetType);
+				IEnumerable<IGameEntity> targets = context.AffectedEntitySelector.Select(state, context);
+				target = targets.ToList().FirstOrDefault(); //TODO fix
 			}
 
 			var effectContext = new ActionContext

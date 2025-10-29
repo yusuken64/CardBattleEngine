@@ -6,7 +6,7 @@ public class TriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
-	public TargetType TargetType { get; set; }
+	public TargetingType TargetType { get; set; }
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
 
@@ -23,7 +23,7 @@ public class TriggeredEffect
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum TargetType
+public enum TargetingType
 {
 	Any,
 	FriendlyMinion,
