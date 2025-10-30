@@ -56,6 +56,9 @@ public enum EffectTrigger
 	OnTurnEnd,
 	OnFreeze,
 	SpellCast,
+	SpellCountered,
+	SecretCasted,
+	SecretResolved,
 } //TODO standardize naming
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

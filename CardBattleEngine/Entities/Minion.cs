@@ -1,9 +1,8 @@
-﻿using System.Diagnostics.Tracing;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
 
-public class Minion : IGameEntity
+public class Minion : IGameEntity, ITriggerSource
 {
 	private MinionCard card;
 	public Guid Id { get; set; } = Guid.NewGuid();
@@ -36,7 +35,7 @@ public class Minion : IGameEntity
 			}
 		}
 	}
-	public List<TriggeredEffect> TriggeredEffects { get; }
+	public IEnumerable<TriggeredEffect> TriggeredEffects { get; }
 
 	private IAttackBehavior _attackBehavior;
 	IAttackBehavior IGameEntity.AttackBehavior
@@ -75,13 +74,13 @@ public class Minion : IGameEntity
 		HasPoisonous = card.HasPoisonous;
 
 		IsAlive = true;
-		TriggeredEffects = new();
-
-		foreach (var effect in card.TriggeredEffects)
+		TriggeredEffects = card.TriggeredEffects.Select(effect =>
 		{
 			var instance = effect.CloneFor(this);
-			TriggeredEffects.Add(instance);
-		}
+			return instance;
+		});
+		
+		
 	}
 
 	public bool CanAttack()

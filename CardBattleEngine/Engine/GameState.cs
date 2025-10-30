@@ -159,6 +159,21 @@ public class GameState
 		return all;
 	}
 
+	public IEnumerable<ITriggerSource> GetAllTriggerSources()
+	{
+		var all = new List<ITriggerSource>();
+
+		foreach (var player in Players)
+		{
+			all.Add(player);
+			all.AddRange(player.Secrets);
+			all.AddRange(player.Board);
+			//all.AddRange(CurrentPlayer.Hand);
+		}
+
+		return all;
+	}
+
 	public IEnumerable<Minion> GetAllMinions()
 	{
 		var all = new List<Minion>();

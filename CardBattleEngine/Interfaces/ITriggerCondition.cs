@@ -18,4 +18,7 @@ public class EffectContext
 {
 	public IGameEntity EffectOwner { get; internal set; }
 	public Minion SummonedUnit { get; set; }
+	public IGameEntity SecretOwner { get; internal set; }
+	public IGameAction TriggeringAction { get; internal set; }
+	public Player OriginalOwner { get; internal set; }
 }

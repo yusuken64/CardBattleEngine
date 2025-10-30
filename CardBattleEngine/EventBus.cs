@@ -1,4 +1,7 @@
-﻿namespace CardBattleEngine;
+﻿using System.Net.Sockets;
+using System.Numerics;
+
+namespace CardBattleEngine;
 
 public class EventBus
 {
@@ -14,17 +17,21 @@ public class EventBus
 		Func<List<IGameEntity>, IGameEntity> picker)
 	{
 		// Normal card effects
-		foreach (var entity in gameState.GetAllEntities())
+		foreach (var triggerSource in gameState.GetAllTriggerSources())
 		{
-			foreach (var effect in entity.TriggeredEffects
+			foreach (var effect in triggerSource.TriggeredEffects
 				.Where(te => te.EffectTrigger == triggeringAction.EffectTrigger &&
 							 te.EffectTiming == timing))
 			{
 				EffectContext effectContext = new()
 				{
-					EffectOwner = entity,
-					SummonedUnit = context.Source as Minion
+					EffectOwner = triggerSource.Owner,
+					SummonedUnit = context.Source as Minion,
+					SecretOwner = triggerSource.Owner,
+					TriggeringAction = triggeringAction,
+					OriginalOwner = context.SourcePlayer,
 				};
+
 				if (effect.Condition?.Evaluate(effectContext) == false)
 				{
 					continue;
@@ -32,14 +39,15 @@ public class EventBus
 
 				foreach (var action in effect.GameActions)
 				{
-					var targets = gameState.GetValidTargets(entity, effect.TargetType);
+					var targets = gameState.GetValidTargets(triggerSource.Owner, effect.TargetType);
 					var target = picker(targets);
 
 					yield return (action, new ActionContext
 					{
-						Source = entity,
-						SourcePlayer = entity.Owner,
+						Source = triggerSource.Owner,
+						SourcePlayer = triggerSource.Owner,
 						Target = target,
+						OriginalAction = context.OriginalAction,
 						AffectedEntitySelector = null // engine injects default/random if needed
 					});
 				}

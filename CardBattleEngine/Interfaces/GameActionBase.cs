@@ -37,4 +37,6 @@ public class ActionContext
 	public StatModifier Modifier;
 
 	public IAffectedEntitySelector AffectedEntitySelector;
+
+	public IGameAction OriginalAction { get; internal set; }
 }

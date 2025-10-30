@@ -1,6 +1,7 @@
-﻿namespace CardBattleEngine;
+﻿
+namespace CardBattleEngine;
 
-public class Player : IGameEntity
+public class Player : IGameEntity, ITriggerSource
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 	public string Name { get; set; }
@@ -8,6 +9,7 @@ public class Player : IGameEntity
 	public List<Card> Hand { get; } = new List<Card>();
 	public List<Minion> Board { get; } = new List<Minion>();
 	public List<Minion> Graveyard { get; } = new List<Minion>();
+	public List<Secret> Secrets { get; set; } = new List<Secret>();//TODO expand to hero auras
 	public int CurrentMana { get; set; }
 	public int MaxMana { get; set; }
 	public int Attack { get; set; }
@@ -22,6 +24,7 @@ public class Player : IGameEntity
 
 	public bool IsAlive { get; set; }
 	public List<TriggeredEffect> TriggeredEffects { get; }
+	IEnumerable<TriggeredEffect> ITriggerSource.TriggeredEffects => TriggeredEffects;
 	public bool IsFrozen { get; internal set; }
 	public bool HasAttackedThisTurn { get; internal set; }
 	public bool MissedAttackFromFrozen { get; internal set; }

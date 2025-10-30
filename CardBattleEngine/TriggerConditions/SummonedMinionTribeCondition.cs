@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
-
 public class SummonedMinionTribeCondition : TriggerConditionBase
 {
 	public MinionToMinionRelationship MinionToMinionRelationship;

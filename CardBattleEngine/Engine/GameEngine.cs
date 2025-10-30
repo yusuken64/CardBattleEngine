@@ -26,10 +26,12 @@ public class GameEngine
 			if (!current.action.IsValid(gameState, current.context))
 				continue;
 
+			current.context.OriginalAction = current.action;
+
 			// Pre-resolution triggers
 			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre, ChooseRandom))
 			{
-				_actionQueue.Enqueue(trigger);
+				trigger.action.Resolve(gameState, trigger.context);
 			}
 
 			if (current.action.Canceled)
