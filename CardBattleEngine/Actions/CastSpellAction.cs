@@ -27,7 +27,15 @@ public class CastSpellAction : IGameAction
 		if (context.SourceCard is SpellCard spellcard) {
 			foreach (SpellCastEffect spellCastEffect in spellcard.SpellCastEffects)
 			{
-				var targets = spellCastEffect.AffectedEntitySelector.Select(state, context);
+				IEnumerable<IGameEntity> targets;
+				if (spellCastEffect.AffectedEntitySelector != null)
+				{
+					targets = spellCastEffect.AffectedEntitySelector.Select(state, context);
+				}
+				else
+				{
+					targets = [context.Target];
+				}
 
 				foreach (var target in targets)
 				{

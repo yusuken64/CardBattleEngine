@@ -108,13 +108,18 @@ public class CardDatabase
 			TargetingType = card.TargetingType,
 			SpellCastEffectDefinitions = card.SpellCastEffects.Select(x =>
 			{
-				return new SpellCastEffectDefinition()
+				AffectedEntitySelectorDefinition affectedEntitySelectorDefinition = null;
+				if (x.AffectedEntitySelector != null)
 				{
-					AffectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition()
+					affectedEntitySelectorDefinition = new()
 					{
 						EntitySelectorTypeName = x.AffectedEntitySelector.GetType().Name,
 						Params = x.AffectedEntitySelector.EmitParams(),
-					},
+					};
+				}
+				return new SpellCastEffectDefinition()
+				{
+					AffectedEntitySelectorDefinition = affectedEntitySelectorDefinition,
 					ActionDefintions = x.GameActions.Select(ga =>
 					{
 						return new ActionDefinition()
@@ -253,11 +258,15 @@ public class CardDatabase
 						x.Params)
 				);
 
-			IAffectedEntitySelector affectedEntitySelector =
-				CreateAffectedEntitySelectorFromDefinintion(
-					spellCastEffectDefinition.AffectedEntitySelectorDefinition.EntitySelectorTypeName,
-					spellCastEffectDefinition.AffectedEntitySelectorDefinition.Params
-				);
+			IAffectedEntitySelector affectedEntitySelector = null;
+			if (spellCastEffectDefinition.AffectedEntitySelectorDefinition != null)
+			{
+				affectedEntitySelector =
+					CreateAffectedEntitySelectorFromDefinintion(
+						spellCastEffectDefinition.AffectedEntitySelectorDefinition.EntitySelectorTypeName,
+						spellCastEffectDefinition.AffectedEntitySelectorDefinition.Params
+					);
+			}
 			SpellCastEffect effect = new()
 			{
 				GameActions = gameActions.ToList(),

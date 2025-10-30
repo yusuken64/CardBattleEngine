@@ -37,11 +37,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = card,
-			//AffectedEntitySelector = (gs, player, targetType) =>
-			//{
-			//	var validTargets = gs.GetValidTargets(player, targetType);
-			//	return validTargets[0];
-			//}
+			Target = opponent,
 		};
 		engine.Resolve(state, actionContext, play);
 
@@ -69,6 +65,14 @@ public class AbilityTest
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
 			TargetType = TargetingType.AnyEnemy,
+			AffectedEntitySelector = new TargetOperationSelector
+			{
+				Operations = [
+					new SelectBoardEntitiesOperation() {
+						Group = TargetGroup.Hero,
+						Side = TargetSide.Enemy,
+					}]
+			},
 			GameActions = new List<IGameAction>
 			{
 				new DamageAction() { Damage = 1 }
@@ -94,10 +98,6 @@ public class AbilityTest
 		engine.Resolve(state, new ActionContext
 		{
 			Target = minionEntity,
-			//AffectedEntitySelector = (s, p, t) =>
-			//{
-			//	return s.OpponentOf(p);
-			//}
 		}, damage);
 
 		// Assert
@@ -144,11 +144,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = abusiveCard,
-			//AffectedEntitySelector = (gs, player, targetType) =>
-			//{
-			//	var validTargets = gs.GetValidTargets(player, targetType);
-			//	return validTargets[0];
-			//}
+			Target = current.Board[0]
 		};
 		engine.Resolve(state, actionContext, playCardAction);
 
@@ -247,7 +243,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = freezeMinionCard,
-			//AffectedEntitySelector = (gs, player, targetType) => enemyMinion // pick enemy minion
+			Target = enemyMinion,
 		};
 
 		// Act

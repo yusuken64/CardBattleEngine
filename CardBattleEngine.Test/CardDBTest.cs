@@ -3,6 +3,7 @@
 namespace CardBattleEngine.Test;
 
 [TestClass]
+[DoNotParallelize]
 public class CardDBTest
 {
 	//public string DBPath = "C:\\Users\\yusuk\\source\\repos\\CardBattleEngine\\Data\\";
@@ -151,10 +152,10 @@ public class CardDBTest
 
 		card.SpellCastEffects.Add(new SpellCastEffect()
 		{
-			AffectedEntitySelector = new BoardEntitySelector()
+			AffectedEntitySelector = new TargetOperationSelector()
 			{
-				Side = TargetSide.Enemy,
-				Group = TargetGroup.Minions,
+				//Side = TargetSide.Enemy,
+				//Group = TargetGroup.Minions,
 			},
 			GameActions = new()
 			{

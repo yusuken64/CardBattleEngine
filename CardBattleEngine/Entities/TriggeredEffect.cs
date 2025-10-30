@@ -9,6 +9,7 @@ public class TriggeredEffect
 	public TargetingType TargetType { get; set; }
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
+	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
 
 	internal TriggeredEffect CloneFor(Minion minion)
 	{
@@ -17,6 +18,7 @@ public class TriggeredEffect
 			EffectTiming = this.EffectTiming,
 			EffectTrigger = this.EffectTrigger,
 			TargetType = TargetType,
+			AffectedEntitySelector = AffectedEntitySelector,
 			GameActions = GameActions.ToList(), //TODO implement deep clone for effects
 		};
 	}

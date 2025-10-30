@@ -7,6 +7,7 @@ public interface IAffectedEntitySelector
 	void ConsumeParams(Dictionary<string, object> paramObj);
 	IEnumerable<IGameEntity> Select(GameState state, ActionContext context);
 }
+
 public abstract class AffectedEntitySelectorBase : IAffectedEntitySelector
 {
 	public virtual void ConsumeParams(Dictionary<string, object> actionParam)

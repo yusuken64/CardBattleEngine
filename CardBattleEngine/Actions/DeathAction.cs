@@ -13,27 +13,35 @@ internal class DeathAction : GameActionBase
 	{
 		var sideEffects = new List<(IGameAction, ActionContext)>();
 		actionContext.Target.IsAlive = false;
+
 		if (actionContext.Target is Minion minion)
 		{
 			minion.Owner.Board.Remove(minion);
 			minion.Owner.Graveyard.Add(minion);
 
 			foreach (var effect in minion.TriggeredEffects
-				.Where(x => x.EffectTrigger == EffectTrigger.Deathrattle))
+				.Where(e => e.EffectTrigger == EffectTrigger.Deathrattle))
 			{
-				sideEffects.AddRange(effect.GameActions.Select(x =>
+				foreach (var gameAction in effect.GameActions)
 				{
-					var target = actionContext.AffectedEntitySelector.Select(state, actionContext);
-
-					return (x, new ActionContext()
+					ActionContext selectorContext = new ActionContext()
 					{
 						SourcePlayer = minion.Owner,
 						Source = minion,
-						//Target = x.Af //TODO get selector from deathrattle
-					});
-				}));
+					};
+					var targets = effect.AffectedEntitySelector.Select(state, selectorContext);
+
+					foreach (var target in targets)
+					{
+						sideEffects.Add((gameAction, new ActionContext
+						{
+							SourcePlayer = minion.Owner,
+							Source = minion,
+							Target = target
+						}));
+					}
+				}
 			}
-			
 		}
 
 		return sideEffects;

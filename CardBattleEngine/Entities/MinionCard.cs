@@ -27,23 +27,29 @@ public class MinionCard : Card
 				effect.EffectTrigger != EffectTrigger.Battlecry)
 				continue;
 
-			IGameEntity? target = null;
+			IEnumerable<IGameEntity> targets;
 			// If this play action provided a selector, ask it for a target
 			if (context.AffectedEntitySelector != null)
 			{
-				IEnumerable<IGameEntity> targets = context.AffectedEntitySelector.Select(state, context);
-				target = targets.ToList().FirstOrDefault(); //TODO fix
+				targets = context.AffectedEntitySelector.Select(state, context);
+			}
+			else
+			{
+				targets = [context.Target];
 			}
 
-			var effectContext = new ActionContext
+			foreach (var target in targets)
 			{
-				SourceCard = this,
-				SourcePlayer = context.SourcePlayer,
-				Target = target
-			};
+				var effectContext = new ActionContext
+				{
+					SourceCard = this,
+					SourcePlayer = context.SourcePlayer,
+					Target = target
+				};
 
-			foreach (var gameAction in effect.GameActions)
-				yield return (gameAction, effectContext);
+				foreach (var gameAction in effect.GameActions)
+					yield return (gameAction, effectContext);
+			}
 		}
 
 		SummonMinionAction summonMinionAction = new()
