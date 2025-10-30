@@ -140,13 +140,14 @@ public class CardDBTest
 				new DrawCardFromDeckAction(),
 			}
 		};
-		var json = CardDatabase.CreateFileFromSpellCard(card, DBPath, "SaveTestSpell");
+		var json = CardDatabase.CreateJsonFromSpellCard(card, "SaveTestSpell");
 		Console.WriteLine(json);
 	}
 
 	[TestMethod]
 	public void CreateSpellDefinitionTest2()
 	{
+		// Arrange
 		SpellCard card = new SpellCard("TestSpell_AOEDamage", 1);
 		card.TargetingType = TargetingType.None;
 
@@ -154,37 +155,109 @@ public class CardDBTest
 		{
 			AffectedEntitySelector = new TargetOperationSelector()
 			{
-				//Side = TargetSide.Enemy,
-				//Group = TargetGroup.Minions,
+				Operations = new List<ITargetOperation>()
+				{
+					new SelectBoardEntitiesOperation()
+					{
+						Group = TargetGroup.Minions,
+						Side = TargetSide.Enemy
+					},
+				}
 			},
 			GameActions = new()
+		{
+			new DamageAction()
 			{
-				new DamageAction()
-				{
-					Damage = 5,
-				}
+				Damage = 5,
 			}
+		}
 		});
-		var json = CardDatabase.CreateFileFromSpellCard(card, DBPath, "SaveTestSpell");
+
+		// Act
+		var json = CardDatabase.CreateJsonFromSpellCard(card, "SaveTestSpell");
 		Console.WriteLine(json);
+
+		var loadedCard = CardDatabase.LoadCardFromJson(json);
+
+		// Assert
+		Assert.IsNotNull(loadedCard, "Loaded card should not be null");
+		Assert.IsInstanceOfType(loadedCard, typeof(SpellCardDefinition), "Loaded card should be a SpellCardDefinition");
+
+		var spellDef = (SpellCardDefinition)loadedCard;
+
+		Assert.AreEqual("SaveTestSpell", spellDef.Id, "Card Id should match");
+		Assert.AreEqual(card.Name, spellDef.Name, "Card name should match");
+		Assert.AreEqual(card.ManaCost, spellDef.Cost, "Mana cost should match");
+		Assert.AreEqual(TargetingType.None, spellDef.TargetingType, "TargetingType should match");
+		Assert.AreEqual(CardType.Spell, spellDef.Type, "Type should be Spell");
+
+		// Check that SpellCastEffectDefinitions was serialized correctly
+		Assert.AreEqual(1, spellDef.SpellCastEffectDefinitions.Count, "Should have one SpellCastEffectDefinition");
+		var effectDef = spellDef.SpellCastEffectDefinitions[0];
+
+		// Verify the selector definition
+		Assert.IsNotNull(effectDef.AffectedEntitySelectorDefinition, "Effect should have a selector definition");
+		var selectorDef = effectDef.AffectedEntitySelectorDefinition!;
+		Assert.AreEqual("TargetOperationSelector", selectorDef.EntitySelectorTypeName, "Selector type name should match");
+
+		Assert.IsNotNull(selectorDef.Params, "Selector definition params should not be null");
+		//Assert.IsTrue(selectorDef.Params.ContainsKey("Operations"), "Selector should have Operations param");
+
+		// Check that the action definition is correct
+		Assert.AreEqual(1, effectDef.ActionDefintions.Count, "Should have one GameAction");
+		var damageActionDef = effectDef.ActionDefintions[0];
+		Assert.AreEqual("DamageAction", damageActionDef.GameActionTypeName, "Action type should be DamageAction");
+
+		Assert.IsTrue(damageActionDef.Params.ContainsKey("Damage"), "DamageAction should have Damage param");
+		Assert.AreEqual(5, Convert.ToInt32(damageActionDef.Params["Damage"]), "Damage value should be 5");
 	}
+
 
 	[TestMethod]
 	public void CreateTargetedSpellDefinitionTest()
 	{
+		// Arrange
 		SpellCard card = new SpellCard("TestSpell_DealDamage", 1);
-		card.SpellCastEffects.Add(new SpellCastEffect());
 		card.TargetingType = TargetingType.Any;
-
-		card.SpellCastEffects[0] = new SpellCastEffect()
+		card.SpellCastEffects.Add(new SpellCastEffect()
 		{
 			GameActions = new()
-			{
-				new DamageAction() { Damage = 3 },
-				new FreezeAction(),
-			}
-		};
-		var json = CardDatabase.CreateFileFromSpellCard(card, DBPath, "SaveTestSpell");
-		Console.WriteLine(json);
+		{
+			new DamageAction() { Damage = 3 },
+			new FreezeAction(),
+		}
+		});
+
+		// Act
+		var json = CardDatabase.CreateJsonFromSpellCard(card, "SaveTestSpell");
+		var loadedCard = CardDatabase.LoadCardFromJson(json);
+
+		// Assert
+		Assert.IsNotNull(loadedCard, "Loaded card should not be null");
+		Assert.IsInstanceOfType(loadedCard, typeof(SpellCardDefinition), "Loaded card should be a SpellCardDefinition");
+
+		var spellDef = (SpellCardDefinition)loadedCard;
+
+		Assert.AreEqual("SaveTestSpell", spellDef.Id, "Card Id should match");
+		Assert.AreEqual(card.Name, spellDef.Name, "Card name should match");
+		Assert.AreEqual(card.ManaCost, spellDef.Cost, "Mana cost should match");
+		Assert.AreEqual(card.TargetingType, spellDef.TargetingType, "TargetingType should match");
+		Assert.AreEqual(CardType.Spell, spellDef.Type, "Type should be Spell");
+
+		// Check that SpellCastEffects were serialized and deserialized correctly
+		Assert.AreEqual(1, spellDef.SpellCastEffectDefinitions.Count, "Should have one SpellCastEffectDefinition");
+
+		var effectDef = spellDef.SpellCastEffectDefinitions[0];
+		Assert.IsNotNull(effectDef.ActionDefintions, "Action definitions should not be null");
+		Assert.AreEqual(2, effectDef.ActionDefintions.Count, "Should have two GameActions");
+
+		var damageAction = effectDef.ActionDefintions[0];
+		var freezeAction = effectDef.ActionDefintions[1];
+
+		Assert.AreEqual("DamageAction", damageAction.GameActionTypeName, "First action should be DamageAction");
+		Assert.AreEqual("FreezeAction", freezeAction.GameActionTypeName, "Second action should be FreezeAction");
+
+		Assert.IsTrue(damageAction.Params.ContainsKey("Damage"), "DamageAction should have Damage param");
+		Assert.AreEqual(3, Convert.ToInt32(damageAction.Params["Damage"]), "Damage value should be 3");
 	}
 }

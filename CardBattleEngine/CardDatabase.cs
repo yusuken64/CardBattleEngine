@@ -13,6 +13,7 @@ public class CardDatabase
 	private readonly Dictionary<string, Type> _actions = new();
 	private readonly Dictionary<string, Type> _triggerConditions = new();
 	private readonly Dictionary<string, Type> _affectedEntitySelectors = new();
+	private readonly Dictionary<string, Type> _targetOperations = new();
 
 	public CardDatabase(string path)
 	{
@@ -20,6 +21,7 @@ public class CardDatabase
 		RegisterTypes<IGameAction>(_actions);
 		RegisterTypes<ITriggerCondition>(_triggerConditions);
 		RegisterTypes<IAffectedEntitySelector>(_affectedEntitySelectors);
+		RegisterTypes<ITargetOperation>(_targetOperations);
 	}
 
 	private void RegisterTypes<T>(Dictionary<string, Type> targetDictionary)
@@ -90,15 +92,11 @@ public class CardDatabase
 		return json;
 	}
 
-	public static string CreateFileFromSpellCard(SpellCard card, string directory, string cardName)
+	public static string CreateJsonFromSpellCard(SpellCard card, string cardName)
 	{
-		Directory.CreateDirectory(directory);
-		var path = Path.Combine(directory, $"{cardName}.json");
-
 		if (card == null) throw new ArgumentNullException(nameof(card));
-		if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
+		if (string.IsNullOrWhiteSpace(cardName)) throw new ArgumentNullException(nameof(cardName));
 
-		// Convert MinionCard -> CardDefinition for serialization
 		var def = new SpellCardDefinition
 		{
 			Id = cardName,
@@ -108,25 +106,23 @@ public class CardDatabase
 			TargetingType = card.TargetingType,
 			SpellCastEffectDefinitions = card.SpellCastEffects.Select(x =>
 			{
-				AffectedEntitySelectorDefinition affectedEntitySelectorDefinition = null;
+				AffectedEntitySelectorDefinition? affectedEntitySelectorDefinition = null;
 				if (x.AffectedEntitySelector != null)
 				{
-					affectedEntitySelectorDefinition = new()
+					affectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition
 					{
 						EntitySelectorTypeName = x.AffectedEntitySelector.GetType().Name,
 						Params = x.AffectedEntitySelector.EmitParams(),
 					};
 				}
-				return new SpellCastEffectDefinition()
+
+				return new SpellCastEffectDefinition
 				{
 					AffectedEntitySelectorDefinition = affectedEntitySelectorDefinition,
-					ActionDefintions = x.GameActions.Select(ga =>
+					ActionDefintions = x.GameActions.Select(ga => new ActionDefinition
 					{
-						return new ActionDefinition()
-						{
-							GameActionTypeName = ga.GetType().Name,
-							Params = ga.EmitParams()
-						};
+						GameActionTypeName = ga.GetType().Name,
+						Params = ga.EmitParams()
 					}).ToList(),
 				};
 			}).ToList()
@@ -138,72 +134,88 @@ public class CardDatabase
 			Converters = { new StringEnumConverter() }
 		});
 
-		File.WriteAllText(path, json);
-
 		return json;
 	}
 
+	public static void WriteJsonToFile(string json, string directory, string cardName)
+	{
+		if (string.IsNullOrWhiteSpace(json)) throw new ArgumentNullException(nameof(json));
+		if (string.IsNullOrWhiteSpace(directory)) throw new ArgumentNullException(nameof(directory));
+		if (string.IsNullOrWhiteSpace(cardName)) throw new ArgumentNullException(nameof(cardName));
+
+		Directory.CreateDirectory(directory);
+		var path = Path.Combine(directory, $"{cardName}.json");
+		File.WriteAllText(path, json);
+	}
 	protected void LoadAll(string directory)
 	{
 		foreach (var file in Directory.GetFiles(directory, "*.json", SearchOption.AllDirectories))
 		{
-			var json = File.ReadAllText(file);
-
-			// Parse the JSON into a JObject to inspect CardType
-			JObject jObject;
+			string json;
 			try
 			{
-				jObject = JObject.Parse(json);
+				json = File.ReadAllText(file);
 			}
-			catch (JsonException ex)
+			catch (IOException ex)
 			{
-				Console.WriteLine($"Failed to parse JSON file {file}: {ex.Message}");
+				Console.WriteLine($"Failed to read file {file}: {ex.Message}");
 				continue;
 			}
 
-			// Read CardType
-			if (!Enum.TryParse(jObject["Type"]?.ToString(), out CardType cardType))
-			{
-				Console.WriteLine($"Missing or invalid CardType in file: {Path.GetFileName(file)}");
-				continue;
-			}
+			var card = LoadCardFromJson(json);
+			if (card == null) continue;
 
-			// Deserialize into the concrete subclass based on CardType
-			try
+			switch (card)
 			{
-				switch (cardType)
-				{
-					case CardType.Minion:
-						{
-							var minion = jObject.ToObject<MinionCardDefinition>(JsonSerializer.Create(new JsonSerializerSettings
-							{
-								NullValueHandling = NullValueHandling.Ignore
-							}));
-							if (minion != null)
-								_minions[minion.Id] = minion;
-							break;
-						}
-
-					case CardType.Spell:
-						{
-							var spell = jObject.ToObject<SpellCardDefinition>(JsonSerializer.Create(new JsonSerializerSettings
-							{
-								NullValueHandling = NullValueHandling.Ignore
-							}));
-							if (spell != null)
-								_spells[spell.Id] = spell;
-							break;
-						}
-
-					default:
-						Console.WriteLine($"Unknown CardType in file: {Path.GetFileName(file)}");
-						break;
-				}
+				case MinionCardDefinition minion:
+					_minions[minion.Id] = minion;
+					break;
+				case SpellCardDefinition spell:
+					_spells[spell.Id] = spell;
+					break;
 			}
-			catch (JsonException ex)
+		}
+	}
+	public static CardDefinition? LoadCardFromJson(string json)
+	{
+		if (string.IsNullOrWhiteSpace(json))
+			throw new ArgumentException("JSON string cannot be null or empty.", nameof(json));
+
+		JObject jObject;
+		try
+		{
+			jObject = JObject.Parse(json);
+		}
+		catch (JsonException ex)
+		{
+			Console.WriteLine($"Failed to parse JSON: {ex.Message}");
+			return null;
+		}
+
+		if (!Enum.TryParse(jObject["Type"]?.ToString(), out CardType cardType))
+		{
+			Console.WriteLine("Missing or invalid CardType in JSON.");
+			return null;
+		}
+
+		try
+		{
+			var serializer = JsonSerializer.Create(new JsonSerializerSettings
 			{
-				Console.WriteLine($"Failed to deserialize card in file {file}: {ex.Message}");
-			}
+				NullValueHandling = NullValueHandling.Ignore
+			});
+
+			return cardType switch
+			{
+				CardType.Minion => jObject.ToObject<MinionCardDefinition>(serializer),
+				CardType.Spell => jObject.ToObject<SpellCardDefinition>(serializer),
+				_ => throw new NotSupportedException($"Unsupported CardType: {cardType}")
+			};
+		}
+		catch (JsonException ex)
+		{
+			Console.WriteLine($"Failed to deserialize card: {ex.Message}");
+			return null;
 		}
 	}
 
@@ -278,13 +290,22 @@ public class CardDatabase
 		return card;
 	}
 
-	private IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinintion(string entitySelectorTypeName, Dictionary<string, object> paramObj)
+	private IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinintion(string entitySelectorTypeName, List<SerializedOperation> paramObj)
 	{
 		if (!_affectedEntitySelectors.TryGetValue(entitySelectorTypeName, out var t))
 			throw new Exception($"Unknown triggerCondition: {entitySelectorTypeName}");
 
 		var instance = (IAffectedEntitySelector)Activator.CreateInstance(t)!;
-		instance.ConsumeParams(paramObj);
+		List<ITargetOperation> targetOperations = paramObj.Select(x =>
+		{
+			var targetOperationType =_targetOperations[x.Type];
+			var targetOperation = (ITargetOperation)Activator.CreateInstance(targetOperationType)!;
+			targetOperation.ConsumeParams(x.Params);
+
+			return targetOperation;
+		}).ToList();
+
+		instance.ConsumeParams(targetOperations);
 		return instance;
 	}
 
@@ -363,5 +384,5 @@ public class TriggerConditionDefinition
 public class AffectedEntitySelectorDefinition
 {
 	public string EntitySelectorTypeName { get; set; }
-	public Dictionary<string, object> Params { get; set; }
+	public List<SerializedOperation> Params { get; set; } = new();
 }

@@ -11,11 +11,16 @@
 				}
 			],
 			"AffectedEntitySelectorDefinition": {
-				"EntitySelectorTypeName": "BoardEntitySelector",
-				"Params": {
-					"Side": "Enemy",
-					"Group": "Minions"
-				}
+				"EntitySelectorTypeName": "TargetOperationSelector",
+				"Params": [
+					{
+						"Type": "SelectBoardEntitiesOperation",
+						"Params": {
+							"Side": "Enemy",
+							"Group": "Minions"
+						}
+					}
+				]
 			}
 		}
 	],

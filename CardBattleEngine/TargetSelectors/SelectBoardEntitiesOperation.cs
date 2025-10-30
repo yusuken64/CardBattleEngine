@@ -6,9 +6,6 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 {
 	public TargetSide Side { get; set; } = TargetSide.Enemy;   // Enemy, Friendly, Both
 	public TargetGroup Group { get; set; } = TargetGroup.Minions; // Minions, Hero, All
-
-	public SelectBoardEntitiesOperation() { }
-
 	public IEnumerable<IGameEntity> Apply(IEnumerable<IGameEntity> input, GameState state, ActionContext context)
 	{
 		// Ignore the input — this is the "base selection"

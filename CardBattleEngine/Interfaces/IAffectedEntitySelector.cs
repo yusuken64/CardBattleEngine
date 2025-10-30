@@ -1,20 +1,19 @@
-﻿
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public interface IAffectedEntitySelector
 {
-	Dictionary<string, object> EmitParams();
-	void ConsumeParams(Dictionary<string, object> paramObj);
+	List<SerializedOperation> EmitParams();
+	void ConsumeParams(List<ITargetOperation> paramObj);
 	IEnumerable<IGameEntity> Select(GameState state, ActionContext context);
 }
 
 public abstract class AffectedEntitySelectorBase : IAffectedEntitySelector
 {
-	public virtual void ConsumeParams(Dictionary<string, object> actionParam)
+	public virtual void ConsumeParams(List<ITargetOperation> actionParam)
 	{
 	}
 
-	public virtual Dictionary<string, object> EmitParams()
+	public virtual List<SerializedOperation> EmitParams()
 	{
 		return new();
 	}
