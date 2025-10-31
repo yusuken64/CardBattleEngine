@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class DeathAction : GameActionBase
+public class DeathAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDeath;
 

@@ -49,6 +49,8 @@ public class GameEngine
 				}
 			}
 
+			_eventBus.EvaluatePersistentEffects(gameState);
+
 			// Post-resolution triggers
 			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Post, ChooseRandom))
 			{

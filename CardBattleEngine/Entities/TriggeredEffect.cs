@@ -66,5 +66,6 @@ public enum EffectTrigger
 public enum EffectTiming
 {
 	Pre,
-	Post
+	Post,
+	Persistant //Aura don't trigger
 }

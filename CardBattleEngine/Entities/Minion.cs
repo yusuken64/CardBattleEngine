@@ -45,7 +45,7 @@ public class Minion : IGameEntity, ITriggerSource
 			return _attackBehavior;
 		}
 	}
-	private readonly List<StatModifier> _modifiers = new();
+	private List<StatModifier> _modifiers = new();
 
 	public bool IsAlive{ get; set; }
 	public bool IsFrozen { get; internal set; }
@@ -138,6 +138,11 @@ public class Minion : IGameEntity, ITriggerSource
 	internal bool HasModifier(StatModifier modifier)
 	{
 		return _modifiers.Contains(modifier);
+	}
+
+	internal void ClearAuras()
+	{
+		_modifiers = _modifiers.Where(x => x.Duration == EffectDuration.Permanent).ToList();
 	}
 }
 

@@ -1,10 +1,51 @@
-﻿using System.Net.Sockets;
-using System.Numerics;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class EventBus
 {
+	internal void EvaluatePersistentEffects(GameState gameState)
+	{
+		// 1. Clear all aura modifiers that were previously applied
+		foreach (var minion in gameState.GetAllMinions())
+		{
+			minion.ClearAuras();
+		}
+
+		// 2. Find all aura sources on the battlefield
+		foreach (var source in gameState.GetAllTriggerSources())
+		{
+			foreach (var auraEffect in source.TriggeredEffects
+				.Where(te => te.EffectTrigger == EffectTrigger.Aura &&
+							 te.EffectTiming == EffectTiming.Persistant))
+			{
+				// Build an effect context for condition checks
+				var effectContext = new EffectContext
+				{
+					EffectOwner = source as IGameEntity,
+					OriginalOwner = source.Owner,
+				};
+
+				if (auraEffect.Condition != null && !auraEffect.Condition.Evaluate(effectContext))
+					continue;
+
+				// 3. Apply the aura's actions to valid targets
+				var actionContext = new ActionContext
+				{
+					Source = (IGameEntity)source,
+					SourcePlayer = source.Owner
+				};
+				var targets = auraEffect.AffectedEntitySelector.Select(gameState, actionContext);
+				foreach (var target in targets)
+				{
+					foreach(var action in auraEffect.GameActions)
+					{
+						action.Resolve(gameState, new ActionContext() { Target = target });
+					}
+				}
+			}
+		}
+	}
+
+
 	/// <summary>
 	/// Returns all triggers for a given action, filtered by timing (Pre/Post/Other),
 	/// including both normal triggered effects and modifier-triggered effects.
