@@ -142,7 +142,8 @@ public class Minion : IGameEntity, ITriggerSource
 
 	internal void ClearAuras()
 	{
-		_modifiers = _modifiers.Where(x => x.Duration == EffectDuration.Permanent).ToList();
+		_modifiers = _modifiers.Where(x => x.Duration != EffectDuration.Permanent).ToList();
+		RecalculateStats();
 	}
 }
 
