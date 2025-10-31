@@ -14,7 +14,7 @@ public class EventBus
 		IGameAction triggeringAction,
 		ActionContext context,
 		EffectTiming timing,
-		Func<List<IGameEntity>, IGameEntity> picker)
+		Func<List<ITriggerSource>, ITriggerSource> picker)
 	{
 		// Normal card effects
 		foreach (var triggerSource in gameState.GetAllTriggerSources())
@@ -25,8 +25,8 @@ public class EventBus
 			{
 				EffectContext effectContext = new()
 				{
-					EffectOwner = triggerSource.Owner,
-					SummonedUnit = context.Source as Minion,
+					EffectOwner = triggerSource as IGameEntity,
+					SummonedUnit = context.SummonedMinion,
 					SecretOwner = triggerSource.Owner,
 					TriggeringAction = triggeringAction,
 					OriginalOwner = context.SourcePlayer,
@@ -39,14 +39,14 @@ public class EventBus
 
 				foreach (var action in effect.GameActions)
 				{
-					var targets = gameState.GetValidTargets(triggerSource.Owner, effect.TargetType);
+					var targets = gameState.GetValidTargets(triggerSource, effect.TargetType);
 					var target = picker(targets);
 
 					yield return (action, new ActionContext
 					{
 						Source = triggerSource.Owner,
 						SourcePlayer = triggerSource.Owner,
-						Target = target,
+						Target = target as IGameEntity,
 						OriginalAction = context.OriginalAction,
 						AffectedEntitySelector = null // engine injects default/random if needed
 					});

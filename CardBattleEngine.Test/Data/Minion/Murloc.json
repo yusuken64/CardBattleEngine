@@ -1,21 +1,18 @@
 {
-  "Id": "Murloc",
-  "Name": "Murloc",
-  "Type": "Minion",
-  "Cost": 1,
   "Attack": 1,
   "Health": 1,
-  "Tribe": 2,
+  "Tribe": "Murloc",
   "TriggeredEffectDefinitions": [
     {
-      "EffectTiming": "Pre",
-      "EffectTrigger": 4,
-      "TargetType": 6,
+      "EffectTiming": "Post",
+      "EffectTrigger": "SummonMinion",
+      "TargetType": "Self",
       "TriggerConditionDefintion": {
         "ConditionTypeName": "SummonedMinionTribeCondition",
         "Params": {
           "MinionTribe": "Murloc",
-          "MinionToMinionRelationship": "Friendly"
+          "MinionToMinionRelationship": "Friendly",
+          "ExcludeSelf" : true
         }
       },
       "ActionDefintion": {
@@ -26,5 +23,9 @@
         }
       }
     }
-  ]
+  ],
+  "Type": "Minion",
+  "Id": "Murloc",
+  "Name": "Murloc",
+  "Cost": 1
 }

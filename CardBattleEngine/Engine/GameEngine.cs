@@ -69,19 +69,6 @@ public class GameEngine
 		return ctx;
 	}
 
-	private Func<GameState, Player, TargetingType, IGameEntity> CreateRandomTargetSelector()
-	{
-		return (gameState, player, targetType) =>
-		{
-			var validTargets = gameState.GetValidTargets(player, targetType);
-			if (validTargets.Count == 0)
-				return null;
-
-			int index = rNG.NextInt(validTargets.Count);
-			return validTargets[index];
-		};
-	}
-
 	public void StartGame(GameState gameState)
 	{
 		var p1 = gameState.Players[0];

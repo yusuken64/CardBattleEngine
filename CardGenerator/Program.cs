@@ -7,7 +7,7 @@ card.TriggeredEffects.Add(new TriggeredEffect()
 {
 	EffectTrigger = EffectTrigger.SummonMinion,
 	EffectTiming = EffectTiming.Pre,
-	TargetType = TargetingType.EnemyMinion,
+	TargetType = TargetingType.Self,
 	Condition = new SummonedMinionTribeCondition()
 	{
 		MinionTribe = MinionTribe.Murloc,

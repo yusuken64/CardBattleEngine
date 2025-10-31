@@ -186,9 +186,9 @@ public class GameState
 		return all;
 	}
 
-	public List<IGameEntity> GetValidTargets(IGameEntity entity, TargetingType type)
+	public List<ITriggerSource> GetValidTargets(ITriggerSource entity, TargetingType type)
 	{
-		var targets = new List<IGameEntity>();
+		var targets = new List<ITriggerSource>();
 		var opponent = OpponentOf(entity.Owner);
 
 		switch (type)

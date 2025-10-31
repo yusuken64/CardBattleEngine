@@ -508,6 +508,7 @@ public class AbilityTest
 		}, new PlayCardAction { Card = firstMurlocCard });
 
 		var firstMurloc = current.Board[0];
+		Assert.IsTrue(firstMurloc.Tribes.Contains(MinionTribe.Murloc));
 
 		// Assert 1: First Murloc has base attack
 		Assert.AreEqual(1, firstMurloc.Attack, "First Murloc should have base attack 1.");

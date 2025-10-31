@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace CardBattleEngine;
 
@@ -82,10 +82,31 @@ public class CardDatabase
 			}).ToList(),
 		};
 
-		var json = JsonConvert.SerializeObject(def, Formatting.Indented, new JsonSerializerSettings
+		var options = new JsonSerializerOptions
 		{
-			TypeNameHandling = TypeNameHandling.Auto
-		});
+			WriteIndented = true,
+			TypeInfoResolver = new DefaultJsonTypeInfoResolver
+			{
+				Modifiers =
+		{
+			static typeInfo =>
+			{
+				// Equivalent to TypeNameHandling.Auto: include type discriminator for polymorphic types
+				if (typeInfo.Kind == JsonTypeInfoKind.Object && typeInfo.Type.IsAbstract)
+				{
+					typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+					{
+						TypeDiscriminatorPropertyName = "$type",
+						IgnoreUnrecognizedTypeDiscriminators = true
+					};
+				}
+			}
+		}
+			}
+		};
+
+		// Serialize
+		string json = JsonSerializer.Serialize(def, options);
 
 		File.WriteAllText(path, json);
 
@@ -128,11 +149,30 @@ public class CardDatabase
 			}).ToList()
 		};
 
-		var json = JsonConvert.SerializeObject(def, Formatting.Indented, new JsonSerializerSettings
+		var options = new JsonSerializerOptions
 		{
-			TypeNameHandling = TypeNameHandling.Auto,
-			Converters = { new StringEnumConverter() }
-		});
+			WriteIndented = true,
+			TypeInfoResolver = new DefaultJsonTypeInfoResolver
+			{
+				Modifiers =
+		{
+			static typeInfo =>
+			{
+				// Equivalent to TypeNameHandling.Auto: include type discriminator for polymorphic types
+				if (typeInfo.Kind == JsonTypeInfoKind.Object && typeInfo.Type.IsAbstract)
+				{
+					typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+					{
+						TypeDiscriminatorPropertyName = "$type",
+						IgnoreUnrecognizedTypeDiscriminators = true
+					};
+				}
+			}
+		}
+			}
+		};
+
+		string json = JsonSerializer.Serialize(def, options);
 
 		return json;
 	}
@@ -181,10 +221,10 @@ public class CardDatabase
 		if (string.IsNullOrWhiteSpace(json))
 			throw new ArgumentException("JSON string cannot be null or empty.", nameof(json));
 
-		JObject jObject;
+		JsonNode? root;
 		try
 		{
-			jObject = JObject.Parse(json);
+			root = JsonNode.Parse(json);
 		}
 		catch (JsonException ex)
 		{
@@ -192,7 +232,7 @@ public class CardDatabase
 			return null;
 		}
 
-		if (!Enum.TryParse(jObject["Type"]?.ToString(), out CardType cardType))
+		if (root?["Type"] is null || !Enum.TryParse(root["Type"]!.ToString(), out CardType cardType))
 		{
 			Console.WriteLine("Missing or invalid CardType in JSON.");
 			return null;
@@ -200,15 +240,10 @@ public class CardDatabase
 
 		try
 		{
-			var serializer = JsonSerializer.Create(new JsonSerializerSettings
-			{
-				NullValueHandling = NullValueHandling.Ignore
-			});
-
 			return cardType switch
 			{
-				CardType.Minion => jObject.ToObject<MinionCardDefinition>(serializer),
-				CardType.Spell => jObject.ToObject<SpellCardDefinition>(serializer),
+				CardType.Minion => root.Deserialize<MinionCardDefinition>(JsonOptions),
+				CardType.Spell => root.Deserialize<SpellCardDefinition>(JsonOptions),
 				_ => throw new NotSupportedException($"Unsupported CardType: {cardType}")
 			};
 		}
@@ -219,6 +254,30 @@ public class CardDatabase
 		}
 	}
 
+	private static readonly JsonSerializerOptions JsonOptions = new()
+	{
+		WriteIndented = true,
+		PropertyNameCaseInsensitive = true,
+		TypeInfoResolver = new DefaultJsonTypeInfoResolver
+		{
+			Modifiers =
+		{
+			static typeInfo =>
+			{
+				// Add type discriminator support for polymorphic serialization (if needed)
+				if (typeInfo.Kind == JsonTypeInfoKind.Object && typeInfo.Type.IsAbstract)
+				{
+					typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+					{
+						TypeDiscriminatorPropertyName = "$type",
+						IgnoreUnrecognizedTypeDiscriminators = true
+					};
+				}
+			}
+		}
+		}
+	};
+
 	public MinionCard GetMinionCard(string id, Player owner)
 	{
 		if (!_minions.TryGetValue(id, out var def))
@@ -226,6 +285,7 @@ public class CardDatabase
 
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
+		card.MinionTribe = def.Tribe;
 
 		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitions)
 		{

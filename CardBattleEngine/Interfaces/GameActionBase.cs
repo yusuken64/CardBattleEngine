@@ -39,4 +39,5 @@ public class ActionContext
 	public IAffectedEntitySelector AffectedEntitySelector;
 
 	public IGameAction OriginalAction { get; internal set; }
+	public Minion SummonedMinion { get; internal set; }
 }

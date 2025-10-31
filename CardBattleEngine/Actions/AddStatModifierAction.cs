@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Text.Json;
+
+namespace CardBattleEngine;
 
 public class AddStatModifierAction : GameActionBase
 {
@@ -47,8 +49,22 @@ public class AddStatModifierAction : GameActionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		AttackChange = Convert.ToInt32(actionParam[nameof(AttackChange)]);
-		HealthChange = Convert.ToInt32(actionParam[nameof(HealthChange)]);
+		if (actionParam[nameof(AttackChange)] is JsonElement attackElem && attackElem.TryGetInt32(out int attack))
+			AttackChange = attack;
+		else
+			AttackChange = 0; // or throw
+
+		if (actionParam[nameof(HealthChange)] is JsonElement healthElem && healthElem.TryGetInt32(out int health))
+			HealthChange = health;
+		else
+			HealthChange = 0; // or throw
+	}
+
+	private int GetInt(Dictionary<string, object> dict, string key)
+	{
+		if (dict[key] is JsonElement elem && elem.TryGetInt32(out int value))
+			return value;
+		throw new InvalidCastException($"Expected int for {key}");
 	}
 
 	public override Dictionary<string, object> EmitParams()

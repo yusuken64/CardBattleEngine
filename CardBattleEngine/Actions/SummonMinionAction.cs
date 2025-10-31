@@ -22,6 +22,7 @@ internal class SummonMinionAction : GameActionBase
 		// Create minion entity
 		var minion = new Minion(Card, actionContext.SourcePlayer);
 		actionContext.SourcePlayer.Board.Add(minion);
+		actionContext.SummonedMinion = minion;
 
 		return [];
 	}
