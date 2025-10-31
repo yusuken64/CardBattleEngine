@@ -1,10 +1,10 @@
 {
-  "Id": "TestMinion",
-  "Name": "TestMinion",
-  "Type": "Minion",
-  "Cost": 1,
   "Attack": 1,
   "Health": 1,
-  "Tribe": null,
-  "TriggeredEffectDefinitions": []
+  "Tribe": "None",
+  "TriggeredEffectDefinitions": [],
+  "Type": "Minion",
+  "Id": "TestMinion",
+  "Name": "TestMinion",
+  "Cost": 1
 }

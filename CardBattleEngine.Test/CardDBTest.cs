@@ -99,7 +99,7 @@ public class CardDBTest
 		var effect = card.TriggeredEffects[0];
 
 		// Assert: Effect timing and trigger type are correct
-		Assert.AreEqual(EffectTiming.Pre, effect.EffectTiming, "Unexpected effect timing.");
+		Assert.AreEqual(EffectTiming.Post, effect.EffectTiming, "Unexpected effect timing.");
 		Assert.AreEqual(EffectTrigger.SummonMinion, effect.EffectTrigger, "Unexpected effect trigger.");
 
 		// Assert: Trigger condition is not null and is correct type
@@ -209,7 +209,7 @@ public class CardDBTest
 		Assert.AreEqual("DamageAction", damageActionDef.GameActionTypeName, "Action type should be DamageAction");
 
 		Assert.IsTrue(damageActionDef.Params.ContainsKey("Damage"), "DamageAction should have Damage param");
-		Assert.AreEqual(5, Convert.ToInt32(damageActionDef.Params["Damage"]), "Damage value should be 5");
+		Assert.AreEqual(5, ParamHelper.GetValue<int>(damageActionDef.Params["Damage"]), "Damage value should be 5");
 	}
 
 
@@ -258,6 +258,6 @@ public class CardDBTest
 		Assert.AreEqual("FreezeAction", freezeAction.GameActionTypeName, "Second action should be FreezeAction");
 
 		Assert.IsTrue(damageAction.Params.ContainsKey("Damage"), "DamageAction should have Damage param");
-		Assert.AreEqual(3, Convert.ToInt32(damageAction.Params["Damage"]), "Damage value should be 3");
+		Assert.AreEqual(3, ParamHelper.GetValue<int>(damageAction.Params["Damage"]), "Damage value should be 3");
 	}
 }

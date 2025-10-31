@@ -59,7 +59,7 @@ public class EventBus
 		{
 			foreach (var effect in minion.ModifierTriggeredEffects
 				.Where(te => te.Item1.EffectTrigger == triggeringAction.EffectTrigger &&
-							 te.Item1.EffectTiming == timing))
+							 te.Item1.EffectTiming == timing).ToList())
 			{
 				foreach (IGameAction action in effect.Item1.GameActions)
 				{
