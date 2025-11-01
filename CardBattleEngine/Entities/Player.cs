@@ -1,4 +1,6 @@
 ﻿
+using CardBattleEngine.Actions;
+
 namespace CardBattleEngine;
 
 public class Player : IGameEntity, ITriggerSource
@@ -15,10 +17,20 @@ public class Player : IGameEntity, ITriggerSource
 	public int Attack { get; set; }
 	public int Health { get; set; } = 30;
 	public int Mana { get; set; }
-	public bool CanAttack { get; internal set; }
+	public bool CanAttack()
+	{
+		return Attack > 0 && !HasAttackedThisTurn;
+	}
 	public bool HasAttacked { get; internal set; }
 
-	public IAttackBehavior AttackBehavior => throw new NotImplementedException();
+	private IAttackBehavior _attackBehavior;
+	IAttackBehavior IGameEntity.AttackBehavior
+	{
+		get
+		{
+			return _attackBehavior;
+		}
+	}
 
 	public Player Owner { get; set; }
 
@@ -29,6 +41,8 @@ public class Player : IGameEntity, ITriggerSource
 	public bool HasAttackedThisTurn { get; internal set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
 	public bool IsStealth { get; internal set; }
+	public Weapon? EquippedWeapon { get; set; }
+	private List<StatModifier> _modifiers = new();
 
 	public Player(string name) 
 	{
@@ -36,6 +50,7 @@ public class Player : IGameEntity, ITriggerSource
 		IsAlive = true;
 		Owner = this;
 		TriggeredEffects = new();
+		_attackBehavior = new HeroAttackBehavior();
 	}
 
 	public Player Clone()
@@ -46,7 +61,7 @@ public class Player : IGameEntity, ITriggerSource
 			MaxMana = MaxMana,
 			Health = Health,
 			Mana = Mana,
-			CanAttack = CanAttack,
+			//EquippedWeapon = EquippedWeapon.Clone,
 			HasAttacked = HasAttacked,
 			IsAlive = IsAlive
 		};
@@ -85,5 +100,26 @@ public class Player : IGameEntity, ITriggerSource
 		}
 
 		return clone;
+	}
+
+	internal void EquipWeapon(Weapon weapon)
+	{
+		this.EquippedWeapon = weapon;
+		RecalculateStats();
+	}
+
+	private void RecalculateStats()
+	{
+		Attack = EquippedWeapon.Attack;
+		//Health = card.Health;
+
+		foreach (var mod in _modifiers)
+		{
+			Attack += mod.AttackChange;
+			//Health += mod.HealthChange;
+		}
+
+		Attack = Math.Max(0, Attack);
+		//Health = Math.Max(0, Health);
 	}
 }

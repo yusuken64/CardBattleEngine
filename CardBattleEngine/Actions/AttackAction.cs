@@ -17,6 +17,11 @@ public class AttackAction : GameActionBase
 			minion.HasSummoningSickness = false;
 			minion.IsStealth = false;
 		}
+		else if (context.Source is Player player)
+		{
+			player.HasAttackedThisTurn = true;
+			player.IsStealth = false;
+		}
 
 		return context.Source.AttackBehavior.GenerateDamageActions(context.Source, context.Target, state);
 	}
@@ -28,7 +33,7 @@ public static class AttackRules
 	{
 		// Find opponent's taunt minions
 		var opponent = state.OpponentOf(attacker.Owner);
-		var taunts = opponent.Board.Where(m => m.Taunt && m.IsAlive);
+		var taunts = opponent.Board.Where(m => m.Taunt && m.IsAlive && !m.IsStealth);
 
 		// If there are taunts, you must target one
 		return !taunts.Any() || (target is Minion t && t.Taunt);
