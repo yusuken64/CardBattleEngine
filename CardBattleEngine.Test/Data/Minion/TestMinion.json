@@ -1,7 +1,7 @@
 {
   "Attack": 1,
   "Health": 1,
-  "Tribe": "None",
+  "Tribe": [ "None"],
   "TriggeredEffectDefinitions": [],
   "Type": "Minion",
   "Id": "TestMinion",

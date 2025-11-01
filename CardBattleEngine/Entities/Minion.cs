@@ -9,7 +9,11 @@ public class Minion : IGameEntity, ITriggerSource
 	public string Name { get; set; }
 	public string TemplateName { get; set; }
 	public int Attack { get; set; }
-	public int Health { get; set; }
+	public int Health
+	{
+		get;
+		set;
+	}
 	public List<MinionTribe> Tribes { get; set; }
 	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
@@ -63,7 +67,8 @@ public class Minion : IGameEntity, ITriggerSource
 		Name = card.Name;
 		Attack = card.Attack;
 		Health = card.Health;
-		Tribes = new List<MinionTribe>() { card.MinionTribe };
+		Tribes = (card.MinionTribes ?? [MinionTribe.None]).ToList();
+
 
 		_attackBehavior = new MinionAttackBehavior();
 		HasAttackedThisTurn = false;
@@ -79,8 +84,6 @@ public class Minion : IGameEntity, ITriggerSource
 			var instance = effect.CloneFor(this);
 			return instance;
 		});
-		
-		
 	}
 
 	public bool CanAttack()
@@ -116,6 +119,17 @@ public class Minion : IGameEntity, ITriggerSource
 
 	private void RecalculateStats()
 	{
+		// Store current and old max health before recalculation
+		int oldHealth = Health;
+		int oldMaxHealth = card.Health;
+
+		foreach (var mod in _modifiers)
+			oldMaxHealth += mod.HealthChange;
+
+		// Calculate how much damage was taken before recalculation
+		int damageTaken = oldMaxHealth - oldHealth;
+
+		// Rebuild stats from base
 		Attack = card.Attack;
 		Health = card.Health;
 
@@ -126,7 +140,13 @@ public class Minion : IGameEntity, ITriggerSource
 		}
 
 		Attack = Math.Max(0, Attack);
-		Health = Math.Max(0, Health);
+		int newMaxHealth = Math.Max(0, Health);
+
+		// Apply old damage taken
+		int newHealth = newMaxHealth - damageTaken;
+
+		// Clamp health within [0, newMaxHealth]
+		Health = Math.Clamp(newHealth, 0, newMaxHealth);
 	}
 
 	internal void RemoveExpiredModifiers()
@@ -142,7 +162,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 	internal void ClearAuras()
 	{
-		_modifiers = _modifiers.Where(x => x.Duration != EffectDuration.Permanent).ToList();
+		_modifiers = _modifiers.Where(x => x.Duration != EffectDuration.Aura).ToList();
 		RecalculateStats();
 	}
 }

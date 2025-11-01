@@ -2,7 +2,7 @@
 
 var minionID = "TestMinion";
 var card = new MinionCard(minionID, cost: 1, attack: 1, health: 1);
-card.MinionTribe = MinionTribe.None;
+card.MinionTribes = [MinionTribe.None];
 //card.TriggeredEffects.Add(new TriggeredEffect()
 //{
 //	EffectTrigger = EffectTrigger.SummonMinion,

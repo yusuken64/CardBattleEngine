@@ -45,8 +45,8 @@ public class SpellTest
 		current.Hand.Add(spellCard);
 
 		var card = cardDatabase.GetMinionCard("TestMinion", opponent);
+		card.Health = 5;
 		var enemyMinion = new Minion(card, opponent);
-		enemyMinion.Health = 5;
 		opponent.Board.Add(enemyMinion);
 
 		engine.Resolve(state, new ActionContext

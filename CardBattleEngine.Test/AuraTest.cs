@@ -15,17 +15,17 @@ public class AuraTest
 
 		// Create normal Murloc
 		var card = new MinionCard("Murloc", cost: 0, attack: 1, health: 1);
-		card.MinionTribe = MinionTribe.Murloc;
+		card.MinionTribes = [MinionTribe.Murloc];
 		card.Owner = current;
 
 		// Create non-Murloc
 		var card2 = new MinionCard("TestMinion", cost: 0, attack: 1, health: 1);
-		card2.MinionTribe = MinionTribe.None;
+		card.MinionTribes = [MinionTribe.None];
 		card2.Owner = current;
 
 		// Create aura Murloc
 		var auraCard = new MinionCard("AuraMurloc", cost: 0, attack: 1, health: 1);
-		auraCard.MinionTribe = MinionTribe.Murloc;
+		card.MinionTribes = [MinionTribe.Murloc];
 		auraCard.Owner = current;
 		auraCard.TriggeredEffects.Add(new TriggeredEffect()
 		{
@@ -36,6 +36,7 @@ public class AuraTest
 				new AddStatModifierAction()
 				{
 					AttackChange = +2,
+					Duration = EffectDuration.Aura
 				}
 			},
 			AffectedEntitySelector = new TargetOperationSelector()

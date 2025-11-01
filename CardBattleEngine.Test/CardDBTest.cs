@@ -69,6 +69,37 @@ public class CardDBTest
 	}
 
 	[TestMethod]
+	public void LoadMurlocTribeTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentPlayer;
+
+		CardDatabase cardDatabase = new(CardDBTest.DBPath);
+
+		// Get two different Murlocs to summon
+		var firstMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
+		var secondMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
+
+		current.Mana = 3; // enough to play both
+
+		current.Hand.Add(firstMurlocCard);
+		current.Hand.Add(secondMurlocCard);
+
+		// Act 1: Play the first Murloc
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = current,
+			SourceCard = firstMurlocCard
+		}, new PlayCardAction { Card = firstMurlocCard });
+
+		var firstMurloc = current.Board[0];
+		Assert.IsTrue(firstMurloc.Tribes.Contains(MinionTribe.Murloc));
+	}
+
+	[TestMethod]
 	public void LoadDBTriggereEffectTest()
 	{
 		var db = new CardDatabase(DBPath);

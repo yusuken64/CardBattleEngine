@@ -53,7 +53,7 @@ public class CardDatabase
 			Cost = card.ManaCost,
 			Attack = card.Attack,
 			Health = card.Health,
-			Tribe = card.MinionTribe,
+			Tribes = card.MinionTribes.ToList(),
 			TriggeredEffectDefinitions = card.TriggeredEffects.Select(x =>
 			{
 				TriggerConditionDefinition conditionDef = null;
@@ -285,7 +285,7 @@ public class CardDatabase
 
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
-		card.MinionTribe = def.Tribe;
+		card.MinionTribes = def.Tribes == null ?[MinionTribe.None] : def.Tribes.ToList();
 
 		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitions)
 		{
@@ -416,7 +416,7 @@ public class MinionCardDefinition : CardDefinition
 {
 	public int Attack { get; set; }
 	public int Health { get; set; }
-	public MinionTribe Tribe { get; set; }
+	public List<MinionTribe> Tribes { get; set; }
 	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
 }
 

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
 
@@ -112,8 +113,10 @@ public class StatModifier
 	public Player SourcePlayer;
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum EffectDuration
 {
 	Permanent,
 	UntilEndOfTurn,
+	Aura,
 }
