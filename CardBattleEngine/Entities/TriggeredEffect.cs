@@ -60,6 +60,7 @@ public enum EffectTrigger
 	SpellCountered,
 	SecretCasted,
 	SecretResolved,
+	EquipWeapon,
 } //TODO standardize naming
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

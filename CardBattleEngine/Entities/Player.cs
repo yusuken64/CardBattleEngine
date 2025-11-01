@@ -21,7 +21,6 @@ public class Player : IGameEntity, ITriggerSource
 	{
 		return Attack > 0 && !HasAttackedThisTurn;
 	}
-	public bool HasAttacked { get; internal set; }
 
 	private IAttackBehavior _attackBehavior;
 	IAttackBehavior IGameEntity.AttackBehavior
@@ -38,7 +37,7 @@ public class Player : IGameEntity, ITriggerSource
 	public List<TriggeredEffect> TriggeredEffects { get; }
 	IEnumerable<TriggeredEffect> ITriggerSource.TriggeredEffects => TriggeredEffects;
 	public bool IsFrozen { get; internal set; }
-	public bool HasAttackedThisTurn { get; internal set; }
+	public bool HasAttackedThisTurn { get; set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
 	public bool IsStealth { get; internal set; }
 	public Weapon? EquippedWeapon { get; set; }
@@ -62,7 +61,7 @@ public class Player : IGameEntity, ITriggerSource
 			Health = Health,
 			Mana = Mana,
 			//EquippedWeapon = EquippedWeapon.Clone,
-			HasAttacked = HasAttacked,
+			HasAttackedThisTurn = HasAttackedThisTurn,
 			IsAlive = IsAlive
 		};
 
@@ -108,9 +107,15 @@ public class Player : IGameEntity, ITriggerSource
 		RecalculateStats();
 	}
 
+	internal void UnequipWeapon()
+	{
+		this.EquippedWeapon = null;
+		RecalculateStats();
+	}
+
 	private void RecalculateStats()
 	{
-		Attack = EquippedWeapon.Attack;
+		Attack = EquippedWeapon?.Attack ?? 0;
 		//Health = card.Health;
 
 		foreach (var mod in _modifiers)

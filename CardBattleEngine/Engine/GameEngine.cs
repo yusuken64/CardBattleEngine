@@ -31,7 +31,11 @@ public class GameEngine
 			// Pre-resolution triggers
 			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre, ChooseRandom))
 			{
-				trigger.action.Resolve(gameState, trigger.context);
+				var preSideEffects = trigger.action.Resolve(gameState, trigger.context);
+				foreach(var preSideEffect in preSideEffects)
+				{
+					_actionQueue.Enqueue(preSideEffect);
+				}
 			}
 
 			if (current.action.Canceled)

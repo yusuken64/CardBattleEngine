@@ -41,7 +41,7 @@ public class HeroAttackBehavior : IAttackBehavior
 				Target = target
 			});
 
-		hero.HasAttacked = true;
+		hero.HasAttackedThisTurn = true;
 		var weapon = hero.EquippedWeapon;
 		if (weapon != null)
 		{
