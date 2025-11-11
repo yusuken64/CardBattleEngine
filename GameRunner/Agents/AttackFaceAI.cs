@@ -9,10 +9,11 @@ public class AttackFaceAI : IGameAgent
 		_player = player;
 	}
 
-	public GameActionBase GetNextAction(GameState game)
+
+	(IGameAction, ActionContext) IGameAgent.GetNextAction(GameState game)
 	{
 		var validActions = game.GetValidActions(_player);
-		return (GameActionBase)validActions[0].Item1;
+		return validActions[0];
 	}
 
 	public void OnGameEnd(GameState gamestate, bool win)

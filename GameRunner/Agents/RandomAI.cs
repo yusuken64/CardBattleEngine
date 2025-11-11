@@ -11,12 +11,13 @@ public class RandomAI : IGameAgent
 		_rng = rng;
 	}
 
-	public GameActionBase GetNextAction(GameState game)
+	(IGameAction, ActionContext) IGameAgent.GetNextAction(GameState game)
 	{
 		var validActions = game.GetValidActions(_player);
 
-		return (GameActionBase)ChooseRandom(validActions).Item1;
+		return ChooseRandom(validActions);
 	}
+
 	public T ChooseRandom<T>(IReadOnlyList<T> options)
 	{
 		if (options.Count == 0) return default!;

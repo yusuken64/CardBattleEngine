@@ -9,7 +9,8 @@ public class HumanAgent : IGameAgent
 		_player = player;
 	}
 
-	public GameActionBase GetNextAction(GameState state)
+
+	(IGameAction, ActionContext) IGameAgent.GetNextAction(GameState state)
 	{
 		var actions = state.GetValidActions(_player).ToList();
 		int selectedIndex = 0;
@@ -61,7 +62,7 @@ public class HumanAgent : IGameAgent
 
 		// Move cursor below menu
 		Console.SetCursorPosition(0, optionStartTop + actions.Count);
-		return (GameActionBase)actions[selectedIndex].Item1;
+		return actions[selectedIndex];
 	}
 	public void OnGameEnd(GameState gamestate, bool win)
 	{

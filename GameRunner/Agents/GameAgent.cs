@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 public interface IGameAgent
 {
-	public GameActionBase GetNextAction(GameState game);
+	public (IGameAction, ActionContext) GetNextAction(GameState game);
 
 	public void OnGameEnd(GameState gamestate, bool win);
 }
@@ -19,25 +19,25 @@ public class OracleAgent : IGameAgent
 		_brain = brain;
 	}
 
-	public GameActionBase GetNextAction(GameState game)
+	public (IGameAction, ActionContext) GetNextAction(GameState game)
 	{
 		var actions = game.GetValidActions(game.CurrentPlayer).ToList();
-		if (actions.Count == 0) return new EndTurnAction();
+		if (actions.Count == 0) return (new EndTurnAction(), new());
 
 		float bestScore = float.NegativeInfinity;
-		GameActionBase bestAction = null;
+		(IGameAction, ActionContext) bestAction = actions[0];
 
 		foreach (var action in actions)
 		{
-			float score = _brain.Evaluate(_engine, game, (GameActionBase)action.Item1);
+			float score = _brain.Evaluate(_engine, game, action);
 			if (score > bestScore)
 			{
 				bestScore = score;
-				bestAction = (GameActionBase)action.Item1;
+				bestAction = action;
 			}
 		}
 
-		return bestAction ?? new EndTurnAction();
+		return bestAction;
 	}
 
 	public void OnGameEnd(GameState gamestate, bool win)
@@ -51,7 +51,7 @@ public class OracleAgent : IGameAgent
 		public float AggressionWeight { get; set; } = 1.0f;
 		public float CardConservationWeight { get; set; } = 1.0f;
 
-		public float Evaluate(GameEngine engine, GameState state, GameActionBase action)
+		public float Evaluate(GameEngine engine, GameState state, (IGameAction, ActionContext) action)
 		{
 			Player player = state.CurrentPlayer;
 			Player opponent = state.OpponentOf(player);

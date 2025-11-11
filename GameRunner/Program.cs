@@ -1,5 +1,4 @@
-﻿using CardBattleEngine;
-using GameRunner;
+﻿using GameRunner;
 
 MonteCarloModel model = new MonteCarloModel("../../../Data/Model");
 OracleAgent.OracleBrain brain = new OracleAgent.OracleBrain()
@@ -20,6 +19,6 @@ Tournament tournament = new Tournament((engine, gameState, i) =>
 	var player2 = new OracleAgent(engine, brain2);
 	return (player1, player2);
 });
-tournament.Run(2000000);
+tournament.Run(20);
 
 model.SaveWeights();
