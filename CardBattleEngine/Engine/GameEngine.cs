@@ -16,6 +16,16 @@ public class GameEngine
 	
 	public void Resolve(GameState gameState, ActionContext actionContext, IGameAction action)
 	{
+		if (!IsAllowedChoice(gameState, actionContext, action))
+		{
+			return;
+		}
+
+		if (gameState.PendingChoice != null)
+		{
+			gameState.PendingChoice = null;
+		}
+
 		_actionQueue.Enqueue((action, actionContext));
 
 		while (_actionQueue.Count > 0)
@@ -68,6 +78,26 @@ public class GameEngine
 				break;
 		}
 	}
+
+	private bool IsAllowedChoice(GameState state, ActionContext actionContext, IGameAction action)
+	{
+		if (state.PendingChoice == null)
+		{
+			// Normal validation logic
+			return true;
+		}
+
+		// If there is a pending choice, only the listed options are valid
+		var allowed = state
+			.PendingChoice
+			.GetActions(state)
+			.Select(opt => opt.Item1)
+			.ToHashSet();
+		
+		return allowed.Contains(action)
+			&& state.PendingChoice.SourcePlayer == actionContext.SourcePlayer;
+	}
+
 	private ActionContext EnsureSelector(ActionContext ctx)
 	{
 		//if (ctx.TargetSelector == null)

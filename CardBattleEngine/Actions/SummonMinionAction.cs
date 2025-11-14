@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class SummonMinionAction : GameActionBase
+public class SummonMinionAction : GameActionBase
 {
 	public MinionCard Card;
 	public override EffectTrigger EffectTrigger => EffectTrigger.SummonMinion;

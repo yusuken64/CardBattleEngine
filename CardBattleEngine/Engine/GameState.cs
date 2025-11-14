@@ -1,5 +1,4 @@
-﻿
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class GameState
 {
@@ -8,6 +7,7 @@ public class GameState
 	public int MaxBoardSize { get; set; } = 7;
 	public Player[] Players { get; internal set; }
 	public Player? Winner { get; set; }
+	public IPendingChoice PendingChoice { get; set; }
 
 	public int maxTurns = 50;
 	public int turn = 0;
@@ -28,6 +28,12 @@ public class GameState
 	public List<(IGameAction, ActionContext)> GetValidActions(Player player)
 	{
 		var actions = new List<(IGameAction, ActionContext)>();
+
+		if (PendingChoice != null)
+		{
+			actions.AddRange(PendingChoice.GetActions(this));
+			return actions;
+		}
 
 		// Playable cards
 		foreach (var card in player.Hand)

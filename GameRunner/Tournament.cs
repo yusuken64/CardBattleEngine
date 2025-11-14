@@ -27,10 +27,10 @@ internal class Tournament
 			engine.StartGame(gameState);
 			while (!gameState.IsGameOver())
 			{
-				//GameEngine.PrintState(gameState, null);
 				var currentAgent = gameState.CurrentPlayer == gameState.Players[0] ? player1 : player2;
-				var action = currentAgent.GetNextAction(gameState);
-				//engine.Resolve(gameState, gameState.CurrentPlayer, gameState.OpponentPlayer, action);
+
+				(IGameAction action, ActionContext context) = currentAgent.GetNextAction(gameState);
+				engine.Resolve(gameState, context, action);
 			}
 
 			GameEngine.PrintState(gameState, null);
