@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Xml.Serialization;
+
+namespace CardBattleEngine;
 
 public class GameState
 {
@@ -55,7 +57,6 @@ public class GameState
 			}
 		}
 
-
 		// Attacks (creatures that can attack)
 		foreach (var attacker in player.Board)
 		{
@@ -99,6 +100,66 @@ public class GameState
 		actions.Add((
 			new EndTurnAction(),
 			new ()
+			{
+				SourcePlayer = player,
+			}));
+
+		return actions;
+	}
+
+	public List<(IGameAction, ActionContext)> GetUntargetedActions(Player player)
+	{
+		var actions = new List<(IGameAction, ActionContext)>();
+
+		if (PendingChoice != null)
+		{
+			actions.AddRange(PendingChoice.GetActions(this));
+			return actions;
+		}
+
+		// Playable cards
+		foreach (var card in player.Hand)
+		{
+			if (card.ManaCost <= player.Mana)
+			{
+				var playCardAction = new PlayCardAction() { Card = card };
+
+				ActionContext actionContext = new()
+				{
+					SourcePlayer = player,
+					SourceCard = card,
+				};
+
+				if (playCardAction.IsValid(this, actionContext))
+				{
+					actions.Add((playCardAction, null));
+				}
+			}
+		}
+
+		// Attacks (creatures that can attack)
+		var attackers = new List<IGameEntity>();
+		attackers.AddRange([player as IGameEntity]);
+		attackers.AddRange(player.Board.Cast<IGameEntity>());
+
+		foreach (var attacker in attackers)
+		{
+			if (!attacker.CanAttack())
+			{
+				continue;
+			}
+
+			var attackHeroAction = new AttackAction();
+			actions.Add((attackHeroAction, new ActionContext()
+			{
+				Source = attacker
+			}));
+		}
+
+		// Always can end turn
+		actions.Add((
+			new EndTurnAction(),
+			new()
 			{
 				SourcePlayer = player,
 			}));

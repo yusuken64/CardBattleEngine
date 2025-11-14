@@ -7,6 +7,7 @@ public class GameEngine
 	private readonly IRNG rNG;
 
 	public Action<GameState, IGameAction> ActionCallback;
+	public Action<GameState> ActionResolvedCallback;
 
 	public GameEngine(IRNG rNG)
 	{
@@ -77,6 +78,7 @@ public class GameEngine
 			if (gameState.IsGameOver())
 				break;
 		}
+		ActionResolvedCallback?.Invoke(gameState);
 	}
 
 	private bool IsAllowedChoice(GameState state, ActionContext actionContext, IGameAction action)

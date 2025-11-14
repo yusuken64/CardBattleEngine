@@ -8,4 +8,5 @@ public interface IGameEntity
 	IAttackBehavior AttackBehavior { get; }
 	int Attack { get; set; }
 	Player Owner { get; set; }
+	public bool CanAttack();
 }
