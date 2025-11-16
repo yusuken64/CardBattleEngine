@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 
 namespace CardBattleEngine;
 
@@ -17,11 +16,28 @@ public static class GameStateHasher
 		sb.Append('|');
 		sb.Append(state.turn);
 
-		// Compute a short hash (SHA256 → base64 or hex)
-		using var sha = SHA256.Create();
-		var bytes = Encoding.UTF8.GetBytes(sb.ToString());
-		var hashBytes = sha.ComputeHash(bytes);
-		return Convert.ToHexString(hashBytes, 0, 8); // short 8-byte hex digest
+		// Compute non-cryptographic FNV-1a hash
+		uint hash = FNV1a32(sb.ToString());
+		return hash.ToString("X8"); // 8 hex chars
+	}
+
+	private static uint FNV1a32(string input)
+	{
+		const uint fnvOffset = 2166136261;
+		const uint fnvPrime = 16777619;
+
+		uint hash = fnvOffset;
+
+		foreach (char c in input)
+		{
+			hash ^= (byte)c;      // mix lower byte
+			hash *= fnvPrime;
+
+			hash ^= (byte)(c >> 8); // mix upper byte (handles Unicode)
+			hash *= fnvPrime;
+		}
+
+		return hash;
 	}
 
 	private static void AppendPlayer(StringBuilder sb, Player p)

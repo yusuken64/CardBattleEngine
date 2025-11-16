@@ -42,8 +42,8 @@ public class GameEngine
 			// Pre-resolution triggers
 			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre, ChooseRandom))
 			{
-				var preSideEffects = trigger.action.Resolve(gameState, trigger.context);
-				foreach(var preSideEffect in preSideEffects)
+				var preSideEffects = ResolveAction(gameState, trigger);
+				foreach (var preSideEffect in preSideEffects)
 				{
 					_actionQueue.Enqueue(preSideEffect);
 				}
@@ -54,8 +54,7 @@ public class GameEngine
 				continue;
 			}
 
-			// Resolve action and enqueue returned side effects
-			var sideEffects = current.action.Resolve(gameState, current.context);
+			IEnumerable<(IGameAction, ActionContext)> sideEffects = ResolveAction(gameState, current);
 			if (sideEffects != null)
 			{
 				foreach (var effect in sideEffects)
@@ -79,6 +78,20 @@ public class GameEngine
 				break;
 		}
 		ActionResolvedCallback?.Invoke(gameState);
+	}
+
+	private static IEnumerable<(IGameAction, ActionContext)> ResolveAction(GameState gameState, (IGameAction action, ActionContext context) current)
+	{
+		gameState.History.Add(new HistoryEntry()
+		{
+			Turn = gameState.turn,
+			Player = current.context.SourcePlayer,
+			Action = current.action,
+			Context = current.context
+		});
+
+		// Resolve action and enqueue returned side effects
+		return current.action.Resolve(gameState, current.context);
 	}
 
 	private bool IsAllowedChoice(GameState state, ActionContext actionContext, IGameAction action)

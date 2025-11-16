@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
@@ -50,22 +51,41 @@ public class AddStatModifierAction : GameActionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		if (actionParam[nameof(AttackChange)] is JsonElement attackElem && attackElem.TryGetInt32(out int attack))
-			AttackChange = attack;
-		else
-			AttackChange = 0; // or throw
-
-		if (actionParam[nameof(HealthChange)] is JsonElement healthElem && healthElem.TryGetInt32(out int health))
-			HealthChange = health;
-		else
-			HealthChange = 0; // or throw
+		AttackChange = ReadInt(actionParam, nameof(AttackChange));
+		HealthChange = ReadInt(actionParam, nameof(HealthChange));
 	}
 
-	private int GetInt(Dictionary<string, object> dict, string key)
+	private static int ReadInt(Dictionary<string, object> dict, string key)
 	{
-		if (dict[key] is JsonElement elem && elem.TryGetInt32(out int value))
-			return value;
-		throw new InvalidCastException($"Expected int for {key}");
+		if (!dict.TryGetValue(key, out var raw) || raw == null)
+			return 0;
+
+		switch (raw)
+		{
+			case int i:
+				return i;
+
+			case long l:
+				return (int)l;
+
+			case double d:
+				return (int)d;
+
+			case JValue jv when jv.Type == JTokenType.Integer:
+				return jv.Value<int>();
+
+			case JValue jv when jv.Type == JTokenType.Float:
+				return (int)jv.Value<double>();
+
+			case JToken jt:
+				return jt.Value<int>(); // safe for numeric tokens
+
+			case string s when int.TryParse(s, out int parsed):
+				return parsed;
+
+			default:
+				return 0;
+		}
 	}
 
 	public override Dictionary<string, object> EmitParams()

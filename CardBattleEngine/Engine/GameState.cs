@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class GameState
 {
@@ -14,12 +12,16 @@ public class GameState
 	public int maxTurns = 50;
 	public int turn = 0;
 
+	public List<HistoryEntry> History { get; set; } = new();
+
 	public GameState(Player p1, Player p2)
 	{
 		Players = [p1, p2];
 
 		CurrentPlayer = p1;
 		OpponentPlayer = p2;
+
+
 	}
 
 	public Player OpponentOf(Player player)

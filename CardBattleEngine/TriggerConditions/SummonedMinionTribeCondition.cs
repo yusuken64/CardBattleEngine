@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CardBattleEngine;
@@ -39,21 +40,39 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 		}
 	}
 
+
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		object tribeData = actionParam[nameof(MinionTribe)];
-		if (tribeData == null) { return; }
-
-		object minionToMinionRelationshipData = actionParam[nameof(MinionToMinionRelationship)];
-		if (minionToMinionRelationshipData == null) { return; }
-
-		MinionTribe = Enum.Parse<MinionTribe>(tribeData.ToString());
-		MinionToMinionRelationship = Enum.Parse<MinionToMinionRelationship>(minionToMinionRelationshipData.ToString());
-
-		if (actionParam[nameof(ExcludeSelf)] is JsonElement elem &&
-			(elem.ValueKind == JsonValueKind.True || elem.ValueKind == JsonValueKind.False))
+		// MinionTribe
+		if (actionParam.TryGetValue(nameof(MinionTribe), out var tribeData) && tribeData != null)
 		{
-			ExcludeSelf = elem.GetBoolean();
+			MinionTribe = Enum.Parse<MinionTribe>(tribeData.ToString(), ignoreCase: true);
+		}
+
+		// MinionToMinionRelationship
+		if (actionParam.TryGetValue(nameof(MinionToMinionRelationship), out var relationshipData) && relationshipData != null)
+		{
+			MinionToMinionRelationship = Enum.Parse<MinionToMinionRelationship>(relationshipData.ToString(), ignoreCase: true);
+		}
+
+		// ExcludeSelf (bool)
+		if (actionParam.TryGetValue(nameof(ExcludeSelf), out var excludeData) && excludeData != null)
+		{
+			switch (excludeData)
+			{
+				case bool b:
+					ExcludeSelf = b;
+					break;
+				case JValue jv when jv.Type == JTokenType.Boolean:
+					ExcludeSelf = jv.Value<bool>();
+					break;
+				case string s when bool.TryParse(s, out bool parsed):
+					ExcludeSelf = parsed;
+					break;
+				default:
+					ExcludeSelf = false; // default
+					break;
+			}
 		}
 		else
 		{

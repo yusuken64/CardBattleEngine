@@ -69,7 +69,6 @@ public class Minion : IGameEntity, ITriggerSource
 		Health = card.Health;
 		Tribes = (card.MinionTribes ?? [MinionTribe.None]).ToList();
 
-
 		_attackBehavior = new MinionAttackBehavior();
 		HasAttackedThisTurn = false;
 		HasSummoningSickness = true;

@@ -154,7 +154,6 @@ public class CardDBTest
 		Assert.AreEqual(0, damageParam["HealthChange"], "Expected 0 health change from triggered effect.");
 	}
 
-
 	[TestMethod]
 	public void CreateSpellDefinitionTest()
 	{
