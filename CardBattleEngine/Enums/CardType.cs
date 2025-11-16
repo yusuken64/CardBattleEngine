@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CardBattleEngine;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum CardType { Minion, Spell, Weapon, Hero }

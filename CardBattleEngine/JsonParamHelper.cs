@@ -25,7 +25,7 @@ public static class JsonParamHelper
 					break;
 
 				case JArray ja:
-					result[kv.Key] = ja.ToObject<List<object>>(); // convert arrays to list
+					result[kv.Key] = ja.ToObject<List<object>>();
 					break;
 
 				default:
@@ -37,39 +37,80 @@ public static class JsonParamHelper
 		return result;
 	}
 
-	public static int GetInt(Dictionary<string, object> dict, string key, int defaultValue = 0)
+	public static T GetValue<T>(Dictionary<string, object> dict, string key, T defaultValue = default)
 	{
 		if (!dict.TryGetValue(key, out var raw) || raw == null)
 			return defaultValue;
 
-		return raw switch
+		// Direct cast works for simple cases
+		if (raw is T v)
+			return v;
+
+		// Handle enums
+		if (typeof(T).IsEnum)
 		{
-			int i => i,
-			long l => (int)l,
-			double d => (int)d,
-			string s when int.TryParse(s, out var parsed) => parsed,
-			_ => defaultValue
-		};
+			if (Enum.TryParse(typeof(T), raw.ToString(), true, out var enumVal))
+				return (T)enumVal;
+
+			return defaultValue;
+		}
+
+		// JObject -> T
+		if (raw is JObject jo)
+		{
+			try
+			{
+				return jo.ToObject<T>();
+			}
+			catch
+			{
+				return defaultValue;
+			}
+		}
+
+		// JValue -> unwrap then convert
+		if (raw is JValue jv)
+			return ConvertWrappedValue<T>(jv.Value, defaultValue);
+
+		// Good for int, long, float, double, bool, etc.
+		if (raw is IConvertible)
+			return ConvertWrappedValue<T>(raw, defaultValue);
+
+		// Last resort: parse from string
+		return ConvertWrappedValue<T>(raw.ToString(), defaultValue);
 	}
 
-	public static bool GetBool(Dictionary<string, object> dict, string key, bool defaultValue = false)
+	private static T ConvertWrappedValue<T>(object raw, T defaultValue)
 	{
-		if (!dict.TryGetValue(key, out var raw) || raw == null)
-			return defaultValue;
-
-		return raw switch
+		try
 		{
-			bool b => b,
-			string s when bool.TryParse(s, out var parsed) => parsed,
-			_ => defaultValue
-		};
-	}
+			// Special case: bool
+			if (typeof(T) == typeof(bool))
+			{
+				if (bool.TryParse(raw.ToString(), out var b))
+					return (T)(object)b;
+			}
 
-	public static TEnum GetEnum<TEnum>(Dictionary<string, object> dict, string key, TEnum defaultValue = default) where TEnum : struct
-	{
-		if (!dict.TryGetValue(key, out var raw) || raw == null)
+			// Special case: int
+			if (typeof(T) == typeof(int))
+			{
+				if (int.TryParse(raw.ToString(), out var i))
+					return (T)(object)i;
+			}
+
+			// Special case: double
+			if (typeof(T) == typeof(double))
+			{
+				if (double.TryParse(raw.ToString(), out var d))
+					return (T)(object)d;
+			}
+
+			// General-purpose conversion
+			return (T)Convert.ChangeType(raw, typeof(T));
+		}
+		catch
+		{
 			return defaultValue;
-
-		return Enum.TryParse<TEnum>(raw.ToString(), true, out var value) ? value : defaultValue;
+		}
 	}
 }

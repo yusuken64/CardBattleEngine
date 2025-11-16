@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CardBattleEngine;
 
@@ -25,7 +26,7 @@ public class TriggeredEffect
 	}
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum TargetingType
 {
 	Any,
@@ -39,7 +40,7 @@ public enum TargetingType
 	AnyMinion,
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum EffectTrigger
 {
 	None,
@@ -63,7 +64,7 @@ public enum EffectTrigger
 	EquipWeapon,
 } //TODO standardize naming
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum EffectTiming
 {
 	Pre,

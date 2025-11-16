@@ -67,7 +67,7 @@ public class DamageAction : GameActionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		Damage = ParamHelper.GetValue<int>(actionParam[nameof(Damage)]);
+		Damage = JsonParamHelper.GetValue<int>(actionParam, nameof(Damage));
 	}
 
 	public override Dictionary<string, object> EmitParams()

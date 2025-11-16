@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace CardBattleEngine;
 
@@ -51,8 +51,8 @@ public class AddStatModifierAction : GameActionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		AttackChange = JsonParamHelper.GetInt(actionParam, nameof(AttackChange));
-		HealthChange = JsonParamHelper.GetInt(actionParam, nameof(HealthChange));
+		AttackChange = JsonParamHelper.GetValue<int>(actionParam, nameof(AttackChange));
+		HealthChange = JsonParamHelper.GetValue<int>(actionParam, nameof(HealthChange));
 	}
 
 	private static int ReadInt(Dictionary<string, object> dict, string key)
@@ -133,7 +133,7 @@ public class StatModifier
 	public Player SourcePlayer;
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum EffectDuration
 {
 	Permanent,

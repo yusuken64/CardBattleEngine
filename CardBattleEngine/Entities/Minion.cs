@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CardBattleEngine;
 
@@ -166,7 +167,7 @@ public class Minion : IGameEntity, ITriggerSource
 	}
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum MinionTribe
 {
 	None,
