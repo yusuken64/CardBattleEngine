@@ -51,8 +51,8 @@ public class AddStatModifierAction : GameActionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		AttackChange = ReadInt(actionParam, nameof(AttackChange));
-		HealthChange = ReadInt(actionParam, nameof(HealthChange));
+		AttackChange = JsonParamHelper.GetInt(actionParam, nameof(AttackChange));
+		HealthChange = JsonParamHelper.GetInt(actionParam, nameof(HealthChange));
 	}
 
 	private static int ReadInt(Dictionary<string, object> dict, string key)

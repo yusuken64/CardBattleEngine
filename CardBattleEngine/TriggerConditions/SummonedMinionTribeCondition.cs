@@ -43,41 +43,9 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		// MinionTribe
-		if (actionParam.TryGetValue(nameof(MinionTribe), out var tribeData) && tribeData != null)
-		{
-			MinionTribe = Enum.Parse<MinionTribe>(tribeData.ToString(), ignoreCase: true);
-		}
-
-		// MinionToMinionRelationship
-		if (actionParam.TryGetValue(nameof(MinionToMinionRelationship), out var relationshipData) && relationshipData != null)
-		{
-			MinionToMinionRelationship = Enum.Parse<MinionToMinionRelationship>(relationshipData.ToString(), ignoreCase: true);
-		}
-
-		// ExcludeSelf (bool)
-		if (actionParam.TryGetValue(nameof(ExcludeSelf), out var excludeData) && excludeData != null)
-		{
-			switch (excludeData)
-			{
-				case bool b:
-					ExcludeSelf = b;
-					break;
-				case JValue jv when jv.Type == JTokenType.Boolean:
-					ExcludeSelf = jv.Value<bool>();
-					break;
-				case string s when bool.TryParse(s, out bool parsed):
-					ExcludeSelf = parsed;
-					break;
-				default:
-					ExcludeSelf = false; // default
-					break;
-			}
-		}
-		else
-		{
-			ExcludeSelf = false; // default
-		}
+		MinionTribe = Enum.Parse<MinionTribe>(actionParam[nameof(MinionTribe)].ToString(), true);
+		MinionToMinionRelationship = Enum.Parse<MinionToMinionRelationship>(actionParam[nameof(MinionToMinionRelationship)].ToString(), true);
+		ExcludeSelf = actionParam.TryGetValue(nameof(ExcludeSelf), out var val) && val is bool b && b;
 	}
 
 	public override Dictionary<string, object> EmitParams()

@@ -302,7 +302,7 @@ public class CardDatabase
 		{
 			var targetOperationType =_targetOperations[x.Type];
 			var targetOperation = (ITargetOperation)Activator.CreateInstance(targetOperationType)!;
-			targetOperation.ConsumeParams(x.Params);
+			targetOperation.ConsumeParams(JsonParamHelper.Normalize(x.Params));
 
 			return targetOperation;
 		}).ToList();
@@ -329,7 +329,7 @@ public class CardDatabase
 			throw new Exception($"Unknown triggerCondition: {typeName}");
 
 		var triggerCondition = (ITriggerCondition)Activator.CreateInstance(t)!;
-		triggerCondition.ConsumeParams(paramObj);
+		triggerCondition.ConsumeParams(JsonParamHelper.Normalize(paramObj));
 		return triggerCondition;
 	}
 }
