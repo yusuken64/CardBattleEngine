@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CardBattleEngine;
 
@@ -57,7 +58,7 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 	}
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum TargetSide
 {
 	Enemy,
@@ -65,7 +66,7 @@ public enum TargetSide
 	Both
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(StringEnumConverter))]
 public enum TargetGroup
 {
 	Minions,
