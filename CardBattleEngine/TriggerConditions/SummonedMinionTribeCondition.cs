@@ -42,8 +42,8 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		MinionTribe = Enum.Parse<MinionTribe>(actionParam[nameof(MinionTribe)].ToString(), true);
-		MinionToMinionRelationship = Enum.Parse<MinionToMinionRelationship>(actionParam[nameof(MinionToMinionRelationship)].ToString(), true);
+		MinionTribe = Utils.GetEnum<MinionTribe>(actionParam, nameof(MinionTribe));
+		MinionToMinionRelationship = Utils.GetEnum<MinionToMinionRelationship>(actionParam, nameof(MinionToMinionRelationship));
 		ExcludeSelf = actionParam.TryGetValue(nameof(ExcludeSelf), out var val) && val is bool b && b;
 	}
 

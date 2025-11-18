@@ -7,6 +7,7 @@ public class GameEngine
 	private readonly IRNG rNG;
 
 	public Action<GameState, IGameAction> ActionCallback;
+	public Action<GameState, (IGameAction action, ActionContext context)> ActionPlaybackCallback;
 	public Action<GameState> ActionResolvedCallback;
 
 	public GameEngine(IRNG rNG)
@@ -71,16 +72,13 @@ public class GameEngine
 				_actionQueue.Enqueue(trigger);
 			}
 
-			ActionCallback?.Invoke(gameState, current.action);
-			//PrintState(gameState, current);
-
 			if (gameState.IsGameOver())
 				break;
 		}
 		ActionResolvedCallback?.Invoke(gameState);
 	}
 
-	private static IEnumerable<(IGameAction, ActionContext)> ResolveAction(GameState gameState, (IGameAction action, ActionContext context) current)
+	private IEnumerable<(IGameAction, ActionContext)> ResolveAction(GameState gameState, (IGameAction action, ActionContext context) current)
 	{
 		gameState.History.Add(new HistoryEntry()
 		{
@@ -91,7 +89,9 @@ public class GameEngine
 		});
 
 		// Resolve action and enqueue returned side effects
-		return current.action.Resolve(gameState, current.context);
+		var ret =  current.action.Resolve(gameState, current.context);
+		ActionPlaybackCallback?.Invoke(gameState, current);
+		return ret;
 	}
 
 	private bool IsAllowedChoice(GameState state, ActionContext actionContext, IGameAction action)
@@ -107,7 +107,7 @@ public class GameEngine
 			.PendingChoice
 			.GetActions(state)
 			.Select(opt => opt.Item1)
-			.ToHashSet();
+			.ToList();
 		
 		return allowed.Contains(action)
 			&& state.PendingChoice.SourcePlayer == actionContext.SourcePlayer;
@@ -127,6 +127,7 @@ public class GameEngine
 
 		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction() { ShuffleFunction = Shuffle});
 		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction() { ShuffleFunction = Shuffle });
+		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartTurnAction());
 	}
 
 	public static void PrintState(GameState gameState, GameActionBase current)

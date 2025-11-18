@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Collections.Generic;
+
+namespace CardBattleEngine;
 
 public class CastSpellAction : IGameAction
 {

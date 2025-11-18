@@ -45,11 +45,11 @@ public static class GameStateHasher
 		sb.Append($"HP{p.Health}M{p.Mana}/{p.MaxMana}H{p.Hand.Count}");
 
 		// Hand summary by card cost
-		var handSummary = string.Join(',', p.Hand.Select(c => c.ManaCost));
+		var handSummary = string.Join(",", p.Hand.Select(c => c.ManaCost));
 		sb.Append($"[{handSummary}]");
 
 		// Board summary by attack/health
-		var boardSummary = string.Join(',', p.Board.Select(m => $"{m.Attack}/{m.Health}"));
+		var boardSummary = string.Join(",", p.Board.Select(m => $"{m.Attack}/{m.Health}"));
 		sb.Append($"B[{boardSummary}]");
 	}
 }

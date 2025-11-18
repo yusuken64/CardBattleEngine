@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using CardBattleEngine;
+using Newtonsoft.Json.Linq;
 
 public static class JsonParamHelper
 {
@@ -37,7 +38,7 @@ public static class JsonParamHelper
 		return result;
 	}
 
-	public static T GetValue<T>(Dictionary<string, object> dict, string key, T defaultValue = default)
+	public static T GetValue<T>(Dictionary<string, object> dict, string key, T defaultValue = default) where T : struct
 	{
 		if (!dict.TryGetValue(key, out var raw) || raw == null)
 			return defaultValue;
@@ -49,8 +50,9 @@ public static class JsonParamHelper
 		// Handle enums
 		if (typeof(T).IsEnum)
 		{
-			if (Enum.TryParse(typeof(T), raw.ToString(), true, out var enumVal))
-				return (T)enumVal;
+			string str = raw.ToString();
+			if (Enum.TryParse(str, out T parsed))
+				return (T)parsed;
 
 			return defaultValue;
 		}
@@ -112,5 +114,17 @@ public static class JsonParamHelper
 		{
 			return defaultValue;
 		}
+	}
+
+	internal static T GetEnum<T>(Dictionary<string, object> dict, string key, T defaultValue = default) where T : struct
+	{
+		if (!dict.TryGetValue(key, out var raw) || raw == null)
+			return defaultValue;
+
+		var str = raw.ToString();
+		if (Enum.TryParse<T>(str, out var parsed))
+			return (T)parsed;
+
+		return defaultValue;
 	}
 }

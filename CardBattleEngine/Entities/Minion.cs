@@ -146,7 +146,7 @@ public class Minion : IGameEntity, ITriggerSource
 		int newHealth = newMaxHealth - damageTaken;
 
 		// Clamp health within [0, newMaxHealth]
-		Health = Math.Clamp(newHealth, 0, newMaxHealth);
+		Health = Utils.Clamp(newHealth, 0, newMaxHealth);
 	}
 
 	internal void RemoveExpiredModifiers()

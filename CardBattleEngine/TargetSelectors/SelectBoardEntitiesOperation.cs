@@ -50,11 +50,8 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 
 	public void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		if (actionParam.TryGetValue(nameof(Side), out var sideValue) && sideValue is string sideString)
-			Side = Enum.Parse<TargetSide>(sideString);
-
-		if (actionParam.TryGetValue(nameof(Group), out var groupValue) && groupValue is string groupString)
-			Group = Enum.Parse<TargetGroup>(groupString);
+		Side = JsonParamHelper.GetEnum<TargetSide>(actionParam, nameof(Side), Side);
+		Group = JsonParamHelper.GetEnum<TargetGroup>(actionParam, nameof(Group), Group);
 	}
 }
 
