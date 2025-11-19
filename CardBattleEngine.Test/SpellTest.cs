@@ -11,7 +11,7 @@ public class SpellTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
 		var spellCard = cardDatabase.GetSpellCard("DrawCardSpell", current);
@@ -38,7 +38,7 @@ public class SpellTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
 		var spellCard = cardDatabase.GetSpellCard("FrostBolt", current);
@@ -69,7 +69,7 @@ public class SpellTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 7; // Assume Flamestrike costs 7
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
 		var spellCard = cardDatabase.GetSpellCard("FlameStrike", current);

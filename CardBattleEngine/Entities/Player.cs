@@ -12,7 +12,6 @@ public class Player : IGameEntity, ITriggerSource
 	public List<Minion> Board { get; } = new List<Minion>();
 	public List<Minion> Graveyard { get; } = new List<Minion>();
 	public List<Secret> Secrets { get; set; } = new List<Secret>();//TODO expand to hero auras
-	public int CurrentMana { get; set; }
 	public int MaxMana { get; set; }
 	public int Attack { get; set; }
 	public int Health { get; set; } = 30;
@@ -56,7 +55,6 @@ public class Player : IGameEntity, ITriggerSource
 	{
 		var clone = new Player(Name)
 		{
-			CurrentMana = CurrentMana,
 			MaxMana = MaxMana,
 			Health = Health,
 			Mana = Mana,

@@ -13,7 +13,7 @@ public class WeaponTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		var weapon = new Weapon
 		{
@@ -54,7 +54,7 @@ public class WeaponTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		var weapon = new Weapon
 		{
@@ -96,7 +96,7 @@ public class WeaponTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var attacker = state.CurrentPlayer;
-		var defender = state.OpponentPlayer;
+		var defender = state.OpponentOf(attacker);
 
 		bool deathrattleTriggered = false;
 

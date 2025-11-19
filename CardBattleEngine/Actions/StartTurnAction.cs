@@ -7,9 +7,20 @@ public class StartTurnAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
+		// Increment turn, switch current player
 		Player player = actionContext.SourcePlayer;
+		state.CurrentPlayer = player;
+		state.turn++;
+
 		player.HasAttackedThisTurn = false;
-		if (player.IsFrozen)
+		if (player.IsFrozen &&
+			player.MissedAttackFromFrozen)
+		{
+			player.IsFrozen = false;
+			player.MissedAttackFromFrozen = false;
+		}
+		else if (player.IsFrozen &&
+			!player.MissedAttackFromFrozen)
 		{
 			player.MissedAttackFromFrozen = true;
 		}
@@ -20,7 +31,14 @@ public class StartTurnAction : GameActionBase
 			minion.HasAttackedThisTurn = false;
 			minion.HasSummoningSickness = false;
 
-			if (minion.IsFrozen)
+			if (minion.IsFrozen &&
+				minion.MissedAttackFromFrozen)
+			{
+				minion.IsFrozen = false;
+				minion.MissedAttackFromFrozen = false;
+			}
+			else if (minion.IsFrozen &&
+				!minion.MissedAttackFromFrozen)
 			{
 				minion.MissedAttackFromFrozen = true;
 			}

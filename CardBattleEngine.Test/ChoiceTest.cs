@@ -11,7 +11,7 @@ public class ChoiceTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		var discoverCard = new SpellCard("DiscoverCard", cost: 1);
 		current.Hand.Add(discoverCard);
@@ -182,7 +182,7 @@ public class ChoiceTest
 		var state = GameFactory.CreateTestGame();
 		var engine = new GameEngine(new XorShiftRNG(1));
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		current.Mana = 1;
 

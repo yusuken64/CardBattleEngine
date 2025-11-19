@@ -38,7 +38,7 @@ public class BattleEffectTest
 		Assert.IsTrue(player2.IsFrozen, "Enemy hero should be frozen");
 
 		// Act 2: Start frozen player's turn -> mark that freeze caused missed attack
-		engine.Resolve(state, new ActionContext { SourcePlayer = player1 }, new EndTurnAction());
+		engine.Resolve(state, new ActionContext { SourcePlayer = player2 }, new StartTurnAction());
 
 		// Assert 2: minion is still frozen but now counted as missed attack
 		Assert.IsTrue(minion2.IsFrozen, "Enemy minion should still be frozen at start of turn");
@@ -50,7 +50,7 @@ public class BattleEffectTest
 		Assert.IsFalse(attackAction.IsValid(state, attackContext), "Frozen minion cannot attack");
 
 		// Act 5: End frozen player's turn -> freeze should wear off
-		engine.Resolve(state, new ActionContext { SourcePlayer = player2 }, new EndTurnAction());
+		engine.Resolve(state, new ActionContext { SourcePlayer = player2 }, new StartTurnAction());
 
 		// Assert 4: freeze removed from minion and hero
 		Assert.IsFalse(minion2.IsFrozen, "Enemy minion freeze should wear off at end of turn");

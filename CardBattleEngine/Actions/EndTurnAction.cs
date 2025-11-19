@@ -24,21 +24,18 @@ public class EndTurnAction : GameActionBase
 				minion.IsFrozen = false;
 				minion.MissedAttackFromFrozen = false;
 			}
+			else
+			{
+				minion.MissedAttackFromFrozen = true;
+			}
 		}
-
-		// Increment turn, switch current player
-		var temp = state.CurrentPlayer;
-		state.CurrentPlayer = state.OpponentPlayer;
-		state.OpponentPlayer = temp;
-
-		state.turn++;
 
 		// Queue start-of-turn effects
 		return new (IGameAction, ActionContext)[]
 		{
 			(new StartTurnAction(), new ActionContext()
 			{
-				SourcePlayer = state.CurrentPlayer
+				SourcePlayer = state.OpponentOf(state.CurrentPlayer)
 			})
 		};
 	}

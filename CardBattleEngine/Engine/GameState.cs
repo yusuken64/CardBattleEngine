@@ -3,7 +3,6 @@
 public class GameState
 {
 	public Player CurrentPlayer { get; set; }
-	public Player OpponentPlayer { get; set; }
 	public int MaxBoardSize { get; set; } = 7;
 	public Player[] Players { get; internal set; }
 	public Player? Winner { get; set; }
@@ -19,9 +18,6 @@ public class GameState
 		Players = [p1, p2];
 
 		CurrentPlayer = p1;
-		OpponentPlayer = p2;
-
-
 	}
 
 	public Player OpponentOf(Player player)
@@ -209,7 +205,6 @@ public class GameState
 		};
 
 		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
-		clone.OpponentPlayer = this.OpponentPlayer == Players[0] ? p1 : p2;
 
 		return clone;
 	}

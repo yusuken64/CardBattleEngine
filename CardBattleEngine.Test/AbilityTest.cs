@@ -11,7 +11,7 @@ public class AbilityTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 		int initialHealth = opponent.Health;
 
 		var card = new MinionCard("BattlecryMinion", cost: 1, attack: 1, health: 1);
@@ -54,7 +54,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 		int initialHealth = opponent.Health;
 
 		// Create minion with Deathrattle effect
@@ -113,7 +113,7 @@ public class AbilityTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 		int initialHealth = opponent.Health;
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
@@ -163,7 +163,7 @@ public class AbilityTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 		int initialHealth = opponent.Health;
 
 		var elemental = new MinionCard("Elemental", 1, 1, 2);
@@ -215,7 +215,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		// Create a minion on opponent's board to freeze
 		var enemyMinionCard = new MinionCard("EnemyMinion", 1, 2, 2);
@@ -263,7 +263,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		// Create a stealth minion in hand
 		var stealthMinionCard = new MinionCard("StealthMinion", 1, 2, 1);
@@ -331,7 +331,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		// Create a Charge minion in hand
 		var chargeMinionCard = new MinionCard("ChargeMinion", 1, 1, 1);
@@ -379,7 +379,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		// Create a Charge minion in hand
 		var divineShieldCard = new MinionCard("DivineShieldMinion", 1, 1, 2);
@@ -435,7 +435,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		// Create a Poisonous minion in hand
 		var poisonCard = new MinionCard("PoisonMinion", 1, 1, 2);
@@ -487,7 +487,7 @@ public class AbilityTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
 

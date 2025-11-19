@@ -75,7 +75,7 @@ public class CardDBTest
 		var engine = new GameEngine(new XorShiftRNG(1));
 
 		var current = state.CurrentPlayer;
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		CardDatabase cardDatabase = new(CardDBTest.DBPath);
 

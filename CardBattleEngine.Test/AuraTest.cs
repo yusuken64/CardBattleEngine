@@ -11,7 +11,7 @@ public class AuraTest
 
 		var current = state.CurrentPlayer;
 		current.Mana = 10; // ensure enough for all summons
-		var opponent = state.OpponentPlayer;
+		var opponent = state.OpponentOf(current);
 
 		// Create normal Murloc
 		var card = new MinionCard("Murloc", cost: 0, attack: 1, health: 1);
