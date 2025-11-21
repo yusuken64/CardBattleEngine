@@ -1,7 +1,7 @@
 ﻿
 namespace CardBattleEngine;
 
-internal class EquipWeaponAction : GameActionBase 
+public class EquipWeaponAction : GameActionBase 
 {
 	public Weapon Weapon { get; set; }
 

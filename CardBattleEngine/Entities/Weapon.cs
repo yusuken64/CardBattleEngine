@@ -4,6 +4,7 @@ namespace CardBattleEngine;
 
 public class Weapon : ITriggerSource
 {
+	public string Name { get; set; }
 	public int Attack { get; set; }
 	public int Durability { get; set; }
 

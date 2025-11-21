@@ -77,6 +77,7 @@ public class Minion : IGameEntity, ITriggerSource
 		HasCharge = card.HasCharge;
 		HasDivineShield = card.HasDivineShield;
 		HasPoisonous = card.HasPoisonous;
+		Taunt = card.HasTaunt;
 
 		IsAlive = true;
 		TriggeredEffects = card.TriggeredEffects.Select(effect =>

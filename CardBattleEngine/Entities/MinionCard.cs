@@ -10,6 +10,7 @@ public class MinionCard : Card
 	public bool HasCharge { get; set; }
 	public bool HasDivineShield { get; set; }
 	public bool HasPoisonous { get; set; }
+	public bool HasTaunt { get; set; }
 
 	public MinionCard(string name, int cost, int attack, int health)
 	{
@@ -68,6 +69,7 @@ public class MinionCard : Card
 			HasCharge = HasCharge,
 			HasDivineShield = HasDivineShield,
 			HasPoisonous = HasPoisonous,
+			HasTaunt = HasTaunt,
 			MinionTribes = MinionTribes.ToList(),
 		};
 	}
