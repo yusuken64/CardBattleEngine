@@ -1,4 +1,4 @@
-﻿namespace CardBattleEngine.Actions;
+﻿namespace CardBattleEngine;
 
 public class HeroAttackBehavior : IAttackBehavior
 {

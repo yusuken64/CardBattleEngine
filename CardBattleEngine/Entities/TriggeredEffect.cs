@@ -62,6 +62,7 @@ public enum EffectTrigger
 	SecretCasted,
 	SecretResolved,
 	EquipWeapon,
+	OnHeroPower,
 } //TODO standardize naming
 
 [JsonConverter(typeof(StringEnumConverter))]

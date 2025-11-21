@@ -43,4 +43,5 @@ public class ActionContext
 	public IGameAction OriginalAction { get; internal set; }
 	public Minion SummonedMinion { get; internal set; }
 	public int PlayIndex { get; set; } = -1;
+	public HeroPower SourceHeroPower { get; set; }
 }

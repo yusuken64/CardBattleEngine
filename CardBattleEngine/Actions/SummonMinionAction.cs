@@ -1,10 +1,8 @@
-﻿using System.Reflection;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class SummonMinionAction : GameActionBase
 {
-	public MinionCard Card;
+	public MinionCard Card { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.SummonMinion;
 
 	public override bool IsValid(GameState state, ActionContext actionContext)

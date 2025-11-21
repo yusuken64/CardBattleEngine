@@ -1,5 +1,4 @@
-﻿
-using CardBattleEngine.Actions;
+﻿using CardBattleEngine;
 
 namespace CardBattleEngine;
 
@@ -41,6 +40,7 @@ public class Player : IGameEntity, ITriggerSource
 	public bool IsStealth { get; internal set; }
 	public Weapon? EquippedWeapon { get; set; }
 	private List<StatModifier> _modifiers = new();
+	public HeroPower HeroPower { get; set; }
 
 	public Player(string name) 
 	{

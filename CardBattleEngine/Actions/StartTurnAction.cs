@@ -12,6 +12,10 @@ public class StartTurnAction : GameActionBase
 		state.CurrentPlayer = player;
 		state.turn++;
 
+		if (player.HeroPower != null)
+		{
+			player.HeroPower.UsedThisTurn = false;
+		}
 		player.HasAttackedThisTurn = false;
 		if (player.IsFrozen &&
 			player.MissedAttackFromFrozen)
