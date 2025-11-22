@@ -18,6 +18,8 @@ public class GameEngine
 	
 	public void Resolve(GameState gameState, ActionContext actionContext, IGameAction action)
 	{
+		if (gameState.IsGameOver()) { return; }
+
 		if (!IsAllowedChoice(gameState, actionContext, action))
 		{
 			return;
@@ -71,9 +73,6 @@ public class GameEngine
 			{
 				_actionQueue.Enqueue(trigger);
 			}
-
-			if (gameState.IsGameOver())
-				break;
 		}
 		ActionResolvedCallback?.Invoke(gameState);
 	}
