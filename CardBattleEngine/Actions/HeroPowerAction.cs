@@ -19,7 +19,7 @@ public class HeroPowerAction : GameActionBase
 	{
 		HeroPower heroPower = context.SourcePlayer.HeroPower;
 		heroPower.UsedThisTurn = true;
-		context.SourcePlayer.Mana -= heroPower.ManaCost;
+		yield return (new SpendManaAction() { Amount = heroPower.ManaCost }, context);
 
 		foreach (var action in heroPower.GameActions)
 		{

@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-public class GainManaAction : GameActionBase
+public class SpendManaAction : GameActionBase
 {
 	public int Amount { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
@@ -12,8 +12,8 @@ public class GainManaAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		actionContext.SourcePlayer.Mana = 
-			Math.Min(actionContext.SourcePlayer.Mana + Amount, 10);
+		actionContext.SourcePlayer.Mana =
+			Math.Max(actionContext.SourcePlayer.Mana - Amount, 0);
 		return [];
 	}
 }

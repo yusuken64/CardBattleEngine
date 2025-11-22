@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using CardBattleEngine;
+
+namespace CardBattleEngine;
 
 public class PlayCardAction : GameActionBase
 {
@@ -23,16 +25,14 @@ public class PlayCardAction : GameActionBase
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		if (!IsValid(state, actionContext))
-			return [];
+			yield break;
 
-		Card.Owner.Mana -= Card.ManaCost;
+		yield return (new SpendManaAction { Amount = Card.ManaCost }, actionContext);
+
 		Card.Owner.Hand.Remove(Card);
 
-		var effects = Card.GetPlayEffects(
-			state,
-			actionContext);
-
-		return effects;
+		foreach (var effect in Card.GetPlayEffects(state, actionContext))
+			yield return effect;
 	}
 
 	public override string ToString()
