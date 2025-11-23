@@ -64,6 +64,7 @@ public enum EffectTrigger
 	EquipWeapon,
 	OnHeroPower,
 	OnHealed,
+	Reborn,
 } //TODO standardize naming
 
 [JsonConverter(typeof(StringEnumConverter))]

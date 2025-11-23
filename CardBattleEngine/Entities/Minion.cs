@@ -5,7 +5,7 @@ namespace CardBattleEngine;
 
 public class Minion : IGameEntity, ITriggerSource
 {
-	private MinionCard card;
+	public MinionCard OriginalCard { get; private set; }
 	public Guid Id { get; set; } = Guid.NewGuid();
 	public string Name { get; set; }
 	public string TemplateName { get; set; }
@@ -63,7 +63,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 	public Minion(MinionCard card, Player owner)
 	{
-		this.card = card;
+		this.OriginalCard = card;
 		Owner = owner;
 
 		Name = card.Name;
@@ -101,7 +101,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 	internal Minion Clone()
 	{
-		return new Minion(this.card, Owner)
+		return new Minion(this.OriginalCard, Owner)
 		{
 			Id = this.Id,
 			TemplateName = this.TemplateName,
@@ -135,8 +135,8 @@ public class Minion : IGameEntity, ITriggerSource
 			oldDamageTaken = 0; // safety for weird states
 
 		// --- Rebuild base stats ---
-		Attack = card.Attack;
-		MaxHealth = card.Health; // start from base max health
+		Attack = OriginalCard.Attack;
+		MaxHealth = OriginalCard.Health; // start from base max health
 
 		// Apply modifiers
 		foreach (var mod in _modifiers)

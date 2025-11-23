@@ -29,6 +29,13 @@ public class SummonMinionAction : GameActionBase
 		{
 			actionContext.SourcePlayer.Board.Add(minion);
 		}
+
+		if (actionContext.IsReborn)
+		{
+			minion.HasReborn = false;
+			minion.Health = 1;
+		}
+
 		actionContext.SummonedMinion = minion;
 
 		return [];

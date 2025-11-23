@@ -11,39 +11,58 @@ public class DeathAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		var sideEffects = new List<(IGameAction, ActionContext)>();
+		// Kill target
 		actionContext.Target.IsAlive = false;
 
 		if (actionContext.Target is Minion minion)
 		{
+			// Move to graveyard
+			int index = minion.Owner.Board.IndexOf(minion);
+
 			minion.Owner.Board.Remove(minion);
 			minion.Owner.Graveyard.Add(minion);
 
+			// --- Deathrattles ---
 			foreach (var effect in minion.TriggeredEffects
 				.Where(e => e.EffectTrigger == EffectTrigger.Deathrattle))
 			{
 				foreach (var gameAction in effect.GameActions)
 				{
-					ActionContext selectorContext = new ActionContext()
+					ActionContext selectorContext = new ActionContext
 					{
 						SourcePlayer = minion.Owner,
-						Source = minion,
+						Source = minion
 					};
+
 					var targets = effect.AffectedEntitySelector.Select(state, selectorContext);
 
 					foreach (var target in targets)
 					{
-						sideEffects.Add((gameAction, new ActionContext
-						{
-							SourcePlayer = minion.Owner,
-							Source = minion,
-							Target = target
-						}));
+						yield return (
+							gameAction,
+							new ActionContext
+							{
+								SourcePlayer = minion.Owner,
+								Source = minion,
+								Target = target
+							});
 					}
 				}
 			}
-		}
 
-		return sideEffects;
+			// --- Reborn ---
+			if (minion.HasReborn)
+			{
+				yield return (
+					new RebornAction(),      // (typo fixed: ReboardAction)
+					new ActionContext
+					{
+						SourcePlayer = minion.Owner,
+						SourceCard = minion.OriginalCard,
+						Source = minion,
+						PlayIndex = index
+					});
+			}
+		}
 	}
 }

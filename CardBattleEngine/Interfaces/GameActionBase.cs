@@ -44,4 +44,5 @@ public class ActionContext
 	public Minion SummonedMinion { get; internal set; }
 	public int PlayIndex { get; set; } = -1;
 	public HeroPower SourceHeroPower { get; set; }
+	public bool IsReborn { get; set; } = false;
 }
