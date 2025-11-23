@@ -14,6 +14,7 @@ public class Player : IGameEntity, ITriggerSource
 	public int MaxMana { get; set; }
 	public int Attack { get; set; }
 	public int Health { get; set; } = 30;
+	public int MaxHealth { get; set; } = 30;
 	public int Mana { get; set; }
 	public bool CanAttack()
 	{

@@ -4,6 +4,7 @@ public interface IGameEntity
 {
 	Guid Id { get; set; }
 	int Health { get; set; }
+	int MaxHealth { get; set; }
 	bool IsAlive { get; set; }
 	public IAttackBehavior AttackBehavior { get; }
 	int Attack { get; set; }

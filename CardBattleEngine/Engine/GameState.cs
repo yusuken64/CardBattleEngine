@@ -64,15 +64,15 @@ public class GameState
 			}
 
 			var attackHeroAction = new AttackAction();
-			ActionContext attackGeroActionContext = new()
+			ActionContext attackHeroActionContext = new()
 			{
 				Source = attacker,
 				SourcePlayer = player,
 				Target = OpponentOf(player)
 			};
-			if (attackHeroAction.IsValid(this, attackGeroActionContext))
+			if (attackHeroAction.IsValid(this, attackHeroActionContext))
 			{
-				actions.Add((attackHeroAction, attackGeroActionContext));
+				actions.Add((attackHeroAction, attackHeroActionContext));
 			}
 
 			foreach (var defender in OpponentOf(player).Board)

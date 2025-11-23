@@ -10,11 +10,8 @@ public class Minion : IGameEntity, ITriggerSource
 	public string Name { get; set; }
 	public string TemplateName { get; set; }
 	public int Attack { get; set; }
-	public int Health
-	{
-		get;
-		set;
-	}
+	public int Health {	get; set; }
+	public int MaxHealth { get; set; }
 	public List<MinionTribe> Tribes { get; set; }
 	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
@@ -71,6 +68,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 		Name = card.Name;
 		Attack = card.Attack;
+		MaxHealth = card.Health;
 		Health = card.Health;
 		Tribes = (card.MinionTribes ?? [MinionTribe.None]).ToList();
 
@@ -108,10 +106,12 @@ public class Minion : IGameEntity, ITriggerSource
 			Id = this.Id,
 			TemplateName = this.TemplateName,
 			Attack = this.Attack,
+			MaxHealth = this.MaxHealth,
 			Health = this.Health,
 			Owner = this.Owner,
 			Taunt = this.Taunt,
 			HasSummoningSickness = this.HasSummoningSickness,
+			AttacksPerformedThisTurn = this.AttacksPerformedThisTurn
 		};
 	}
 	internal void AddModifier(StatModifier modifier)
@@ -128,34 +128,32 @@ public class Minion : IGameEntity, ITriggerSource
 
 	private void RecalculateStats()
 	{
-		// Store current and old max health before recalculation
-		int oldHealth = Health;
-		int oldMaxHealth = card.Health;
+		// Before recalculating, compute how much damage the unit has taken.
+		// (damageTaken = MaxHealth_before - Health_before)
+		int oldDamageTaken = MaxHealth - Health;
+		if (oldDamageTaken < 0)
+			oldDamageTaken = 0; // safety for weird states
 
-		foreach (var mod in _modifiers)
-			oldMaxHealth += mod.HealthChange;
-
-		// Calculate how much damage was taken before recalculation
-		int damageTaken = oldMaxHealth - oldHealth;
-
-		// Rebuild stats from base
+		// --- Rebuild base stats ---
 		Attack = card.Attack;
-		Health = card.Health;
+		MaxHealth = card.Health; // start from base max health
 
+		// Apply modifiers
 		foreach (var mod in _modifiers)
 		{
 			Attack += mod.AttackChange;
-			Health += mod.HealthChange;
+			MaxHealth += mod.HealthChange;
 		}
 
+		// Clamp final stats
 		Attack = Math.Max(0, Attack);
-		int newMaxHealth = Math.Max(0, Health);
+		MaxHealth = Math.Max(0, MaxHealth);
 
-		// Apply old damage taken
-		int newHealth = newMaxHealth - damageTaken;
+		// --- Reapply damage taken ---
+		int newHealth = MaxHealth - oldDamageTaken;
 
-		// Clamp health within [0, newMaxHealth]
-		Health = Utils.Clamp(newHealth, 0, newMaxHealth);
+		// Clamp health to valid range
+		Health = Utils.Clamp(newHealth, 0, MaxHealth);
 	}
 
 	internal void RemoveExpiredModifiers()

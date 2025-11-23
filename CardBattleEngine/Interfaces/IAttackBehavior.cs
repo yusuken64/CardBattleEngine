@@ -83,6 +83,7 @@ public class MinionAttackBehavior : IAttackBehavior
 				Damage = defendingMinion.Attack
 			}, new ActionContext()
 			{
+				SourcePlayer = attackingMinion.Owner,
 				Target = attackingMinion,
 				Source = defendingMinion,
 			});
