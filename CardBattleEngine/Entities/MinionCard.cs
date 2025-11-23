@@ -11,6 +11,10 @@ public class MinionCard : Card
 	public bool HasDivineShield { get; set; }
 	public bool HasPoisonous { get; set; }
 	public bool HasTaunt { get; set; }
+	public bool HasRush { get; set; }
+	public bool HasWindfury { get; set; }
+	public bool HasLifeSteal { get; set; }
+	public bool HasReborn{ get; set; }
 
 	public MinionCard(string name, int cost, int attack, int health)
 	{

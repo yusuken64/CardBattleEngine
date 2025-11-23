@@ -2,41 +2,60 @@
 
 public interface IAttackBehavior
 {
+	public int MaxAttacks(IGameEntity attacker);
 	bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state);
 	IEnumerable<(IGameAction, ActionContext)> GenerateDamageActions(IGameEntity attacker, IGameEntity target, GameState state);
 }
-internal class MinionAttackBehavior : IAttackBehavior
+public class MinionAttackBehavior : IAttackBehavior
 {
 	public bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state)
 	{
-		if (attacker is not Minion attackingMinion)
+		if (attacker is not Minion minion)
 			return false;
 
-		// Can't attack friendly units
-		if (attackingMinion.Owner == target.Owner)
-			return false;
-
-		if (attackingMinion.IsFrozen)
-		{
-			return false;
-		}
-
-		if (target is Minion targetMinion && targetMinion.IsStealth)
-			return false; // cannot attack stealth minions
-
-		// Can't attack dead targets
+		// Target must be alive
 		if (!target.IsAlive)
 			return false;
 
-		// Respect taunt via centralized rule
-		if (!AttackRules.MustAttackTaunt(attacker, target, state))
+		// Cannot attack friendly units
+		if (minion.Owner == target.Owner)
 			return false;
 
-		if (attackingMinion.HasAttackedThisTurn)
+		// Attacker is frozen
+		if (minion.IsFrozen)
 			return false;
 
-		if (attackingMinion.HasSummoningSickness && !attackingMinion.HasCharge)
+		// Cannot attack stealth minions
+		if (target is Minion tminion && tminion.IsStealth)
 			return false;
+
+		// Must obey taunt rules
+		if (!AttackRules.MustAttackTaunt(minion, target, state))
+			return false;
+
+		// ----- WIND FURY / ATTACK COUNT -----
+		if (minion.AttacksPerformedThisTurn >= MaxAttacks(attacker))
+			return false;
+
+		// ----- SUMMONING SICKNESS / RUSH / CHARGE -----
+		if (minion.HasSummoningSickness)
+		{
+			if (minion.HasCharge)
+			{
+				// Charge = can attack anything
+			}
+			else if (minion.HasRush)
+			{
+				// Rush = can ONLY attack minions on first turn
+				if (target is not Minion)
+					return false;
+			}
+			else
+			{
+				// No charge, no rush
+				return false;
+			}
+		}
 
 		return true;
 	}
@@ -67,7 +86,15 @@ internal class MinionAttackBehavior : IAttackBehavior
 				Target = attackingMinion,
 				Source = defendingMinion,
 			});
-		//else if (target is Player defendingHero)
-		//	yield return new DamageAction(defendingHero, attackingMinion.Attack);
+	}
+
+	public int MaxAttacks(IGameEntity attacker)
+	{
+		if (attacker is Minion minion)
+		{
+			//if (minion.HasMegaWindfury) return 4;
+			if (minion.HasWindfury) return 2;
+		}
+		return 1;
 	}
 }

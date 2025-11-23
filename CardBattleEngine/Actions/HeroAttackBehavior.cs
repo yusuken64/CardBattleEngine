@@ -2,6 +2,11 @@
 
 public class HeroAttackBehavior : IAttackBehavior
 {
+	public int MaxAttacks(IGameEntity attacker)
+	{
+		return 1;
+	}
+
 	public bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state)
 	{
 		if (attacker is not Player hero || !hero.CanAttack()) // weapon, cooldown, etc.
@@ -61,5 +66,4 @@ public class HeroAttackBehavior : IAttackBehavior
 			}
 		}
 	}
-
 }

@@ -19,7 +19,6 @@ public class Minion : IGameEntity, ITriggerSource
 	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
 	public bool HasSummoningSickness { get; internal set; }
-	public bool HasAttackedThisTurn { get; internal set; }
 	public IEnumerable<(TriggeredEffect, StatModifier)> ModifierTriggeredEffects
 	{
 		get
@@ -43,7 +42,7 @@ public class Minion : IGameEntity, ITriggerSource
 	public IEnumerable<TriggeredEffect> TriggeredEffects { get; }
 
 	private IAttackBehavior _attackBehavior;
-	IAttackBehavior IGameEntity.AttackBehavior
+	public IAttackBehavior AttackBehavior
 	{
 		get
 		{
@@ -59,6 +58,11 @@ public class Minion : IGameEntity, ITriggerSource
 	public bool HasCharge { get; internal set; }
 	public bool HasDivineShield { get; internal set; }
 	public bool HasPoisonous { get; internal set; }
+	public bool HasRush { get; set; }
+	public bool HasWindfury { get; set; }
+	public bool HasLifeSteal { get; set; }
+	public bool HasReborn { get; set; }
+	public int AttacksPerformedThisTurn { get; internal set; }
 
 	public Minion(MinionCard card, Player owner)
 	{
@@ -71,13 +75,17 @@ public class Minion : IGameEntity, ITriggerSource
 		Tribes = (card.MinionTribes ?? [MinionTribe.None]).ToList();
 
 		_attackBehavior = new MinionAttackBehavior();
-		HasAttackedThisTurn = false;
+		AttacksPerformedThisTurn = 0;
 		HasSummoningSickness = true;
 		IsStealth = card.IsStealth;
 		HasCharge = card.HasCharge;
 		HasDivineShield = card.HasDivineShield;
 		HasPoisonous = card.HasPoisonous;
 		Taunt = card.HasTaunt;
+		HasRush = card.HasRush;
+		HasWindfury = card.HasWindfury;
+		HasLifeSteal = card.HasLifeSteal;
+		HasReborn = card.HasReborn;
 
 		IsAlive = true;
 		TriggeredEffects = card.TriggeredEffects.Select(effect =>
@@ -89,7 +97,8 @@ public class Minion : IGameEntity, ITriggerSource
 
 	public bool CanAttack()
 	{
-		return HasCharge || (!HasSummoningSickness && !HasAttackedThisTurn);
+		var maxAttacks = _attackBehavior.MaxAttacks(this);
+		return (HasCharge || HasRush || !HasSummoningSickness) && (AttacksPerformedThisTurn < maxAttacks);
 	}
 
 	internal Minion Clone()
@@ -103,7 +112,6 @@ public class Minion : IGameEntity, ITriggerSource
 			Owner = this.Owner,
 			Taunt = this.Taunt,
 			HasSummoningSickness = this.HasSummoningSickness,
-			HasAttackedThisTurn = this.HasAttackedThisTurn
 		};
 	}
 	internal void AddModifier(StatModifier modifier)

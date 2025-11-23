@@ -32,7 +32,7 @@ public class StartTurnAction : GameActionBase
 		// Reset attack flags
 		foreach (var minion in actionContext.SourcePlayer.Board)
 		{
-			minion.HasAttackedThisTurn = false;
+			minion.AttacksPerformedThisTurn = 0;
 			minion.HasSummoningSickness = false;
 
 			if (minion.IsFrozen &&

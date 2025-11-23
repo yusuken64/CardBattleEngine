@@ -369,7 +369,7 @@ public class AbilityTest
 		engine.Resolve(state, attackContext, attackAction);
 
 		// Assert: minion has attacked
-		Assert.IsTrue(chargeMinion.HasAttackedThisTurn, "Charge minion should have attacked");
+		Assert.AreEqual(1, chargeMinion.AttacksPerformedThisTurn, "Charge minion should have attacked");
 	}
 
 	[TestMethod]

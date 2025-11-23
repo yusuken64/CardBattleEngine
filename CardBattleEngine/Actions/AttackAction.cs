@@ -13,9 +13,9 @@ public class AttackAction : GameActionBase
 	{
 		if (context.Source is Minion minion)
 		{
-			minion.HasAttackedThisTurn = true;
 			minion.HasSummoningSickness = false;
 			minion.IsStealth = false;
+			minion.AttacksPerformedThisTurn++;
 		}
 		else if (context.Source is Player player)
 		{
