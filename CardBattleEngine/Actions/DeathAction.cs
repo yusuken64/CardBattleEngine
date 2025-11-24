@@ -14,6 +14,13 @@ public class DeathAction : GameActionBase
 		// Kill target
 		actionContext.Target.IsAlive = false;
 
+		if (actionContext.Target is Player player)
+		{
+			yield return (new EndGameAction(), new ActionContext()
+			{
+				SourcePlayer = player,
+			});
+		}
 		if (actionContext.Target is Minion minion)
 		{
 			// Move to graveyard

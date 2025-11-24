@@ -65,6 +65,7 @@ public enum EffectTrigger
 	OnHeroPower,
 	OnHealed,
 	Reborn,
+	GameEnd,
 } //TODO standardize naming
 
 [JsonConverter(typeof(StringEnumConverter))]
