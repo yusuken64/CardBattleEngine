@@ -18,7 +18,7 @@ public class DeathAction : GameActionBase
 		{
 			yield return (new EndGameAction(), new ActionContext()
 			{
-				SourcePlayer = player,
+				SourcePlayer = state.OpponentOf(player),
 			});
 		}
 		if (actionContext.Target is Minion minion)
