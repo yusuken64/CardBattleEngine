@@ -133,6 +133,7 @@ public class StatModifier
 	public Player SourcePlayer;
 }
 
+//TODO refactor to ExpirationTrigger
 [JsonConverter(typeof(StringEnumConverter))]
 public enum EffectDuration
 {

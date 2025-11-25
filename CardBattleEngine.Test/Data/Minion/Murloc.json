@@ -12,7 +12,7 @@
         "Params": {
           "MinionTribe": "Murloc",
           "MinionToMinionRelationship": "Friendly",
-          "ExcludeSelf" : true
+          "ExcludeSelf": true
         }
       },
       "ActionDefintion": {
@@ -20,6 +20,15 @@
         "Params": {
           "AttackChange": 1,
           "HealthChange": 0
+        }
+      },
+      "AffectedEntitySelectorDefinition": {
+        "EntitySelectorTypeName": "ContextSelector",
+        "Params": {
+          "IncludeTarget": false,
+          "IncludeSource": true,
+          "IncludeSourcePlayer": false,
+          "IncludeTargetOwner": false
         }
       }
     }

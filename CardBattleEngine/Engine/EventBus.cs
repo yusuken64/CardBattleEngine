@@ -18,10 +18,11 @@ public class EventBus
 							 te.EffectTiming == EffectTiming.Persistant))
 			{
 				// Build an effect context for condition checks
-				var effectContext = new EffectContext
+				var effectContext = new ActionContext()
 				{
-					EffectOwner = source as IGameEntity,
-					OriginalOwner = source.Owner,
+					SourcePlayer = source.Owner,
+					Source = source as IGameEntity,
+					Target = null,
 				};
 
 				if (auraEffect.Condition != null && !auraEffect.Condition.Evaluate(effectContext))
@@ -36,7 +37,7 @@ public class EventBus
 				var targets = auraEffect.AffectedEntitySelector.Select(gameState, actionContext);
 				foreach (var target in targets)
 				{
-					foreach(var action in auraEffect.GameActions)
+					foreach (var action in auraEffect.GameActions)
 					{
 						action.Resolve(gameState, new ActionContext() { Target = target });
 					}
@@ -64,13 +65,15 @@ public class EventBus
 				.Where(te => te.EffectTrigger == triggeringAction.EffectTrigger &&
 							 te.EffectTiming == timing))
 			{
-				EffectContext effectContext = new()
+				var effectContext = new ActionContext()
 				{
-					EffectOwner = triggerSource as IGameEntity,
-					SummonedUnit = context.SummonedMinion,
-					SecretOwner = triggerSource.Owner,
-					TriggeringAction = triggeringAction,
-					OriginalOwner = context.SourcePlayer,
+					SourcePlayer = triggerSource.Owner,
+					Source = triggerSource as IGameEntity,
+					Target = context.Target,
+					SummonedMinion = context.SummonedMinion,
+					PlayIndex = context.PlayIndex,
+					SourceCard = context.SourceCard,
+					OriginalAction = context.OriginalAction
 				};
 
 				if (effect.Condition?.Evaluate(effectContext) == false)
@@ -80,17 +83,19 @@ public class EventBus
 
 				foreach (var action in effect.GameActions)
 				{
-					var targets = gameState.GetValidTargets(triggerSource, effect.TargetType);
-					var target = picker(targets);
+					if (effect.AffectedEntitySelector == null) { continue; }
+					var affectedTargets = effect.AffectedEntitySelector.Select(gameState, effectContext);
 
-					yield return (action, new ActionContext
+					foreach (var target in affectedTargets)
 					{
-						Source = triggerSource.Owner,
-						SourcePlayer = triggerSource.Owner,
-						Target = target as IGameEntity,
-						OriginalAction = context.OriginalAction,
-						AffectedEntitySelector = null // engine injects default/random if needed
-					});
+						yield return (action, new ActionContext
+						{
+							Source = triggerSource.Owner,
+							SourcePlayer = triggerSource.Owner,
+							Target = target as IGameEntity,
+							OriginalAction = context.OriginalAction,
+						});
+					}
 				}
 			}
 		}

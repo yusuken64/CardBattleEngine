@@ -29,11 +29,15 @@ public class SecretTest
 							{
 								EffectTrigger = EffectTrigger.SpellCast,
 								EffectTiming = EffectTiming.Pre,
-								TargetType = TargetingType.EnemyHero,
+								TargetType = TargetingType.None,
 								GameActions = [new CancelEffectAction()],
 								Condition= new SpellOwnerCondition()
 								{
 									TargetSide = TargetSide.Enemy
+								},
+								AffectedEntitySelector = new ContextSelector()
+								{
+									IncludeSourcePlayer = true,
 								}
 							}
 						}

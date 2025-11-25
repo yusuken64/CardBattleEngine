@@ -1,8 +1,8 @@
 ﻿using CardBattleEngine;
 
-var minionID = "TestMinion";
-var card = new MinionCard(minionID, cost: 1, attack: 1, health: 1);
-card.MinionTribes = [MinionTribe.None];
+//var minionID = "TestMurloc";
+//var card = new MinionCard(minionID, cost: 1, attack: 1, health: 1);
+//card.MinionTribes = [MinionTribe.Murloc];
 //card.TriggeredEffects.Add(new TriggeredEffect()
 //{
 //	EffectTrigger = EffectTrigger.SummonMinion,
@@ -19,9 +19,33 @@ card.MinionTribes = [MinionTribe.None];
 //		{
 //			AttackChange = 1,
 //		}
+//	},
+//	AffectedEntitySelector = new ContextSelector()
+//	{
+//		IncludeSource = true,
 //	}
 //});
 
-var json = CardDatabase.CreateFileFromMinionCard(card, ".\\Data\\", minionID);
+var cardID = "CardID";
+var card = new SpellCard("FlameStrike", 5)
+{
+	TargetingType = TargetingType.None,
+};
+card.SpellCastEffects.Add(new SpellCastEffect()
+{
+	GameActions = [new DamageAction()
+	{
+		Damage = 5
+	}],
+	AffectedEntitySelector = new TargetOperationSelector()
+	{
+		Operations = [new SelectBoardEntitiesOperation() {
+			Group = TargetGroup.Minions,
+			Side = TargetSide.Enemy
+		}]
+	}
+});
+
+var json = CardDatabase.CreateJsonFromSpellCard(card, cardID);
 Console.WriteLine(json);
 

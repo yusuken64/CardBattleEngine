@@ -7,10 +7,10 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 	public MinionToMinionRelationship MinionToMinionRelationship;
 	public MinionTribe MinionTribe;
 	public bool ExcludeSelf { get; set; } = false;
-	public override bool Evaluate(EffectContext context)
+	public override bool Evaluate(ActionContext context)
 	{
-		var effectSource = context.EffectOwner;
-		var summoned = context.SummonedUnit;
+		var effectSource = context.Source;
+		var summoned = context.SummonedMinion;
 
 		if (summoned == null)
 			return false;

@@ -47,7 +47,8 @@ public class CardDBTest
 				{
 					Damage = 1,
 				}
-			}
+			},
+			
 		});
 
 		CardDatabase.CreateFileFromMinionCard(card, ".\\Data\\", "BattleCryMinion");

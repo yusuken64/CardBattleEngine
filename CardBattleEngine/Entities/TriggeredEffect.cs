@@ -26,6 +26,16 @@ public class TriggeredEffect
 	}
 }
 
+//TODO maybe ITrigger interface?
+//Attach to things that expire
+public class ExpirationTrigger
+{
+	public EffectTrigger EffectTrigger { get; set; }
+	public EffectTiming EffectTiming { get; set; }
+	public ITriggerCondition Condition { get; set; }
+	public int CountDown { get; set; }
+}
+
 [JsonConverter(typeof(StringEnumConverter))]
 public enum TargetingType
 {

@@ -1,21 +1,45 @@
-﻿namespace CardBattleEngine;
+﻿using System.Linq;
 
+namespace CardBattleEngine;
 public class TargetOperationSelector : AffectedEntitySelectorBase
 {
 	public List<ITargetOperation> Operations { get; set; } = new();
 
-	public override void ConsumeParams(List<ITargetOperation> paramObj)
+	// Serialize to:  { "Operations": [ { Type = "...", Params = {...} }, ... ] }
+	public override Dictionary<string, object> EmitParams()
 	{
-		Operations = paramObj;
+		return new Dictionary<string, object>
+		{
+			["Operations"] = Operations
+				.Select(op => new SerializedOperation
+				{
+					Type = op.GetType(),
+					Params = op.EmitParams()
+				})
+				.ToList()
+		};
 	}
 
-	public override List<SerializedOperation> EmitParams()
+	// Deserialize from dictionary:
+	// Params["Operations"] -> List<SerializedOperation>
+	public override void ConsumeParams(Dictionary<string, object> Params)
 	{
-		return Operations.Select(op => new SerializedOperation
+		if (!Params.TryGetValue("Operations", out var opsObj) || opsObj is not List<SerializedOperation> opList)
 		{
-			Type = op.GetType().Name,
-			Params = (Dictionary<string, object>)op.EmitParams()
-		}).ToList();
+			Operations = new List<ITargetOperation>();
+			return;
+		}
+
+		Operations = opList
+			.Select(serializedOperation =>
+			{
+				var op = (ITargetOperation)Activator.CreateInstance(serializedOperation.Type)!;
+
+				op.ConsumeParams(JsonParamHelper.Normalize(serializedOperation.Params));
+
+				return op;
+			})
+			.ToList();
 	}
 
 	public override IEnumerable<IGameEntity> Select(GameState state, ActionContext context)
@@ -35,8 +59,9 @@ public interface ITargetOperation
 	Dictionary<string, object> EmitParams();
 	void ConsumeParams(Dictionary<string, object> actionParam);
 }
+
 public class SerializedOperation
 {
-	public string Type { get; set; } = null!;
+	public Type Type { get; set; } = null!;
 	public Dictionary<string, object> Params { get; set; } = null!;
 }

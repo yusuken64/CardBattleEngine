@@ -2,18 +2,18 @@
 
 public interface IAffectedEntitySelector
 {
-	List<SerializedOperation> EmitParams();
-	void ConsumeParams(List<ITargetOperation> paramObj);
+	Dictionary<string, object> EmitParams();
+	void ConsumeParams(Dictionary<string, object> Params);
 	IEnumerable<IGameEntity> Select(GameState state, ActionContext context);
 }
 
 public abstract class AffectedEntitySelectorBase : IAffectedEntitySelector
 {
-	public virtual void ConsumeParams(List<ITargetOperation> actionParam)
+	public virtual void ConsumeParams(Dictionary<string, object> Params)
 	{
 	}
 
-	public virtual List<SerializedOperation> EmitParams()
+	public virtual Dictionary<string, object> EmitParams()
 	{
 		return new();
 	}

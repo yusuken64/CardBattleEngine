@@ -7,7 +7,7 @@ public class DamageAction : GameActionBase
 	public int Damage { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDamage;
 
-	public int ActualDamageDealt { get; private set; }
+	public int ActualDamageDealt { get; set; }
 
 	public override bool IsValid(GameState state, ActionContext actionContext)
 	{

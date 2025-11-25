@@ -73,6 +73,11 @@ public class CardDatabase
 					{
 						GameActionTypeName = x.GameActions[0].GetType().Name,
 						Params = x.GameActions[0].EmitParams()
+					},
+					AffectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition()
+					{
+						EntitySelectorTypeName = x.AffectedEntitySelector?.GetType().Name,
+						Params = x.AffectedEntitySelector?.EmitParams()
 					}
 				};
 			}).ToList()
@@ -249,6 +254,10 @@ public class CardDatabase
 				TargetType = triggeredEffectDefinition.TargetType,
 				Condition = condition,
 				GameActions = [action],
+				AffectedEntitySelector = CreateAffectedEntitySelectorFromDefinition(
+					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.EntitySelectorTypeName,
+					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.Params
+					)
 			};
 			card.TriggeredEffects.Add(effect);
 		}
@@ -293,29 +302,23 @@ public class CardDatabase
 		return card;
 	}
 
-	private IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinintion(string entitySelectorTypeName, List<SerializedOperation> paramObj)
+	private IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinintion(
+		string entitySelectorTypeName,
+		Dictionary<string, object> paramObj)
 	{
 		if (!_affectedEntitySelectors.TryGetValue(entitySelectorTypeName, out var t))
-			throw new Exception($"Unknown triggerCondition: {entitySelectorTypeName}");
+			throw new Exception($"Unknown entitySelector: {entitySelectorTypeName}");
 
 		var instance = (IAffectedEntitySelector)Activator.CreateInstance(t)!;
-		List<ITargetOperation> targetOperations = paramObj.Select(x =>
-		{
-			var targetOperationType =_targetOperations[x.Type];
-			var targetOperation = (ITargetOperation)Activator.CreateInstance(targetOperationType)!;
-			targetOperation.ConsumeParams(JsonParamHelper.Normalize(x.Params));
 
-			return targetOperation;
-		}).ToList();
-
-		instance.ConsumeParams(targetOperations);
+		instance.ConsumeParams(paramObj);
 		return instance;
 	}
 
 	public IGameAction CreateGameActionFromDefinition(string typeName, Dictionary<string, object> paramObj)
 	{
 		if (!_actions.TryGetValue(typeName, out var t))
-			throw new Exception($"Unknown triggerCondition: {typeName}");
+			throw new Exception($"Unknown entitySelector: {typeName}");
 
 		var action = (IGameAction)Activator.CreateInstance(t)!;
 		action.ConsumeParams(paramObj);
@@ -327,11 +330,23 @@ public class CardDatabase
 		if (typeName == null) { return null; }
 
 		if (!_triggerConditions.TryGetValue(typeName, out var t))
-			throw new Exception($"Unknown triggerCondition: {typeName}");
+			throw new Exception($"Unknown entitySelector: {typeName}");
 
 		var triggerCondition = (ITriggerCondition)Activator.CreateInstance(t)!;
 		triggerCondition.ConsumeParams(JsonParamHelper.Normalize(paramObj));
 		return triggerCondition;
+	}
+
+	public IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinition(string typeName, Dictionary<string, object> paramObj)
+	{
+		if (typeName == null) { return null; }
+
+		if (!_affectedEntitySelectors.TryGetValue(typeName, out var t))
+			throw new Exception($"Unknown entitySelector: {typeName}");
+
+		var entitySelector = (IAffectedEntitySelector)Activator.CreateInstance(t)!;
+		entitySelector.ConsumeParams(JsonParamHelper.Normalize(paramObj));
+		return entitySelector;
 	}
 }
 
@@ -370,6 +385,7 @@ public class TriggeredEffectDefinition
 	public TargetingType TargetType { get; set; }
 	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
 	public ActionDefinition ActionDefintion { get; set; }
+	public AffectedEntitySelectorDefinition AffectedEntitySelectorDefinition { get; set; }
 }
 
 public class ActionDefinition
@@ -387,5 +403,5 @@ public class TriggerConditionDefinition
 public class AffectedEntitySelectorDefinition
 {
 	public string EntitySelectorTypeName { get; set; }
-	public List<SerializedOperation> Params { get; set; } = new();
+	public Dictionary<string, object> Params { get; set; } = new();
 }

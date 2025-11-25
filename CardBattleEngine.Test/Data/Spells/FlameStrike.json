@@ -12,20 +12,25 @@
 			],
 			"AffectedEntitySelectorDefinition": {
 				"EntitySelectorTypeName": "TargetOperationSelector",
-				"Params": [
-					{
-						"Type": "SelectBoardEntitiesOperation",
-						"Params": {
-							"Side": "Enemy",
-							"Group": "Minions"
-						}
+				"Params": {
+					"Operations": {
+						"$type": "System.Collections.Generic.List`1[[CardBattleEngine.SerializedOperation, CardBattleEngine]], System.Private.CoreLib",
+						"$values": [
+							{
+								"Type": "CardBattleEngine.SelectBoardEntitiesOperation, CardBattleEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+								"Params": {
+									"Side": "Enemy",
+									"Group": "Minions"
+								}
+							}
+						]
 					}
-				]
+				}
 			}
 		}
 	],
 	"Type": "Spell",
 	"Id": "FlameStrike",
 	"Name": "FlameStrike",
-	"Cost": 1
+	"Cost": 5
 }
