@@ -45,4 +45,5 @@ public class ActionContext
 	public int PlayIndex { get; set; } = -1;
 	public HeroPower SourceHeroPower { get; set; }
 	public bool IsReborn { get; set; } = false;
+	public bool IsAuraEffect { get; internal set; }
 }

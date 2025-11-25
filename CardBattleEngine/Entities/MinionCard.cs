@@ -34,9 +34,9 @@ public class MinionCard : Card
 
 			IEnumerable<IGameEntity> targets;
 			// If this play action provided a selector, ask it for a target
-			if (context.AffectedEntitySelector != null)
+			if (effect.AffectedEntitySelector != null)
 			{
-				targets = context.AffectedEntitySelector.Select(state, context);
+				targets = effect.AffectedEntitySelector.Select(state, context);
 			}
 			else
 			{

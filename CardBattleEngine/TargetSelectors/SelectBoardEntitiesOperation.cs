@@ -7,6 +7,7 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 {
 	public TargetSide Side { get; set; } = TargetSide.Enemy;   // Enemy, Friendly, Both
 	public TargetGroup Group { get; set; } = TargetGroup.Minions; // Minions, Hero, All
+	public bool ExcludeSelf { get; set; }
 	public IEnumerable<IGameEntity> Apply(IEnumerable<IGameEntity> input, GameState state, ActionContext context)
 	{
 		// Ignore the input — this is the "base selection"
@@ -24,7 +25,8 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 			{
 				case TargetGroup.Minions:
 					foreach (var minion in player.Board)
-						yield return minion;
+						if (!ExcludeSelf || minion != context.Source)
+							yield return minion;
 					break;
 				case TargetGroup.Hero:
 					yield return player;

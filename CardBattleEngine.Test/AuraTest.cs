@@ -35,8 +35,7 @@ public class AuraTest
 			{
 				new AddStatModifierAction()
 				{
-					AttackChange = +2,
-					Duration = EffectDuration.Aura
+					AttackChange = +2
 				}
 			},
 			AffectedEntitySelector = new TargetOperationSelector()

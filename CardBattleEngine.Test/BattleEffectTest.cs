@@ -57,4 +57,65 @@ public class BattleEffectTest
 		Assert.IsFalse(minion2.MissedAttackFromFrozen, "MissedAttackFromFrozen flag should be reset");
 		Assert.IsFalse(player2.IsFrozen, "Enemy hero freeze should wear off at end of turn");
 	}
+
+	[TestMethod]
+	public void TempBuff()
+	{
+		// Arrange
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		var testCard = new MinionCard("Test", 1, 1, 1);
+		var card = new MinionCard("TempBuff", 1, 1, 1);
+		card.TriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Battlecry,
+			EffectTiming = EffectTiming.Post,
+			TargetType = TargetingType.None,
+			GameActions = [new AddStatModifierAction() {
+				AttackChange = 2,
+				ExpirationTrigger = new TriggeredEffect()
+				{
+					EffectTrigger = EffectTrigger.OnTurnEnd,
+					EffectTiming = EffectTiming.Post,
+					GameActions = [new RemoveModifierAction()]
+				}
+			}],
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				Operations = [new SelectBoardEntitiesOperation()
+				{
+					Group = TargetGroup.Minions,
+					Side = TargetSide.Friendly,
+					ExcludeSelf = true
+				}]
+			}
+		});
+		card.Owner = player1;
+		player1.Hand.Add(card);
+
+		player1.Board.Add(new Minion(testCard, player1));
+		player1.Board.Add(new Minion(testCard, player1));
+		player1.Board.Add(new Minion(testCard, player1));
+
+		ActionContext actionContext = new()
+		{
+			SourcePlayer = player1
+		};
+		PlayCardAction playCardAction = new()
+		{
+			Card = card,
+		};
+
+		engine.Resolve(state, actionContext, playCardAction);
+		
+		// Assert
+		Assert.AreEqual(4, player1.Board.Count);
+		Assert.AreEqual(3, player1.Board[0].Attack);
+		Assert.AreEqual(3, player1.Board[1].Attack);
+		Assert.AreEqual(3, player1.Board[2].Attack);
+		Assert.AreEqual(1, player1.Board[3].Attack);
+	}
 }

@@ -3,7 +3,7 @@ using Newtonsoft.Json.Converters;
 
 namespace CardBattleEngine;
 
-public class TriggeredEffect
+public class TriggeredEffect : ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
@@ -11,7 +11,7 @@ public class TriggeredEffect
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
-
+	public ExpirationTrigger ExpirationTrigger { get; set; }
 	internal TriggeredEffect CloneFor(Minion minion)
 	{
 		return new TriggeredEffect()
@@ -26,15 +26,21 @@ public class TriggeredEffect
 	}
 }
 
-//TODO maybe ITrigger interface?
-//Attach to things that expire
-public class ExpirationTrigger
+public class ExpirationTrigger : ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
 	public ITriggerCondition Condition { get; set; }
 	public int CountDown { get; set; }
 }
+
+public interface ITriggeredEffect
+{
+	public EffectTrigger EffectTrigger { get; set; }
+	public EffectTiming EffectTiming { get; set; }
+	public ITriggerCondition Condition { get; set; }
+}
+
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum TargetingType

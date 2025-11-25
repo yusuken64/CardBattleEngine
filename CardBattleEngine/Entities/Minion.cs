@@ -21,7 +21,7 @@ public class Minion : IGameEntity, ITriggerSource
 		get
 		{
 			// Also return a triggered effect for each temporary modifier
-			foreach (var mod in _modifiers.Where(m => m.Duration == EffectDuration.UntilEndOfTurn))
+			foreach (var mod in _modifiers.Where(m => m.ExpirationTrigger != null))
 			{
 				yield return (new TriggeredEffect
 				{
@@ -47,6 +47,7 @@ public class Minion : IGameEntity, ITriggerSource
 		}
 	}
 	private List<StatModifier> _modifiers = new();
+	private List<StatModifier> _auraModifiers = new();
 
 	public bool IsAlive{ get; set; }
 	public bool IsFrozen { get; internal set; }
@@ -120,6 +121,12 @@ public class Minion : IGameEntity, ITriggerSource
 		RecalculateStats();
 	}
 
+	internal void AddAuraModifier(StatModifier auraStatModifier)
+	{
+		_auraModifiers.Add(auraStatModifier);
+		RecalculateStats();
+	}
+
 	internal void RemoveModifier(StatModifier modifier)
 	{
 		_modifiers.Remove(modifier);
@@ -145,6 +152,12 @@ public class Minion : IGameEntity, ITriggerSource
 			MaxHealth += mod.HealthChange;
 		}
 
+		foreach (var mod in _auraModifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+		}
+
 		// Clamp final stats
 		Attack = Math.Max(0, Attack);
 		MaxHealth = Math.Max(0, MaxHealth);
@@ -156,12 +169,6 @@ public class Minion : IGameEntity, ITriggerSource
 		Health = Utils.Clamp(newHealth, 0, MaxHealth);
 	}
 
-	internal void RemoveExpiredModifiers()
-	{
-		_modifiers.RemoveAll(m => m.Duration == EffectDuration.UntilEndOfTurn);
-		RecalculateStats();
-	}
-
 	internal bool HasModifier(StatModifier modifier)
 	{
 		return _modifiers.Contains(modifier);
@@ -169,7 +176,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 	internal void ClearAuras()
 	{
-		_modifiers = _modifiers.Where(x => x.Duration != EffectDuration.Aura).ToList();
+		_auraModifiers.Clear();
 		RecalculateStats();
 	}
 }

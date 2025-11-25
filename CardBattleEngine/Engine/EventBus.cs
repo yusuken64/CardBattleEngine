@@ -39,7 +39,11 @@ public class EventBus
 				{
 					foreach (var action in auraEffect.GameActions)
 					{
-						action.Resolve(gameState, new ActionContext() { Target = target });
+						action.Resolve(gameState, new ActionContext()
+						{
+							Target = target,
+							IsAuraEffect = true,
+						});
 					}
 				}
 			}
