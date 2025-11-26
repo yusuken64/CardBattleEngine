@@ -85,22 +85,12 @@ public class EventBus
 					continue;
 				}
 
-				if (effect.AffectedEntitySelector == null) { continue; }
-				foreach (var action in effect.GameActions)
+				yield return (new TriggerEffectAction()
 				{
-					var affectedTargets = effect.AffectedEntitySelector.Select(gameState, effectContext);
-
-					foreach (var target in affectedTargets)
-					{
-						yield return (action, new ActionContext
-						{
-							Source = triggerSource.Entity,
-							SourcePlayer = triggerSource.Entity.Owner,
-							Target = target as IGameEntity,
-							OriginalAction = context.OriginalAction,
-						});
-					}
-				}
+					TriggeredEffect = effect,
+					TriggerSource = triggerSource,
+					EffectContext = effectContext,
+				}, context);
 			}
 		}
 
