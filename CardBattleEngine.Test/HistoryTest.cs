@@ -7,7 +7,7 @@ public class HistoryTest
 	public void HistoryRecordACtionTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		ActionContext actionContext = new();
 		IGameAction action = new DebugLambaAction()
@@ -27,7 +27,7 @@ public class HistoryTest
 	public void HistoryLogsSideEffects()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		// Arrange: Create an action that returns another action as side effect
 		var mainAction = new DebugLambaAction

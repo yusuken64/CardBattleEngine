@@ -1,7 +1,7 @@
 ﻿using CardBattleEngine;
 
 var gameState = GameFactory.CreateTestGame();
-var engine = new GameEngine(new XorShiftRNG(0));
+var engine = new GameEngine();
 
 engine.ActionResolvedCallback = (gameStat) =>
 {

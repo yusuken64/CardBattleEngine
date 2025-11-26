@@ -7,7 +7,7 @@ public class ChoiceTest
 	public void DiscoverTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
@@ -58,7 +58,7 @@ public class ChoiceTest
 	{
 		// Arrange: create game state and engine
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
 
@@ -122,7 +122,7 @@ public class ChoiceTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
 
@@ -180,7 +180,7 @@ public class ChoiceTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
 

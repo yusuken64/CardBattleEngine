@@ -7,7 +7,7 @@
 		public void CloneTest()
 		{
 			var gameState = GameFactory.CreateTestGame();
-			var engine = new GameEngine(new XorShiftRNG(1));
+			var engine = new GameEngine();
 
 			engine.StartGame(gameState);
 

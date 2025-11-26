@@ -59,8 +59,7 @@ public class EventBus
 		GameState gameState,
 		IGameAction triggeringAction,
 		ActionContext context,
-		EffectTiming timing,
-		Func<List<ITriggerSource>, ITriggerSource> picker)
+		EffectTiming timing)
 	{
 		// Normal card effects
 		foreach (var triggerSource in gameState.GetAllTriggerSources())

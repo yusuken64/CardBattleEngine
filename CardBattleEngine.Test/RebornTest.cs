@@ -7,7 +7,7 @@ public class RebornTest
 	public void MinionRebornTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		// Create the reborn card
 		var rebornCard = new MinionCard("rebornMinion", 1, 3, 4)

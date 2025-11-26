@@ -36,7 +36,7 @@ public static class GameFactory
 			});
 		}
 
-		var state = new GameState(p1, p2);
+		var state = new GameState(p1, p2, new XorShiftRNG(1));
 		return state;
 	}
 }

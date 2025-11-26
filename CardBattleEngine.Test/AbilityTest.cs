@@ -7,7 +7,7 @@ public class AbilityTest
 	public void Battlecry_Deals1DamageOnPlay()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
@@ -51,7 +51,7 @@ public class AbilityTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -109,7 +109,7 @@ public class AbilityTest
 	public void BattleCry_BuffMinion()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
@@ -164,7 +164,7 @@ public class AbilityTest
 	public void BattleCry_AddMinionToHand()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
@@ -217,7 +217,7 @@ public class AbilityTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -265,7 +265,7 @@ public class AbilityTest
 	public void StealthMinion()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -333,7 +333,7 @@ public class AbilityTest
 	public void ChargeMinion()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -381,7 +381,7 @@ public class AbilityTest
 	public void DivineShieldMinion()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -437,7 +437,7 @@ public class AbilityTest
 	public void PoisonMinion()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -489,7 +489,7 @@ public class AbilityTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);

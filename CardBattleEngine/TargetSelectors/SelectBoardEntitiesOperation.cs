@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace CardBattleEngine;
-
+﻿namespace CardBattleEngine;
 public class SelectBoardEntitiesOperation : ITargetOperation
 {
 	public TeamRelationship Side { get; set; } = TeamRelationship.Enemy;   // Enemy, Friendly, Both

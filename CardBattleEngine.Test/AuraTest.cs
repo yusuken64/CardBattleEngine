@@ -7,7 +7,7 @@ public class AuraTest
 	public void MurlocAuraTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 10; // ensure enough for all summons

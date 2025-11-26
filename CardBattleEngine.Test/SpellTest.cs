@@ -7,7 +7,7 @@ public class SpellTest
 	public void DrawCardSpellTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
@@ -34,7 +34,7 @@ public class SpellTest
 	public void FrostBoltSpellTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 1;
@@ -65,7 +65,7 @@ public class SpellTest
 	public void FlamestrikeSpellTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 7; // Assume Flamestrike costs 7

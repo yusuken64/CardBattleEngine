@@ -8,7 +8,7 @@ public class HeroPowerTests
 	public void NoHeroPowerTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 2;
@@ -37,7 +37,7 @@ public class HeroPowerTests
 	public void TargetedHeroPowerTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		current.Mana = 2;
@@ -84,7 +84,7 @@ public class HeroPowerTests
 	public void HeroPowerResetsAtStartOfTurn()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 

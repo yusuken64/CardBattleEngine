@@ -8,7 +8,7 @@ public class BattleEffectTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
@@ -63,7 +63,7 @@ public class BattleEffectTest
 	{
 		// Arrange
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
@@ -123,7 +123,7 @@ public class BattleEffectTest
 	public void CleaveTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 

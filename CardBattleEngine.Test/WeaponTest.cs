@@ -10,7 +10,7 @@ public class WeaponTest
 	public void EquipWeaponTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -51,7 +51,7 @@ public class WeaponTest
 	public void ReEquipWeaponTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
@@ -93,7 +93,7 @@ public class WeaponTest
 	public void WeaponDurabilityTest()
 	{
 		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine(new XorShiftRNG(1));
+		var engine = new GameEngine();
 
 		var attacker = state.CurrentPlayer;
 		var defender = state.OpponentOf(attacker);

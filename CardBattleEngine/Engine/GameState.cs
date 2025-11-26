@@ -12,10 +12,12 @@ public class GameState
 	public int turn = 0;
 
 	public List<HistoryEntry> History { get; set; } = new();
+	private readonly IRNG rNG;
 
-	public GameState(Player p1, Player p2)
+	public GameState(Player p1, Player p2, IRNG rng)
 	{
 		Players = [p1, p2];
+		rNG = rng;
 
 		CurrentPlayer = p1;
 	}
@@ -195,7 +197,7 @@ public class GameState
 		var p2 = Players[1].Clone();
 
 		// Create a new game state using the cloned players
-		var clone = new GameState(p1, p2)
+		var clone = new GameState(p1, p2, this.rNG.Clone())
 		{
 			MaxBoardSize = this.MaxBoardSize,
 			maxTurns = this.maxTurns,
@@ -291,5 +293,35 @@ public class GameState
 		}
 
 		return targets;
+	}
+	
+	public T ChooseRandom<T>(IReadOnlyList<T> options)
+	{
+		if (options.Count == 0) return default!;
+		return options[rNG.NextInt(0, options.Count)];
+	}
+
+	public IEnumerable<T> ChooseRandom<T>(IReadOnlyList<T> options, int count)
+	{
+		if (options.Count == 0 || count <= 0)
+			return Array.Empty<T>();
+
+		// Work on a copy
+		var copy = options.ToList();
+
+		// Shuffle the copy
+		Shuffle(copy);
+
+		// Return the first `count` items from the shuffled copy
+		return copy.Take(count);
+	}
+
+	public void Shuffle<T>(IList<T> list)
+	{
+		for (int i = list.Count - 1; i > 0; i--)
+		{
+			int j = rNG.NextInt(0, i + 1); // same RNG as ChooseRandom
+			(list[i], list[j]) = (list[j], list[i]);
+		}
 	}
 }

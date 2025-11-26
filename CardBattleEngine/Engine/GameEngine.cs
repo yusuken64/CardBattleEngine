@@ -4,15 +4,13 @@ public class GameEngine
 {
 	private readonly EventBus _eventBus;
 	private readonly Queue<(IGameAction, ActionContext)> _actionQueue = new();
-	private readonly IRNG rNG;
 
 	public Action<GameState, IGameAction> ActionCallback;
 	public Action<GameState, (IGameAction action, ActionContext context)> ActionPlaybackCallback;
 	public Action<GameState> ActionResolvedCallback;
 
-	public GameEngine(IRNG rNG)
+	public GameEngine()
 	{
-		this.rNG = rNG;
 		_eventBus = new();
 	}
 	
@@ -43,7 +41,7 @@ public class GameEngine
 			current.context.OriginalAction = current.action;
 
 			// Pre-resolution triggers
-			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre, ChooseRandom))
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre))
 			{
 				var preSideEffects = ResolveAction(gameState, trigger);
 				foreach (var preSideEffect in preSideEffects)
@@ -62,12 +60,12 @@ public class GameEngine
 			{
 				foreach (var effect in sideEffects)
 				{
-					_actionQueue.Enqueue((effect.Item1, EnsureSelector(effect.Item2)));
+					_actionQueue.Enqueue((effect.Item1, effect.Item2));
 				}
 			}
 
 			// Post-resolution triggers
-			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Post, ChooseRandom))
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Post))
 			{
 				_actionQueue.Enqueue(trigger);
 			}
@@ -112,20 +110,13 @@ public class GameEngine
 			&& state.PendingChoice.SourcePlayer == actionContext.SourcePlayer;
 	}
 
-	private ActionContext EnsureSelector(ActionContext ctx)
-	{
-		//if (ctx.TargetSelector == null)
-		//	ctx.TargetSelector = CreateRandomTargetSelector();
-		return ctx;
-	}
-
 	public void StartGame(GameState gameState)
 	{
 		var p1 = gameState.Players[0];
 		var p2 = gameState.Players[1];
 
-		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction() { ShuffleFunction = Shuffle});
-		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction() { ShuffleFunction = Shuffle });
+		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction());
+		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction());
 		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartTurnAction());
 	}
 
@@ -148,23 +139,8 @@ public class GameEngine
 		return $"{player.Name.PadRight(10)} {player.Health} {player.Mana} | {board}";
 	}
 
-	public T ChooseRandom<T>(IReadOnlyList<T> options)
-	{
-		if (options.Count == 0) return default!;
-		return options[rNG.NextInt(0, options.Count)];
-	}
-
-	public void Shuffle<T>(IList<T> list)
-	{
-		for (int i = list.Count - 1; i > 0; i--)
-		{
-			int j = rNG.NextInt(0, i + 1); // same RNG as ChooseRandom
-			(list[i], list[j]) = (list[j], list[i]);
-		}
-	}
-
 	public GameEngine Clone()
 	{
-		return new GameEngine(this.rNG.Clone());
+		return new GameEngine();
 	}
 }
