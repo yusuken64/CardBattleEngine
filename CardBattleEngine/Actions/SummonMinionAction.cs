@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using System.Collections.Generic;
+
+namespace CardBattleEngine;
 
 public class SummonMinionAction : GameActionBase
 {
@@ -21,14 +23,18 @@ public class SummonMinionAction : GameActionBase
 
 		// Create minion entity
 		var minion = new Minion(Card, actionContext.SourcePlayer);
-		if (actionContext.PlayIndex != -1)
-		{
-			actionContext.SourcePlayer.Board.Insert(actionContext.PlayIndex, minion);
-		}
-		else
-		{
-			actionContext.SourcePlayer.Board.Add(minion);
-		}
+
+		var list = actionContext.SourcePlayer.Board;
+		int requested = actionContext.PlayIndex;
+
+		int clampedIndex =
+			(requested == -1 || requested < 0 || requested > list.Count)
+				? list.Count
+				: requested;
+
+		list.Insert(clampedIndex, minion);
+
+		actionContext.PlayIndex = clampedIndex;
 
 		if (actionContext.IsReborn)
 		{
