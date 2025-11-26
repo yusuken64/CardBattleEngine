@@ -35,7 +35,7 @@ card.SpellCastEffects.Add(new SpellCastEffect()
 {
 	GameActions = [new DamageAction()
 	{
-		Damage = 5
+		Damage = (Value)5
 	}],
 	AffectedEntitySelector = new TargetOperationSelector()
 	{

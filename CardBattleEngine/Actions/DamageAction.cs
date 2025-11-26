@@ -4,7 +4,7 @@ namespace CardBattleEngine;
 
 public class DamageAction : GameActionBase
 {
-	public int Damage { get; set; }
+	public IValueProvider Damage { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDamage;
 
 	public int ActualDamageDealt { get; set; }
@@ -28,7 +28,7 @@ public class DamageAction : GameActionBase
 
 		foreach (var target in targets)
 		{
-			int damageToApply = Damage;
+			int damageToApply = Damage.GetValue(state, actionContext);
 
 			// Divine Shield negates damage completely
 			if (target is Minion targetMinion && targetMinion.HasDivineShield)
@@ -86,7 +86,7 @@ public class DamageAction : GameActionBase
 
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		Damage = JsonParamHelper.GetValue<int>(actionParam, nameof(Damage));
+		Damage = (Value)JsonParamHelper.GetValue<int>(actionParam, nameof(Damage));
 	}
 
 	public override Dictionary<string, object> EmitParams()

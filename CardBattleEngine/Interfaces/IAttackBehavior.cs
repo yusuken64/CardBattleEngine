@@ -68,8 +68,9 @@ public class MinionAttackBehavior : IAttackBehavior
 		// Attacker deals damage to target
 		yield return (new DamageAction()
 		{
-			Damage = attackingMinion.Attack
-		}, new ActionContext()
+			Damage = (Value)attackingMinion.Attack
+		},
+		new ActionContext()
 		{
 			SourcePlayer = attackingMinion.Owner,
 			Source = attackingMinion,
@@ -78,15 +79,17 @@ public class MinionAttackBehavior : IAttackBehavior
 
 		// Defender deals retaliatory damage if possible
 		if (target is Minion defendingMinion && defendingMinion.IsAlive)
+		{
 			yield return (new DamageAction()
 			{
-				Damage = defendingMinion.Attack
+				Damage = (Value)defendingMinion.Attack
 			}, new ActionContext()
 			{
 				SourcePlayer = attackingMinion.Owner,
 				Target = attackingMinion,
 				Source = defendingMinion,
 			});
+		}
 	}
 
 	public int MaxAttacks(IGameEntity attacker)

@@ -23,7 +23,7 @@ public class AbilityTest
 			TargetType = TargetingType.AnyEnemy,
 			GameActions = new List<IGameAction>() 
 			{
-				new DamageAction() { Damage = 1 }
+				new DamageAction() { Damage = (Value)1 }
 			}
 		});
 
@@ -75,7 +75,7 @@ public class AbilityTest
 			},
 			GameActions = new List<IGameAction>
 			{
-				new DamageAction() { Damage = 1 }
+				new DamageAction() { Damage = (Value)1 }
 			}
 		});
 		current.Mana = 1;
@@ -94,7 +94,7 @@ public class AbilityTest
 
 		// Act: Kill the minion to trigger Deathrattle
 		var minionEntity = state.CurrentPlayer.Board[0];
-		var damage = new DamageAction() { Damage = minionEntity.Health };
+		var damage = new DamageAction() { Damage = (Value)minionEntity.Health };
 		engine.Resolve(state, new ActionContext
 		{
 			Target = minionEntity,
@@ -416,7 +416,7 @@ public class AbilityTest
 				SourcePlayer = opponent,
 				Target = divineMinion
 			},
-			new DamageAction() { Damage = 1 });
+			new DamageAction() { Damage = (Value)1 });
 
 		Assert.IsFalse(divineMinion.HasDivineShield, "First hit should remove Divine Shield.");
 		Assert.AreEqual(2, divineMinion.Health, "Health should remain unchanged after Divine Shield absorbed damage.");
@@ -428,7 +428,7 @@ public class AbilityTest
 				SourcePlayer = opponent,
 				Target = divineMinion
 			},
-			new DamageAction() { Damage = 1 });
+			new DamageAction() { Damage = (Value)1 });
 
 		Assert.AreEqual(1, divineMinion.Health, "Second hit should reduce health after Divine Shield is gone.");
 	}

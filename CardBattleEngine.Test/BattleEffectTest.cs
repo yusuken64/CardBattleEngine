@@ -1,4 +1,7 @@
-﻿namespace CardBattleEngine.Test;
+﻿using CardBattleEngine.ValueProviders;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+namespace CardBattleEngine.Test;
 
 [TestClass]
 public class BattleEffectTest
@@ -117,5 +120,73 @@ public class BattleEffectTest
 		Assert.AreEqual(3, player1.Board[1].Attack);
 		Assert.AreEqual(3, player1.Board[2].Attack);
 		Assert.AreEqual(1, player1.Board[3].Attack);
+	}
+
+	[TestMethod]
+	public void CleaveTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine(new XorShiftRNG(1));
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		var testCard = new MinionCard("Test", 1, 5, 5);
+		player2.Board.Add(new Minion(testCard, player2) { Name = "minion1" });
+		player2.Board.Add(new Minion(testCard, player2) { Name = "minion2" });
+		player2.Board.Add(new Minion(testCard, player2) { Name = "minion3" });
+		player2.Board.Add(new Minion(testCard, player2) { Name = "minion4" });
+		player2.Board.Add(new Minion(testCard, player2) { Name = "minion5" });
+
+		var cleaveCard = new MinionCard("Cleave", 1, 4, 4);
+		cleaveCard.TriggeredEffects.Add(new TriggeredEffect()
+		{
+			TargetType = TargetingType.None,
+			EffectTiming = EffectTiming.Pre,
+			EffectTrigger = EffectTrigger.Attack,
+			Condition = new OriginalSourceCondition(),
+			GameActions =
+			[
+				new DeferredResolveAction()
+				{
+					Action = new DamageAction()
+					{
+						Damage = new StatValue()
+						{
+							EntityStat = StatValue.Stat.Attack,
+							EntityContextProvider = StatValue.ContextProvider.Source
+						}
+					},
+					AffectedEntitySelector = new TargetOperationSelector()
+					{
+						Operations =
+						[new CleaveOperation()
+						{
+							IncludeCenter = false
+						}]
+					}
+				}
+			],
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeTarget = true
+			}
+
+		});
+		cleaveCard.HasCharge = true;
+		player1.Board.Add(new Minion(cleaveCard, player1));
+
+		var attackAction = new AttackAction();
+		var actionContext = new ActionContext()
+		{
+			Source = player1.Board[0],
+			Target = player2.Board[2],
+		};
+		engine.Resolve(state, actionContext, attackAction);
+
+		Assert.AreEqual(5, player2.Board[0].Health);
+		Assert.AreEqual(1, player2.Board[1].Health);
+		Assert.AreEqual(1, player2.Board[2].Health);
+		Assert.AreEqual(1, player2.Board[3].Health);
+		Assert.AreEqual(5, player2.Board[4].Health);
 	}
 }

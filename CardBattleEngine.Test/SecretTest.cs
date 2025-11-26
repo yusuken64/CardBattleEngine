@@ -70,7 +70,7 @@ public class SecretTest
 			{
 				GameActions = new List<IGameAction>()
 				{
-				new DamageAction() { Damage = 5 }
+				new DamageAction() { Damage = (Value)5 }
 				}
 			});
 

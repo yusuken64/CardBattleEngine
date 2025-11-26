@@ -50,7 +50,7 @@ public class HeroPowerTests
 			[
 				new DamageAction()
 				{
-					Damage = 1
+					Damage = (Value)1
 				}
 			]
 		};

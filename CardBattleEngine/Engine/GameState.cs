@@ -253,7 +253,7 @@ public class GameState
 	public List<ITriggerSource> GetValidTargets(ITriggerSource entity, TargetingType type)
 	{
 		var targets = new List<ITriggerSource>();
-		var opponent = OpponentOf(entity.Owner);
+		var opponent = OpponentOf(entity.Entity.Owner);
 
 		switch (type)
 		{
@@ -275,7 +275,7 @@ public class GameState
 				break;
 
 			case TargetingType.FriendlyMinion:
-				targets.AddRange(entity.Owner.Board.Where(m => m.IsAlive));
+				targets.AddRange(entity.Entity.Owner.Board.Where(m => m.IsAlive));
 				break;
 
 			case TargetingType.Self:
@@ -284,7 +284,7 @@ public class GameState
 
 			case TargetingType.Any:
 				targets.Add(entity);
-				targets.AddRange(entity.Owner.Board.Where(m => m.IsAlive));
+				targets.AddRange(entity.Entity.Owner.Board.Where(m => m.IsAlive));
 				targets.Add(opponent);
 				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
 				break;

@@ -40,10 +40,22 @@ public class ActionContext
 
 	public IAffectedEntitySelector AffectedEntitySelector;
 
+	public ActionContext() { }
+
+	public ActionContext(ActionContext context)
+	{
+		this.SourcePlayer = context.SourcePlayer;
+		this.SourceCard = context.SourceCard;
+		this.Source = context.Source;
+		this.Target = context.Target;
+		this.Modifier = context.Modifier;
+	}
+
 	public IGameAction OriginalAction { get; internal set; }
 	public Minion SummonedMinion { get; internal set; }
 	public int PlayIndex { get; set; } = -1;
 	public HeroPower SourceHeroPower { get; set; }
 	public bool IsReborn { get; set; } = false;
 	public bool IsAuraEffect { get; internal set; }
+	public IGameEntity OriginalSource { get; internal set; }
 }

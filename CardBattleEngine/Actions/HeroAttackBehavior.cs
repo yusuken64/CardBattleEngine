@@ -37,7 +37,7 @@ public class HeroAttackBehavior : IAttackBehavior
 		yield return (
 			new DamageAction
 			{
-				Damage = hero.Attack
+				Damage = (Value)hero.Attack
 			},
 			new ActionContext
 			{

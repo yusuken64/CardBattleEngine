@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Runtime.CompilerServices;
 
 namespace CardBattleEngine;
 
@@ -61,6 +62,8 @@ public class Minion : IGameEntity, ITriggerSource
 	public bool HasLifeSteal { get; set; }
 	public bool HasReborn { get; set; }
 	public int AttacksPerformedThisTurn { get; internal set; }
+
+	public IGameEntity Entity => this;
 
 	public Minion(MinionCard card, Player owner)
 	{
@@ -178,6 +181,11 @@ public class Minion : IGameEntity, ITriggerSource
 	{
 		_auraModifiers.Clear();
 		RecalculateStats();
+	}
+
+	public override string ToString()
+	{
+		return $"{Name} {Attack}/{Health}";
 	}
 }
 

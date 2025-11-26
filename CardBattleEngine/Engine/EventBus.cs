@@ -20,8 +20,8 @@ public class EventBus
 				// Build an effect context for condition checks
 				var effectContext = new ActionContext()
 				{
-					SourcePlayer = source.Owner,
-					Source = source as IGameEntity,
+					SourcePlayer = source.Entity.Owner,
+					Source = source.Entity,
 					Target = null,
 				};
 
@@ -32,7 +32,7 @@ public class EventBus
 				var actionContext = new ActionContext
 				{
 					Source = (IGameEntity)source,
-					SourcePlayer = source.Owner
+					SourcePlayer = source.Entity.Owner
 				};
 				var targets = auraEffect.AffectedEntitySelector.Select(gameState, actionContext);
 				foreach (var target in targets)
@@ -71,13 +71,14 @@ public class EventBus
 			{
 				var effectContext = new ActionContext()
 				{
-					SourcePlayer = triggerSource.Owner,
-					Source = triggerSource as IGameEntity,
+					SourcePlayer = triggerSource.Entity.Owner,
+					Source = triggerSource.Entity,
 					Target = context.Target,
 					SummonedMinion = context.SummonedMinion,
 					PlayIndex = context.PlayIndex,
 					SourceCard = context.SourceCard,
-					OriginalAction = context.OriginalAction
+					OriginalAction = context.OriginalAction,
+					OriginalSource = context.Source
 				};
 
 				if (effect.Condition?.Evaluate(effectContext) == false)
@@ -85,17 +86,17 @@ public class EventBus
 					continue;
 				}
 
+				if (effect.AffectedEntitySelector == null) { continue; }
 				foreach (var action in effect.GameActions)
 				{
-					if (effect.AffectedEntitySelector == null) { continue; }
 					var affectedTargets = effect.AffectedEntitySelector.Select(gameState, effectContext);
 
 					foreach (var target in affectedTargets)
 					{
 						yield return (action, new ActionContext
 						{
-							Source = triggerSource.Owner,
-							SourcePlayer = triggerSource.Owner,
+							Source = triggerSource.Entity,
+							SourcePlayer = triggerSource.Entity.Owner,
 							Target = target as IGameEntity,
 							OriginalAction = context.OriginalAction,
 						});

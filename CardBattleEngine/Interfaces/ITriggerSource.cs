@@ -2,6 +2,6 @@
 
 public interface ITriggerSource
 {
-	Player Owner { get; }
+	IGameEntity Entity { get; }
 	IEnumerable<TriggeredEffect> TriggeredEffects { get; }
 }

@@ -42,7 +42,7 @@ public class Player : IGameEntity, ITriggerSource
 	public Weapon? EquippedWeapon { get; set; }
 	private List<StatModifier> _modifiers = new();
 	public HeroPower HeroPower { get; set; }
-
+	public IGameEntity Entity => this;
 	public Player(string name) 
 	{
 		Name = name;
