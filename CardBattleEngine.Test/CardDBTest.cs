@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CardBattleEngine.Test;
+﻿namespace CardBattleEngine.Test;
 
 [TestClass]
 [DoNotParallelize]
@@ -136,7 +134,7 @@ public class CardDBTest
 
 		// Assert: Trigger condition is not null and is correct type
 		Assert.IsNotNull(effect.Condition, "Expected a trigger condition.");
-		Assert.AreEqual("SummonedMinionTribeCondition", effect.Condition.GetType().Name, "Unexpected condition type.");
+		Assert.AreEqual("SummonedMinionCondition", effect.Condition.GetType().Name, "Unexpected condition type.");
 
 		// Assert: Condition parameters match expected (Murloc tribe)
 		var tribeParam = effect.Condition.EmitParams()["MinionTribe"].ToString();
@@ -191,7 +189,7 @@ public class CardDBTest
 					new SelectBoardEntitiesOperation()
 					{
 						Group = TargetGroup.Minions,
-						Side = TargetSide.Enemy
+						Side = TeamRelationship.Enemy
 					},
 				}
 			},

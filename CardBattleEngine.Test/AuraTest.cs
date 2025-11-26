@@ -44,7 +44,7 @@ public class AuraTest
 				{
 					new SelectBoardEntitiesOperation() {
 						Group = TargetGroup.Minions,
-						Side = TargetSide.Friendly
+						Side = TeamRelationship.Friendly
 					},
 					new TribeOperation()
 					{

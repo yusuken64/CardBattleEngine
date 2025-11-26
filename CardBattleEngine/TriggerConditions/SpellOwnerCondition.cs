@@ -2,18 +2,18 @@
 
 public class SpellOwnerCondition : TriggerConditionBase
 {
-	public TargetSide TargetSide { get; set; }
+	public TeamRelationship TeamRelationship { get; set; }
 	public override bool Evaluate(ActionContext context)
 	{
-		switch (TargetSide)
+		switch (TeamRelationship)
 		{
-			case TargetSide.Enemy:
+			case TeamRelationship.Enemy:
 				return context.SourcePlayer != context.SourceCard.Owner;
 				break;
-			case TargetSide.Friendly:
+			case TeamRelationship.Friendly:
 				return context.SourcePlayer == context.SourceCard.Owner;
 				break;
-			case TargetSide.Both:
+			case TeamRelationship.Any:
 				return true;
 				break;
 		}

@@ -1,4 +1,4 @@
-﻿namespace CardBattleEngine.ValueProviders;
+﻿namespace CardBattleEngine;
 
 public class StatValue : Value
 {

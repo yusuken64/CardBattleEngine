@@ -8,10 +8,10 @@
       "EffectTrigger": "SummonMinion",
       "TargetType": "Self",
       "TriggerConditionDefintion": {
-        "ConditionTypeName": "SummonedMinionTribeCondition",
+        "ConditionTypeName": "SummonedMinionCondition",
         "Params": {
           "MinionTribe": "Murloc",
-          "MinionToMinionRelationship": "Friendly",
+          "TeamRelationship": "Friendly",
           "ExcludeSelf": true
         }
       },

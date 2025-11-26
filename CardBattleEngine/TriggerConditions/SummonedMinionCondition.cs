@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿namespace CardBattleEngine;
 
-namespace CardBattleEngine;
-public class SummonedMinionTribeCondition : TriggerConditionBase
+public class SummonedMinionCondition : TriggerConditionBase
 {
-	public MinionToMinionRelationship MinionToMinionRelationship;
-	public MinionTribe MinionTribe;
+	public TeamRelationship MinionToMinionRelationship { get; set; }
+	public MinionTribe MinionTribe { get; set; }
 	public bool ExcludeSelf { get; set; } = false;
 	public override bool Evaluate(ActionContext context)
 	{
@@ -18,20 +16,25 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 		if (ExcludeSelf && summoned == effectSource)
 			return false;
 
-		// Check tribe match
-		if (summoned.Tribes == null || !summoned.Tribes.Contains(MinionTribe))
-			return false;
+		if (MinionTribe != MinionTribe.None &&
+			MinionTribe != MinionTribe.All)
+		{
+			// Check tribe match
+			if (summoned.Tribes == null ||
+				!summoned.Tribes.Contains(MinionTribe))
+				return false;
+		}
 
 		// Check relationship
 		switch (MinionToMinionRelationship)
 		{
-			case MinionToMinionRelationship.Friendly:
+			case TeamRelationship.Friendly:
 				return effectSource.Owner == summoned.Owner;
 
-			case MinionToMinionRelationship.Enemy:
+			case TeamRelationship.Enemy:
 				return effectSource.Owner != summoned.Owner;
 
-			case MinionToMinionRelationship.Any:
+			case TeamRelationship.Any:
 				return true;
 
 			default:
@@ -43,7 +46,7 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
 		MinionTribe = Utils.GetEnum<MinionTribe>(actionParam, nameof(MinionTribe));
-		MinionToMinionRelationship = Utils.GetEnum<MinionToMinionRelationship>(actionParam, nameof(MinionToMinionRelationship));
+		MinionToMinionRelationship = Utils.GetEnum<TeamRelationship>(actionParam, nameof(MinionToMinionRelationship));
 		ExcludeSelf = actionParam.TryGetValue(nameof(ExcludeSelf), out var val) && val is bool b && b;
 	}
 
@@ -56,12 +59,4 @@ public class SummonedMinionTribeCondition : TriggerConditionBase
 			{ nameof(ExcludeSelf), ExcludeSelf.ToString() }
 		};
 	}
-}
-
-[JsonConverter(typeof(StringEnumConverter))]
-public enum MinionToMinionRelationship
-{
-	Friendly,
-	Enemy,
-	Any,
 }

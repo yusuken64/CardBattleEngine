@@ -70,7 +70,7 @@ public class AbilityTest
 				Operations = [
 					new SelectBoardEntitiesOperation() {
 						Group = TargetGroup.Hero,
-						Side = TargetSide.Enemy,
+						Side = TeamRelationship.Enemy,
 					}]
 			},
 			GameActions = new List<IGameAction>

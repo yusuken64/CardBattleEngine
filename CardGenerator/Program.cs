@@ -41,7 +41,7 @@ card.SpellCastEffects.Add(new SpellCastEffect()
 	{
 		Operations = [new SelectBoardEntitiesOperation() {
 			Group = TargetGroup.Minions,
-			Side = TargetSide.Enemy
+			Side = TeamRelationship.Enemy
 		}]
 	}
 });

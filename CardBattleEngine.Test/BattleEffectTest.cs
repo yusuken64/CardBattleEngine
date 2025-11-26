@@ -1,7 +1,4 @@
-﻿using CardBattleEngine.ValueProviders;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-namespace CardBattleEngine.Test;
+﻿namespace CardBattleEngine.Test;
 
 [TestClass]
 public class BattleEffectTest
@@ -91,7 +88,7 @@ public class BattleEffectTest
 				Operations = [new SelectBoardEntitiesOperation()
 				{
 					Group = TargetGroup.Minions,
-					Side = TargetSide.Friendly,
+					Side = TeamRelationship.Friendly,
 					ExcludeSelf = true
 				}]
 			}

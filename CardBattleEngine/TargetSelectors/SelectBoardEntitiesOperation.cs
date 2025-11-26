@@ -5,7 +5,7 @@ namespace CardBattleEngine;
 
 public class SelectBoardEntitiesOperation : ITargetOperation
 {
-	public TargetSide Side { get; set; } = TargetSide.Enemy;   // Enemy, Friendly, Both
+	public TeamRelationship Side { get; set; } = TeamRelationship.Enemy;   // Enemy, Friendly, Both
 	public TargetGroup Group { get; set; } = TargetGroup.Minions; // Minions, Hero, All
 	public bool ExcludeSelf { get; set; }
 	public IEnumerable<IGameEntity> Apply(IEnumerable<IGameEntity> input, GameState state, ActionContext context)
@@ -13,9 +13,9 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 		// Ignore the input — this is the "base selection"
 		var players = Side switch
 		{
-			TargetSide.Friendly => new[] { context.SourcePlayer },
-			TargetSide.Enemy => new[] { state.OpponentOf(context.SourcePlayer) },
-			TargetSide.Both => new[] { context.SourcePlayer, state.OpponentOf(context.SourcePlayer) },
+			TeamRelationship.Friendly => new[] { context.SourcePlayer },
+			TeamRelationship.Enemy => new[] { state.OpponentOf(context.SourcePlayer) },
+			TeamRelationship.Any => new[] { context.SourcePlayer, state.OpponentOf(context.SourcePlayer) },
 			_ => Enumerable.Empty<Player>()
 		};
 
@@ -52,23 +52,7 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 
 	public void ConsumeParams(Dictionary<string, object> actionParam)
 	{
-		Side = JsonParamHelper.GetEnum<TargetSide>(actionParam, nameof(Side), Side);
+		Side = JsonParamHelper.GetEnum<TeamRelationship>(actionParam, nameof(Side), Side);
 		Group = JsonParamHelper.GetEnum<TargetGroup>(actionParam, nameof(Group), Group);
 	}
-}
-
-[JsonConverter(typeof(StringEnumConverter))]
-public enum TargetSide
-{
-	Enemy,
-	Friendly,
-	Both
-}
-
-[JsonConverter(typeof(StringEnumConverter))]
-public enum TargetGroup
-{
-	Minions,
-	Hero,
-	All
 }

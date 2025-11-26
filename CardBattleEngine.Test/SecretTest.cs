@@ -33,7 +33,7 @@ public class SecretTest
 								GameActions = [new CancelEffectAction()],
 								Condition= new SpellOwnerCondition()
 								{
-									TargetSide = TargetSide.Enemy
+									TeamRelationship = TeamRelationship.Enemy
 								},
 								AffectedEntitySelector = new ContextSelector()
 								{
