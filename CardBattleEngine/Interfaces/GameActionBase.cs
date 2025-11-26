@@ -58,4 +58,5 @@ public class ActionContext
 	public bool IsReborn { get; set; } = false;
 	public bool IsAuraEffect { get; internal set; }
 	public IGameEntity OriginalSource { get; internal set; }
+	public int DamageDealt { get; internal set; }
 }

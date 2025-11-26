@@ -2,8 +2,8 @@
 
 public class StatValue : Value
 {
-	public Stat EntityStat;
-	public ContextProvider EntityContextProvider;
+	public Stat EntityStat { get; set; }
+	public ContextProvider EntityContextProvider { get; set; }
 
 	public override int GetValue(GameState state, ActionContext context)
 	{
@@ -33,17 +33,17 @@ public class StatValue : Value
 
 		return 0;
 	}
+}
 
-	public enum Stat
-	{
-		Cost,
-		Attack,
-		Health
-	}
+public enum Stat
+{
+	Cost,
+	Attack,
+	Health
+}
 
-	public enum ContextProvider
-	{
-		Target,
-		Source
-	}
+public enum ContextProvider
+{
+	Target,
+	Source
 }

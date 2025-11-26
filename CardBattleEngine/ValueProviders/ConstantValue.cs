@@ -2,7 +2,9 @@
 
 public class ConstantValue : Value
 {
-	public int Number { get; }
+	public int Number { get; set; }
+
+	public ConstantValue() { }
 
 	public ConstantValue(int number) => Number = number;
 

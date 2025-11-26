@@ -7,8 +7,6 @@ public class DamageAction : GameActionBase
 	public IValueProvider Damage { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDamage;
 
-	public int ActualDamageDealt { get; set; }
-
 	public override bool IsValid(GameState state, ActionContext actionContext)
 	{
 		// Valid if target is still alive / on board
@@ -41,7 +39,7 @@ public class DamageAction : GameActionBase
 			int originalHealth = target.Health;
 			target.Health -= damageToApply;
 			int actualDamageDealt = Math.Max(0, originalHealth - target.Health);
-			this.ActualDamageDealt = actualDamageDealt;
+			actionContext.DamageDealt = actualDamageDealt;
 
 			// Lifesteal: heal source for actual damage dealt
 			if (source is Minion attackingMinion &&

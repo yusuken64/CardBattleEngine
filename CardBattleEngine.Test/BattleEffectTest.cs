@@ -152,8 +152,8 @@ public class BattleEffectTest
 					{
 						Damage = new StatValue()
 						{
-							EntityStat = StatValue.Stat.Attack,
-							EntityContextProvider = StatValue.ContextProvider.Source
+							EntityStat = Stat.Attack,
+							EntityContextProvider = ContextProvider.Source
 						}
 					},
 					AffectedEntitySelector = new TargetOperationSelector()
