@@ -186,4 +186,45 @@ public class BattleEffectTest
 		Assert.AreEqual(1, player2.Board[3].Health);
 		Assert.AreEqual(5, player2.Board[4].Health);
 	}
+
+	[TestMethod]
+	public void SummonTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		var testCard = new MinionCard("Test", 1, 5, 5);
+		testCard.TriggeredEffects.Add(
+			new TriggeredEffect()
+			{
+				TargetType = TargetingType.None,
+				EffectTiming = EffectTiming.Post,
+				EffectTrigger = EffectTrigger.Battlecry,
+				GameActions = 
+				[
+					new SummonMinionAction()
+					{
+						Card = new MinionCard("Summoned", 1, 2, 2)
+					}
+				],
+				AffectedEntitySelector = null
+			});
+		player1.Mana = 1;
+		player1.Hand.Add(testCard);
+		testCard.Owner = player1;
+
+		IGameAction playCardAction = new PlayCardAction()
+		{
+			Card = testCard,
+		};
+		ActionContext actionContext = new()
+		{
+			SourcePlayer = player1,
+		};
+		engine.Resolve(state, actionContext, playCardAction);
+
+		Assert.AreEqual(2, player1.Board.Count());
+	}
 }

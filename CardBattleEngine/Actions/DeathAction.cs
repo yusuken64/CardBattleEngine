@@ -38,7 +38,8 @@ public class DeathAction : GameActionBase
 					ActionContext selectorContext = new ActionContext
 					{
 						SourcePlayer = minion.Owner,
-						Source = minion
+						Source = minion,
+						PlayIndex = index,
 					};
 
 					var targets = effect.AffectedEntitySelector.Select(state, selectorContext);
@@ -51,7 +52,8 @@ public class DeathAction : GameActionBase
 							{
 								SourcePlayer = minion.Owner,
 								Source = minion,
-								Target = target
+								Target = target,
+								PlayIndex = index,
 							});
 					}
 				}
