@@ -32,6 +32,7 @@ public class TriggerEffectAction : GameActionBase
 					SourcePlayer = TriggerSource.Entity.Owner,
 					Target = target as IGameEntity,
 					OriginalAction = context.OriginalAction,
+					OriginalSource = context.Source,
 				});
 			}
 		}

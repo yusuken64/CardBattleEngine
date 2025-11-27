@@ -2,7 +2,7 @@
 
 public class HealAction : GameActionBase
 {
-	public int Amount;
+	public IValueProvider Amount { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnHealed;
 
 	public override bool IsValid(GameState gameState, ActionContext context)
@@ -13,10 +13,13 @@ public class HealAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
+		int healAmount = Amount.GetValue(state, context);
 		context.Target.Health = Math.Min(
-			context.Target.Health + Amount,
+			context.Target.Health + healAmount,
 			context.Target.MaxHealth
 		);
+
+		context.HealedAmount = healAmount;
 		return [];
 	}
 }

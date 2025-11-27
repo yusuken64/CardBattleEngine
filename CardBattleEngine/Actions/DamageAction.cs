@@ -50,7 +50,7 @@ public class DamageAction : GameActionBase
 				yield return (
 					new HealAction()
 					{
-						Amount = actualDamageDealt
+						Amount = (Value)actualDamageDealt
 					},
 					new ActionContext()
 					{

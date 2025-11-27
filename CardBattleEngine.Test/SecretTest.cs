@@ -31,7 +31,7 @@ public class SecretTest
 								EffectTiming = EffectTiming.Pre,
 								TargetType = TargetingType.None,
 								GameActions = [new CancelEffectAction()],
-								Condition= new SpellOwnerCondition()
+								Condition= new SourceOwnerCondition()
 								{
 									TeamRelationship = TeamRelationship.Enemy
 								},
