@@ -35,11 +35,22 @@ public class DamageAction : GameActionBase
 				damageToApply = 0; // no damage actually applied
 			}
 
+			int armorBlocked = 0;
+			if (target is Player player)
+			{
+				armorBlocked = Math.Min(player.Armor, damageToApply);
+
+				player.Armor -= armorBlocked;
+				damageToApply -= armorBlocked;
+			}
+
 			// Apply damage
 			int originalHealth = target.Health;
 			target.Health -= damageToApply;
 			int actualDamageDealt = Math.Max(0, originalHealth - target.Health);
-			actionContext.DamageDealt = actualDamageDealt;
+			actionContext.DamageDealt = actualDamageDealt + armorBlocked;
+			actionContext.HealthDamageDealt = actualDamageDealt;
+			actionContext.ArmorDamageDealt = armorBlocked;
 
 			// Lifesteal: heal source for actual damage dealt
 			if (source is not null &&

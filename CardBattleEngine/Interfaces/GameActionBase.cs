@@ -60,4 +60,6 @@ public class ActionContext
 	public IGameEntity OriginalSource { get; internal set; }
 	public int DamageDealt { get; internal set; }
 	public int HealedAmount { get; internal set; }
+	public int HealthDamageDealt { get; internal set; }
+	public int ArmorDamageDealt { get; internal set; }
 }
