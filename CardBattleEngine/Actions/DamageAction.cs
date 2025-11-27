@@ -42,7 +42,8 @@ public class DamageAction : GameActionBase
 			actionContext.DamageDealt = actualDamageDealt;
 
 			// Lifesteal: heal source for actual damage dealt
-			if (source is Minion attackingMinion &&
+			if (source is not null &&
+				source is Minion attackingMinion &&
 				attackingMinion.HasLifeSteal &&
 				actualDamageDealt > 0)
 			{
@@ -66,7 +67,11 @@ public class DamageAction : GameActionBase
 				shouldDie = true;
 
 			// Poisonous effect
-			if (source is Minion attacker && attacker.HasPoisonous && target is Minion && actualDamageDealt > 0)
+			if (source is not null && 
+				source is Minion attacker && 
+				attacker.HasPoisonous && 
+				target is Minion && 
+				actualDamageDealt > 0)
 				shouldDie = true;
 
 			if (shouldDie)

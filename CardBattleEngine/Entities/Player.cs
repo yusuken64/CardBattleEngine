@@ -43,6 +43,9 @@ public class Player : IGameEntity, ITriggerSource
 	private List<StatModifier> _modifiers = new();
 	public HeroPower HeroPower { get; set; }
 	public IGameEntity Entity => this;
+
+	public int Fatigue { get; internal set; } = 0;
+
 	public Player(string name) 
 	{
 		Name = name;

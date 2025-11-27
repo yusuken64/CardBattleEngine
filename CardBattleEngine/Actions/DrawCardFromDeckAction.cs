@@ -4,14 +4,20 @@ public class DrawCardFromDeckAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.DrawCard;
 
-	public override bool IsValid(GameState state, ActionContext actionContext) => actionContext.SourcePlayer.Deck.Count > 0;
+	public override bool IsValid(GameState state, ActionContext actionContext) => true;
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		var card = actionContext.SourcePlayer.Deck[0];
-		actionContext.SourcePlayer.Deck.RemoveAt(0);
-		
-		return [(new GainCardAction() { Card = card }, actionContext)];
+		if (actionContext.SourcePlayer.Deck.Any())
+		{
+			var card = actionContext.SourcePlayer.Deck[0];
+			actionContext.SourcePlayer.Deck.RemoveAt(0);
+			yield return (new GainCardAction() { Card = card }, actionContext);
+		}
+		else
+		{
+			yield return (new FatigueAction(), actionContext);
+		}
 	}
 }
 
