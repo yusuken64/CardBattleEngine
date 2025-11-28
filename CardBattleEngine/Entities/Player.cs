@@ -33,7 +33,6 @@ public class Player : IGameEntity, ITriggerSource
 
 	public bool IsAlive { get; set; }
 	public List<TriggeredEffect> TriggeredEffects { get; }
-	IEnumerable<TriggeredEffect> ITriggerSource.TriggeredEffects => TriggeredEffects;
 	public bool IsFrozen { get; internal set; }
 	public bool HasAttackedThisTurn { get; set; }
 	public bool MissedAttackFromFrozen { get; internal set; }

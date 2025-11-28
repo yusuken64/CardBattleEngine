@@ -12,6 +12,13 @@ public class SpellCard : Card
 	public override CardType Type => CardType.Spell;
 	public TargetingType TargetingType { get; set; }
 	public List<SpellCastEffect> SpellCastEffects { get; } = new();
+	public override int Health { get; set; }
+	public override int MaxHealth { get; set; }
+	public override bool IsAlive { get; set; }
+	public override int Attack { get; set; }
+
+	public override IAttackBehavior AttackBehavior => null;
+
 
 	public override Card Clone()
 	{

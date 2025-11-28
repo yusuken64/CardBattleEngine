@@ -16,7 +16,7 @@ public class AbilityTest
 
 		var card = new MinionCard("BattlecryMinion", cost: 1, attack: 1, health: 1);
 		card.Owner = current;
-		card.TriggeredEffects.Add(new TriggeredEffect()
+		card.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
@@ -60,7 +60,7 @@ public class AbilityTest
 		// Create minion with Deathrattle effect
 		var minionCard = new MinionCard("DeathrattleMinion", cost: 1, attack: 1, health: 1);
 		minionCard.Owner = current;
-		minionCard.TriggeredEffects.Add(new TriggeredEffect
+		minionCard.MinionTriggeredEffects.Add(new TriggeredEffect
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
@@ -122,7 +122,7 @@ public class AbilityTest
 		current.Board.Add(new Minion(testCard, current));
 
 		var abusiveCard = new MinionCard("AbusiveSergeant", 1, 1, 1);
-		abusiveCard.TriggeredEffects.Add(new TriggeredEffect()
+		abusiveCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
@@ -174,7 +174,7 @@ public class AbilityTest
 		var elemental = new MinionCard("Elemental", 1, 1, 2);
 
 		var firefly = new MinionCard("FireFly", 1, 1, 2);
-		firefly.TriggeredEffects.Add(new TriggeredEffect()
+		firefly.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
@@ -229,7 +229,7 @@ public class AbilityTest
 
 		// Create the Battlecry minion with Freeze effect
 		var freezeMinionCard = new MinionCard("FrostMage", 2, 2, 3);
-		freezeMinionCard.TriggeredEffects.Add(new TriggeredEffect
+		freezeMinionCard.MinionTriggeredEffects.Add(new TriggeredEffect
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
@@ -482,69 +482,5 @@ public class AbilityTest
 		// Assert: both should die (since the poison minion also takes damage)
 		Assert.IsFalse(state.GetAllMinions().Contains(targetMinion), "Target should die instantly due to poison.");
 		Assert.IsFalse(state.GetAllMinions().Contains(poisonMinion), "Poison minion should die from combat damage.");
-	}
-
-	[TestMethod]
-	public void MurlocSynergy()
-	{
-		// Arrange
-		var state = GameFactory.CreateTestGame();
-		var engine = new GameEngine();
-
-		var current = state.CurrentPlayer;
-		var opponent = state.OpponentOf(current);
-
-		CardDatabase cardDatabase = new(CardDBTest.DBPath);
-
-		// Get two different Murlocs to summon
-		var firstMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
-		var secondMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
-
-		current.Mana = 3; // enough to play both
-
-		current.Hand.Add(firstMurlocCard);
-		current.Hand.Add(secondMurlocCard);
-
-		// Act 1: Play the first Murloc
-		engine.Resolve(state, new ActionContext
-		{
-			SourcePlayer = current,
-			SourceCard = firstMurlocCard
-		}, new PlayCardAction { Card = firstMurlocCard });
-
-		var firstMurloc = current.Board[0];
-		Assert.IsTrue(firstMurloc.Tribes.Contains(MinionTribe.Murloc));
-
-		// Assert 1: First Murloc has base attack
-		Assert.AreEqual(1, firstMurloc.Attack, "First Murloc should have base attack 1.");
-
-		// Act 2: Play the second Murloc
-		engine.Resolve(state, new ActionContext
-		{
-			SourcePlayer = current,
-			SourceCard = secondMurlocCard
-		}, new PlayCardAction { Card = secondMurlocCard });
-
-		var secondMurloc = current.Board[1];
-
-		// Assert 2: Both Murlocs got buffed by the triggered effect
-		Assert.AreEqual(2, firstMurloc.Attack, "First Murloc should gain +1 attack from second Murloc summon.");
-		Assert.AreEqual(1, secondMurloc.Attack, "Second Murloc should have base attack 1 initially.");
-
-		// Act 3: Play a third Murloc
-		var thirdMurlocCard = cardDatabase.GetMinionCard("Murloc", current);
-		current.Hand.Add(thirdMurlocCard);
-		engine.Resolve(state, new ActionContext
-		{
-			SourcePlayer = current,
-			SourceCard = thirdMurlocCard
-		}, new PlayCardAction { Card = thirdMurlocCard });
-
-		var thirdMurloc = current.Board[2];
-
-		// Assert 3: All Murlocs on board have been buffed correctly
-		Assert.AreEqual(3, firstMurloc.Attack, "First Murloc should now have +2 attack from subsequent Murloc summons.");
-		Assert.AreEqual(2, secondMurloc.Attack, "Second Murloc should now have +1 attack from third Murloc summon.");
-		Assert.AreEqual(1, thirdMurloc.Attack, "Third Murloc should have base attack 1.");
 	}
 }

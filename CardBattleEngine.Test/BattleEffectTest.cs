@@ -69,7 +69,7 @@ public class BattleEffectTest
 
 		var testCard = new MinionCard("Test", 1, 1, 1);
 		var card = new MinionCard("TempBuff", 1, 1, 1);
-		card.TriggeredEffects.Add(new TriggeredEffect()
+		card.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
@@ -135,7 +135,7 @@ public class BattleEffectTest
 		player2.Board.Add(new Minion(testCard, player2) { Name = "minion5" });
 
 		var cleaveCard = new MinionCard("Cleave", 1, 4, 4);
-		cleaveCard.TriggeredEffects.Add(new TriggeredEffect()
+		cleaveCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			TargetType = TargetingType.None,
 			EffectTiming = EffectTiming.Pre,
@@ -196,7 +196,7 @@ public class BattleEffectTest
 		var player2 = state.Players[1];
 
 		var testCard = new MinionCard("Test", 1, 5, 5);
-		testCard.TriggeredEffects.Add(
+		testCard.MinionTriggeredEffects.Add(
 			new TriggeredEffect()
 			{
 				TargetType = TargetingType.None,

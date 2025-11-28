@@ -2,7 +2,6 @@
 
 public class WeaponCard : Card
 {
-	public int Attack;
 	public int Durability;
 
 	public WeaponCard(string name, int cost, int attack, int durabilty)
@@ -14,6 +13,14 @@ public class WeaponCard : Card
 	}
 
 	public override CardType Type => CardType.Weapon;
+
+	public override int Attack { get; set; }
+	public override int Health { get =>  Durability; set { Durability = value; } }
+	public override int MaxHealth { get => Durability; set { Durability = value; } }
+	public override bool IsAlive { get; set; }
+	public override IAttackBehavior AttackBehavior => throw new NotImplementedException();
+
+
 	public override Card Clone()
 	{
 		throw new NotImplementedException();

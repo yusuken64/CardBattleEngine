@@ -3,8 +3,10 @@
 public class MinionCard : Card
 {
 	public override CardType Type => CardType.Minion;
-	public int Attack { get; set; }
-	public int Health { get; set; }
+	public override int Health { get; set; }
+	public override int MaxHealth { get; set; }
+	public override int Attack { get; set; }
+	public override bool IsAlive { get; set; } = true;
 	public List<MinionTribe> MinionTribes { get; set; } = new();
 	public bool IsStealth { get; set; }
 	public bool HasCharge { get; set; }
@@ -15,6 +17,9 @@ public class MinionCard : Card
 	public bool HasWindfury { get; set; }
 	public bool HasLifeSteal { get; set; }
 	public bool HasReborn{ get; set; }
+	public List<TriggeredEffect> MinionTriggeredEffects { get; set; } = new();//triggered effects on summoned minion
+	public override IAttackBehavior AttackBehavior => null;
+
 
 	public MinionCard(string name, int cost, int attack, int health)
 	{
@@ -26,7 +31,7 @@ public class MinionCard : Card
 
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext context)
 	{
-		foreach (var effect in TriggeredEffects)
+		foreach (var effect in MinionTriggeredEffects)
 		{
 			if (effect.EffectTrigger != EffectTrigger.OnPlay &&
 				effect.EffectTrigger != EffectTrigger.Battlecry)

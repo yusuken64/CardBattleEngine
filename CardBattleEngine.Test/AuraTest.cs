@@ -27,7 +27,7 @@ public class AuraTest
 		var auraCard = new MinionCard("AuraMurloc", cost: 0, attack: 1, health: 1);
 		card.MinionTribes = [MinionTribe.Murloc];
 		auraCard.Owner = current;
-		auraCard.TriggeredEffects.Add(new TriggeredEffect()
+		auraCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Aura,
 			EffectTiming = EffectTiming.Persistant,

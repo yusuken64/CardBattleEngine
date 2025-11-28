@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System.Runtime.CompilerServices;
 
 namespace CardBattleEngine;
 
@@ -37,7 +36,7 @@ public class Minion : IGameEntity, ITriggerSource
 			}
 		}
 	}
-	public IEnumerable<TriggeredEffect> TriggeredEffects { get; }
+	public List<TriggeredEffect> TriggeredEffects { get; }
 
 	private IAttackBehavior _attackBehavior;
 	public IAttackBehavior AttackBehavior
@@ -90,11 +89,11 @@ public class Minion : IGameEntity, ITriggerSource
 		HasReborn = card.HasReborn;
 
 		IsAlive = true;
-		TriggeredEffects = card.TriggeredEffects.Select(effect =>
+		TriggeredEffects = card.MinionTriggeredEffects.Select(effect =>
 		{
 			var instance = effect.CloneFor(this);
 			return instance;
-		});
+		}).ToList();
 	}
 
 	public bool CanAttack()

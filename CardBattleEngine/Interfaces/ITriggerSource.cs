@@ -2,6 +2,6 @@
 
 public interface ITriggerSource
 {
-	IGameEntity Entity { get; }
-	IEnumerable<TriggeredEffect> TriggeredEffects { get; }
+	public IGameEntity Entity { get; }
+	public List<TriggeredEffect> TriggeredEffects { get; }
 }
