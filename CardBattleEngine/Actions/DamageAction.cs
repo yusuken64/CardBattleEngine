@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class DamageAction : GameActionBase
 {

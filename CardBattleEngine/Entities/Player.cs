@@ -1,6 +1,4 @@
-﻿using CardBattleEngine;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class Player : IGameEntity, ITriggerSource
 {

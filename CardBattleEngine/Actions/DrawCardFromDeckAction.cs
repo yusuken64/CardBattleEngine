@@ -40,3 +40,46 @@ public class GainCardAction : GameActionBase
 		return [];
 	}
 }
+
+public class AddCardToDeckAction : GameActionBase
+{
+	public Card Card { get; set; }
+	public override EffectTrigger EffectTrigger => EffectTrigger.None;
+
+	public override bool IsValid(GameState gameState, ActionContext context)
+	{
+		Player player;
+		if (context.Target is Player targetPlayer)
+		{
+			player = targetPlayer;
+		}
+		else
+		{
+			player = context.SourcePlayer;
+		}
+
+		return player != null;
+	}
+
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
+	{
+		if (!IsValid(state, actionContext)) { return []; }
+
+		Player player;
+		if (actionContext.Target is Player targetPlayer)
+		{
+			player = targetPlayer;
+		}
+		else
+		{
+			player = actionContext.SourcePlayer;
+		}
+
+		if (player != null)
+		{
+			player.Deck.Add(Card);
+		}
+
+		return [];
+	}
+}
