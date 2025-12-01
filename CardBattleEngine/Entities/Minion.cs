@@ -117,19 +117,19 @@ public class Minion : IGameEntity, ITriggerSource
 			AttacksPerformedThisTurn = this.AttacksPerformedThisTurn
 		};
 	}
-	internal void AddModifier(StatModifier modifier)
+	public void AddModifier(StatModifier modifier)
 	{
 		_modifiers.Add(modifier);
 		RecalculateStats();
 	}
 
-	internal void AddAuraModifier(StatModifier auraStatModifier)
+	public void AddAuraModifier(StatModifier auraStatModifier)
 	{
 		_auraModifiers.Add(auraStatModifier);
 		RecalculateStats();
 	}
 
-	internal void RemoveModifier(StatModifier modifier)
+	public void RemoveModifier(StatModifier modifier)
 	{
 		_modifiers.Remove(modifier);
 		RecalculateStats();
@@ -171,12 +171,12 @@ public class Minion : IGameEntity, ITriggerSource
 		Health = Utils.Clamp(newHealth, 0, MaxHealth);
 	}
 
-	internal bool HasModifier(StatModifier modifier)
+	public bool HasModifier(StatModifier modifier)
 	{
 		return _modifiers.Contains(modifier);
 	}
 
-	internal void ClearAuras()
+	public void ClearAuras()
 	{
 		_auraModifiers.Clear();
 		RecalculateStats();

@@ -12,3 +12,11 @@ public abstract class Value : IValueProvider
 	public static implicit operator Value(int v)
 		=> new ConstantValue(v);
 }
+
+public static class ValueProviderExtensions
+{
+	public static int GetValueOrZero(this IValueProvider provider, GameState state, ActionContext context)
+	{
+		return provider?.GetValue(state, context) ?? 0;
+	}
+}

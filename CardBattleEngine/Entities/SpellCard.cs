@@ -7,6 +7,7 @@ public class SpellCard : Card
 	{
 		Name = name;
 		ManaCost = cost;
+		OriginalManaCost = cost;
 	}
 
 	public override CardType Type => CardType.Spell;
@@ -14,10 +15,11 @@ public class SpellCard : Card
 	public List<SpellCastEffect> SpellCastEffects { get; } = new();
 	public override int Health { get; set; }
 	public override int MaxHealth { get; set; }
-	public override bool IsAlive { get; set; }
+	public override bool IsAlive { get; set; } = true;
 	public override int Attack { get; set; }
 
 	public override IAttackBehavior AttackBehavior => null;
+	private int OriginalManaCost;
 
 
 	public override Card Clone()
@@ -32,5 +34,25 @@ public class SpellCard : Card
 		{
 			(new CastSpellAction(), actionContext)
 		};
+	}
+
+	internal override void RecalculateStats()
+	{
+		ManaCost = OriginalManaCost;
+
+		// Apply modifiers
+		foreach (var mod in _modifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+		}
+
+		foreach (var mod in _auraModifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+		}
+
+		ManaCost = Math.Max(0, ManaCost);
 	}
 }

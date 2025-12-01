@@ -219,7 +219,7 @@ public class GameState
 		{
 			all.Add(player);
 			all.AddRange(player.Board);
-			//all.AddRange(CurrentPlayer.Hand);
+			all.AddRange(player.Hand);
 		}
 
 		return all;
@@ -234,7 +234,7 @@ public class GameState
 			all.Add(player);
 			all.AddRange(player.Secrets);
 			all.AddRange(player.Board);
-			all.AddRange(CurrentPlayer.Hand);
+			all.AddRange(player.Hand);
 		}
 
 		return all;

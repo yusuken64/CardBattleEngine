@@ -10,4 +10,9 @@ public interface IGameEntity
 	int Attack { get; set; }
 	Player Owner { get; set; }
 	public bool CanAttack();
+	public void AddModifier(StatModifier statModifier);
+	public void AddAuraModifier(StatModifier statModifier);
+	public void RemoveModifier(StatModifier modifier);
+	public bool HasModifier(StatModifier modifier);
+	public void ClearAuras();
 }

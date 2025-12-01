@@ -30,5 +30,39 @@ public abstract class Card : ITriggerSource, IGameEntity
 	{
 		return false;
 	}
+
+	internal List<StatModifier> _modifiers = new();
+	internal List<StatModifier> _auraModifiers = new();
+
+	public void AddModifier(StatModifier modifier)
+	{
+		_modifiers.Add(modifier);
+		RecalculateStats();
+	}
+
+	public void AddAuraModifier(StatModifier auraStatModifier)
+	{
+		_auraModifiers.Add(auraStatModifier);
+		RecalculateStats();
+	}
+
+	public void RemoveModifier(StatModifier modifier)
+	{
+		_modifiers.Remove(modifier);
+		RecalculateStats();
+	}
+
+	internal abstract void RecalculateStats();
+
+	public bool HasModifier(StatModifier modifier)
+	{
+		return _modifiers.Contains(modifier);
+	}
+
+	public void ClearAuras()
+	{
+		_auraModifiers.Clear();
+		RecalculateStats();
+	}
 	#endregion
 }

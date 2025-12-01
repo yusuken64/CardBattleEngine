@@ -2,10 +2,10 @@
 
 public class ContextSelector : AffectedEntitySelectorBase
 {
-	public bool IncludeTarget;
-	public bool IncludeSource;
-	public bool IncludeSourcePlayer;
-	public bool IncludeTargetOwner;
+	public bool IncludeTarget { get; set; }
+	public bool IncludeSource { get; set; }
+	public bool IncludeSourcePlayer { get; set; }
+	public bool IncludeTargetOwner { get; set; }
 
 	public override IEnumerable<IGameEntity> Select(GameState state, ActionContext context)
 	{

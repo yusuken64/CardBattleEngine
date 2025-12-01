@@ -4,6 +4,11 @@ public class MinionCard : Card
 {
 	public override CardType Type => CardType.Minion;
 	public override int Health { get; set; }
+
+	private int OriginalManaCost;
+	private int OriginalAttack;
+	private int OriginalHealth;
+
 	public override int MaxHealth { get; set; }
 	public override int Attack { get; set; }
 	public override bool IsAlive { get; set; } = true;
@@ -27,6 +32,10 @@ public class MinionCard : Card
 		ManaCost = cost;
 		Attack = attack;
 		Health = health;
+
+		OriginalManaCost = cost;
+		OriginalAttack = attack;
+		OriginalHealth = health;
 	}
 
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext context)
@@ -81,5 +90,32 @@ public class MinionCard : Card
 			HasTaunt = HasTaunt,
 			MinionTribes = MinionTribes.ToList(),
 		};
+	}
+
+	internal override void RecalculateStats()
+	{
+		Attack = OriginalAttack;
+		MaxHealth = OriginalHealth;
+		ManaCost = OriginalManaCost;
+
+		// Apply modifiers
+		foreach (var mod in _modifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+			ManaCost += mod.CostChange;
+		}
+
+		foreach (var mod in _auraModifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+			ManaCost += mod.CostChange;
+		}
+
+		Attack = Math.Max(0, Attack);
+		MaxHealth = Math.Max(0, MaxHealth);
+		Health = MaxHealth;
+		ManaCost = Math.Max(0, ManaCost);
 	}
 }

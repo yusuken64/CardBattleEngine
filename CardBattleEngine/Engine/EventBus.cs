@@ -5,9 +5,9 @@ public class EventBus
 	internal void EvaluatePersistentEffects(GameState gameState)
 	{
 		// 1. Clear all aura modifiers that were previously applied
-		foreach (var minion in gameState.GetAllMinions())
+		foreach (var entity in gameState.GetAllEntities())
 		{
-			minion.ClearAuras();
+			entity.ClearAuras();
 		}
 
 		// 2. Find all aura sources on the battlefield
@@ -41,6 +41,8 @@ public class EventBus
 					{
 						action.Resolve(gameState, new ActionContext()
 						{
+							Source = (IGameEntity)source,
+							SourcePlayer = source.Entity.Owner,
 							Target = target,
 							IsAuraEffect = true,
 						});

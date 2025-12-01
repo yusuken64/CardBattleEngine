@@ -38,7 +38,6 @@ public class Player : IGameEntity, ITriggerSource
 	public bool MissedAttackFromFrozen { get; internal set; }
 	public bool IsStealth { get; internal set; }
 	public Weapon? EquippedWeapon { get; set; }
-	private List<StatModifier> _modifiers = new();
 	public HeroPower HeroPower { get; set; }
 	public IGameEntity Entity => this;
 
@@ -126,5 +125,37 @@ public class Player : IGameEntity, ITriggerSource
 
 		Attack = Math.Max(0, Attack);
 		//Health = Math.Max(0, Health);
+	}
+
+	internal List<StatModifier> _modifiers = new();
+	internal List<StatModifier> _auraModifiers = new();
+
+	public void AddModifier(StatModifier modifier)
+	{
+		_modifiers.Add(modifier);
+		RecalculateStats();
+	}
+
+	public void AddAuraModifier(StatModifier auraStatModifier)
+	{
+		_auraModifiers.Add(auraStatModifier);
+		RecalculateStats();
+	}
+
+	public void RemoveModifier(StatModifier modifier)
+	{
+		_modifiers.Remove(modifier);
+		RecalculateStats();
+	}
+
+	public bool HasModifier(StatModifier modifier)
+	{
+		return _modifiers.Contains(modifier);
+	}
+
+	public void ClearAuras()
+	{
+		_auraModifiers.Clear();
+		RecalculateStats();
 	}
 }

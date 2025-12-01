@@ -10,8 +10,11 @@ public class WeaponCard : Card
 		Name = name;
 		Attack = attack;
 		Durability = durabilty;
-	}
 
+		OriginalManaCost = cost;
+		OriginalAttack = attack;
+		OriginalDurability = durabilty;
+	}
 	public override CardType Type => CardType.Weapon;
 
 	public override int Attack { get; set; }
@@ -20,6 +23,9 @@ public class WeaponCard : Card
 	public override bool IsAlive { get; set; }
 	public override IAttackBehavior AttackBehavior => throw new NotImplementedException();
 
+	private int OriginalManaCost;
+	private int OriginalAttack;
+	private int OriginalDurability;
 
 	public override Card Clone()
 	{
@@ -42,5 +48,32 @@ public class WeaponCard : Card
 				}
 			}, actionContext)
 		};
+	}
+
+	internal override void RecalculateStats()
+	{
+		Attack = OriginalAttack;
+		MaxHealth = OriginalDurability;
+		ManaCost = OriginalManaCost;
+
+		// Apply modifiers
+		foreach (var mod in _modifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+			ManaCost += mod.CostChange;
+		}
+
+		foreach (var mod in _auraModifiers)
+		{
+			Attack += mod.AttackChange;
+			MaxHealth += mod.HealthChange;
+			ManaCost += mod.CostChange;
+		}
+
+		Attack = Math.Max(0, Attack);
+		MaxHealth = Math.Max(0, MaxHealth);
+		Health = MaxHealth;
+		ManaCost = Math.Max(0, ManaCost);
 	}
 }
