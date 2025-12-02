@@ -5,7 +5,7 @@ public class AddStatModifierAction : GameActionBase
 	public int AttackChange { get; set; }
 	public int HealthChange { get; set; }
 	public int CostChange { get; set; }
-	public TriggeredEffect ExpirationTrigger { get; set;}
+	public ExpirationTrigger ExpirationTrigger { get; set;}
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public override bool IsValid(GameState state, ActionContext actionContext)
@@ -81,7 +81,7 @@ public class AddStatModifierValueAction : GameActionBase
 	public IValueProvider AttackChange { get; set; }
 	public IValueProvider HealthChange { get; set; }
 	public IValueProvider CostChange { get; set; }
-	public TriggeredEffect ExpirationTrigger { get; set; }
+	public ExpirationTrigger ExpirationTrigger { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public override bool IsValid(GameState state, ActionContext actionContext)
@@ -159,5 +159,5 @@ public class StatModifier
 	public int HealthChange;
 	public int CostChange;
 
-	public TriggeredEffect ExpirationTrigger;
+	public ExpirationTrigger ExpirationTrigger;
 }

@@ -76,12 +76,12 @@ public class BattleEffectTest
 			TargetType = TargetingType.None,
 			GameActions = [new AddStatModifierAction() {
 				AttackChange = 2,
-				ExpirationTrigger = new TriggeredEffect()
-				{
-					EffectTrigger = EffectTrigger.OnTurnEnd,
-					EffectTiming = EffectTiming.Post,
-					GameActions = [new RemoveModifierAction()]
-				}
+				//ExpirationTrigger = new TriggeredEffect()
+				//{
+				//	EffectTrigger = EffectTrigger.OnTurnEnd,
+				//	EffectTiming = EffectTiming.Post,
+				//	GameActions = [new RemoveModifierAction()]
+				//}
 			}],
 			AffectedEntitySelector = new TargetOperationSelector()
 			{
@@ -110,7 +110,7 @@ public class BattleEffectTest
 		};
 
 		engine.Resolve(state, actionContext, playCardAction);
-		
+
 		// Assert
 		Assert.AreEqual(4, player1.Board.Count);
 		Assert.AreEqual(3, player1.Board[0].Attack);
@@ -202,7 +202,7 @@ public class BattleEffectTest
 				TargetType = TargetingType.None,
 				EffectTiming = EffectTiming.Post,
 				EffectTrigger = EffectTrigger.Battlecry,
-				GameActions = 
+				GameActions =
 				[
 					new SummonMinionAction()
 					{
@@ -226,5 +226,58 @@ public class BattleEffectTest
 		engine.Resolve(state, actionContext, playCardAction);
 
 		Assert.AreEqual(2, player1.Board.Count());
+	}
+
+	[TestMethod]
+	public void BuffTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		MinionCard testCard = new MinionCard("testCard", 1, 1, 10);
+		testCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.OnDamage,
+			AffectedEntitySelector = new ContextSelector() { IncludeSource = true },
+			GameActions = [
+				new AddStatModifierAction()
+				{
+					AttackChange = 1
+				}],
+			ExpirationTrigger = new ExpirationTrigger()
+			{
+				EffectTrigger = EffectTrigger.None,
+				EffectTiming = EffectTiming.Pre,
+			}
+		});
+		Minion testMinion = new(testCard, player1);
+		player1.Board.Add(testMinion);
+
+		Assert.AreEqual(1, testMinion.Attack);
+
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = player1,
+				Target = testMinion
+			},
+			new DamageAction() { Damage = (Value)1 });
+
+		Assert.AreEqual(2, testMinion.Attack);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = player1
+			},
+			new EndTurnAction());
+
+		Assert.AreEqual(2, testMinion.Attack);
 	}
 }

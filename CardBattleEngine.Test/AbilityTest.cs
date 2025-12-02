@@ -132,11 +132,11 @@ public class AbilityTest
 				new AddStatModifierAction()
 				{
 					AttackChange = 2,
-					ExpirationTrigger = new TriggeredEffect()
+					ExpirationTrigger = new ExpirationTrigger()
 					{
 						EffectTrigger = EffectTrigger.OnTurnEnd,
 						EffectTiming = EffectTiming.Post,
-						GameActions = [new RemoveModifierAction()]
+						//GameActions = [new RemoveModifierAction()]
 					}
 				}
 			}

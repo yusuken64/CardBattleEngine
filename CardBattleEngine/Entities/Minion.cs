@@ -22,11 +22,11 @@ public class Minion : IGameEntity, ITriggerSource
 		{
 			// Also return a triggered effect for each temporary modifier
 			foreach (var mod in _modifiers.Where(m => m.ExpirationTrigger != null))
-			{
+			{				
 				yield return (new TriggeredEffect
 				{
-					EffectTrigger = EffectTrigger.OnTurnEnd,
-					EffectTiming = EffectTiming.Pre,
+					EffectTrigger = mod.ExpirationTrigger.EffectTrigger,
+					EffectTiming = mod.ExpirationTrigger.EffectTiming,
 					TargetType = TargetingType.Self,
 					GameActions = new List<IGameAction>
 					{
