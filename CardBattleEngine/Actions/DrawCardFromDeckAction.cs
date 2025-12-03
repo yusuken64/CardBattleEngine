@@ -20,6 +20,25 @@ public class DrawCardFromDeckAction : GameActionBase
 		}
 	}
 }
+public class DrawTargetCardFromDeckAction : GameActionBase
+{
+	public override EffectTrigger EffectTrigger => EffectTrigger.DrawCard;
+
+	public override bool IsValid(GameState state, ActionContext actionContext)
+	{
+		return actionContext.SourcePlayer.Deck.Contains(actionContext.Target);
+	}
+
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
+	{
+		var card = actionContext.SourcePlayer.Deck.FirstOrDefault(x => x == actionContext.Target);
+		if (card != null)
+		{
+			actionContext.SourcePlayer.Deck.Remove(card);
+			yield return (new GainCardAction() { Card = card }, actionContext);
+		}
+	}
+}
 
 public class GainCardAction : GameActionBase
 {

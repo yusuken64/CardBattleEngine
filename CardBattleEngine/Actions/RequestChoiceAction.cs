@@ -14,6 +14,7 @@ public class RequestChoiceAction : GameActionBase
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
 		PendingChoice.SourcePlayer = context.SourcePlayer;
+		PendingChoice.GetActions(state);
 		state.PendingChoice = PendingChoice;
 
 		return [];

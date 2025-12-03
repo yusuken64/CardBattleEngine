@@ -102,10 +102,10 @@ public class GameEngine
 		// If there is a pending choice, only the listed options are valid
 		var allowed = state
 			.PendingChoice
-			.GetActions(state)
+			.Options
 			.Select(opt => opt.Item1)
 			.ToList();
-		
+
 		return allowed.Contains(action)
 			&& state.PendingChoice.SourcePlayer == actionContext.SourcePlayer;
 	}

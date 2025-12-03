@@ -2,9 +2,10 @@
 
 public interface IPendingChoice
 {
-	Player SourcePlayer { get; set; }
+	public Player SourcePlayer { get; set; }
+	public IEnumerable<(IGameAction, ActionContext)> Options { get; set; }
 
-	IEnumerable<(IGameAction, ActionContext)> GetActions(GameState gameState);
+	public IEnumerable<(IGameAction, ActionContext)> GetActions(GameState gameState);
 }
 
 public class SimpleChoice : IPendingChoice

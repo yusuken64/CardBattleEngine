@@ -14,12 +14,16 @@ public class GameState
 	public List<HistoryEntry> History { get; set; } = new();
 	private readonly IRNG rNG;
 
-	public GameState(Player p1, Player p2, IRNG rng)
+	public IReadOnlyList<Card> CardDB { get; private set; }
+
+	public GameState(Player p1, Player p2, IRNG rng, IEnumerable<Card> cardDB)
 	{
 		Players = [p1, p2];
 		rNG = rng;
 
 		CurrentPlayer = p1;
+
+		CardDB = cardDB.GroupBy(x => x.Name).Select(x => x.First()).ToList().AsReadOnly();
 	}
 
 	public Player OpponentOf(Player player)
@@ -197,7 +201,7 @@ public class GameState
 		var p2 = Players[1].Clone();
 
 		// Create a new game state using the cloned players
-		var clone = new GameState(p1, p2, this.rNG.Clone())
+		var clone = new GameState(p1, p2, this.rNG.Clone(), this.CardDB)
 		{
 			MaxBoardSize = this.MaxBoardSize,
 			maxTurns = this.maxTurns,
