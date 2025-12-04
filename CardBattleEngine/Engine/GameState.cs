@@ -23,7 +23,12 @@ public class GameState
 
 		CurrentPlayer = p1;
 
-		CardDB = cardDB.GroupBy(x => x.Name).Select(x => x.First()).ToList().AsReadOnly();
+		CardDB = cardDB
+			.Where(c => c != null && !string.IsNullOrEmpty(c.Name))
+			.GroupBy(c => c.Name)
+			.Select(g => g.First())
+			.ToList()
+			.AsReadOnly();
 	}
 
 	public Player OpponentOf(Player player)
