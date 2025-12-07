@@ -1,6 +1,4 @@
-﻿using CardBattleEngine.Actions;
-
-namespace CardBattleEngine.Test;
+﻿namespace CardBattleEngine.Test;
 
 [TestClass]
 public class MulliganTest

@@ -1,6 +1,4 @@
-﻿using CardBattleEngine.Actions;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class GameEngine
 {

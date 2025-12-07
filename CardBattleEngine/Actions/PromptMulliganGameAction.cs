@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CardBattleEngine.Actions;
+namespace CardBattleEngine;
 
 public class PromptMulliganGameAction : GameActionBase
 {
