@@ -12,8 +12,6 @@ public class BattleEffectTest
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
-		engine.StartGame(state);
-
 		// Add minions to both boards
 		var minionCard1 = new MinionCard("TestMinion1", 1, 2, 2) { Owner = player1 };
 		var minionCard2 = new MinionCard("TestMinion2", 1, 2, 2) { Owner = player2 };

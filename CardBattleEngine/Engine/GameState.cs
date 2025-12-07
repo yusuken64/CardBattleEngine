@@ -6,7 +6,11 @@ public class GameState
 	public int MaxBoardSize { get; set; } = 7;
 	public Player[] Players { get; internal set; }
 	public Player? Winner { get; set; }
-	public IPendingChoice PendingChoice { get; set; }
+
+	//TODO replace with a queue or pending choices
+	//allow for multiple choices to be queued and resolved one at a time
+	//the engine loop should halt if there are and pending choices
+	public IPendingChoice PendingChoice { get; set; } 
 
 	public int maxTurns = 50;
 	public int turn = 0;

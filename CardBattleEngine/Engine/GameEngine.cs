@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine;
+﻿using CardBattleEngine.Actions;
+
+namespace CardBattleEngine;
 
 public class GameEngine
 {
@@ -117,7 +119,10 @@ public class GameEngine
 
 		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction());
 		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction());
-		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartTurnAction());
+
+		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new PromptMulliganGameAction());
+
+		//Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartTurnAction());
 	}
 
 	public static void PrintState(GameState gameState, GameActionBase current)
