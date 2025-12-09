@@ -5,6 +5,7 @@ namespace CardBattleEngine;
 public class SummonMinionAction : GameActionBase
 {
 	public MinionCard Card { get; set; }
+	public int IndexOffset { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.SummonMinion;
 
 	public override bool IsValid(GameState state, ActionContext actionContext)
@@ -25,7 +26,7 @@ public class SummonMinionAction : GameActionBase
 		var minion = new Minion(Card, actionContext.SourcePlayer);
 
 		var list = actionContext.SourcePlayer.Board;
-		int requested = actionContext.PlayIndex;
+		int requested = actionContext.PlayIndex + IndexOffset;
 
 		int clampedIndex =
 			(requested == -1 || requested < 0 || requested > list.Count)

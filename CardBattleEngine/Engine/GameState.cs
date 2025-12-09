@@ -220,6 +220,7 @@ public class GameState
 		};
 
 		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
+		clone.PendingChoice = this.PendingChoice;
 
 		return clone;
 	}

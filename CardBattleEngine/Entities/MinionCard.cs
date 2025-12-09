@@ -40,6 +40,13 @@ public class MinionCard : Card
 
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext context)
 	{
+		SummonMinionAction summonMinionAction = new()
+		{
+			Card = this
+		};
+		yield return (summonMinionAction, context);
+
+		int originalIndex = context.PlayIndex;
 		foreach (var effect in MinionTriggeredEffects)
 		{
 			if (effect.EffectTrigger != EffectTrigger.OnPlay &&
@@ -63,19 +70,14 @@ public class MinionCard : Card
 				{
 					SourceCard = this,
 					SourcePlayer = context.SourcePlayer,
-					Target = target
+					Target = target,
+					PlayIndex = originalIndex
 				};
 
 				foreach (var gameAction in effect.GameActions)
 					yield return (gameAction, effectContext);
 			}
 		}
-
-		SummonMinionAction summonMinionAction = new()
-		{
-			Card = this
-		};
-		yield return (summonMinionAction, context);
 	}
 
 	public override Card Clone()
