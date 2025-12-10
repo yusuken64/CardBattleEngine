@@ -11,12 +11,14 @@ public interface IGameAction
 	IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context);
 	Dictionary<string, object> EmitParams();
 	void ConsumeParams(Dictionary<string, object> actionParam);
+	object CustomSFX { get; set; } //this will be used the client to assosiated SFX To Action when animated
 }
 
 public abstract class GameActionBase : IGameAction
 {
 	public bool Canceled { get; set; }
 	public abstract EffectTrigger EffectTrigger { get; }
+
 	public abstract bool IsValid(GameState gameState, ActionContext context);
 	public abstract IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context);
 	public virtual void ConsumeParams(Dictionary<string, object> actionParam)
@@ -27,6 +29,7 @@ public abstract class GameActionBase : IGameAction
 	{
 		return new();
 	}
+	public object CustomSFX { get; set; }
 }
 
 //TODO make different implementations for context for each action??

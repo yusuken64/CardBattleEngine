@@ -1,28 +1,24 @@
-﻿using System.Collections.Generic;
+﻿namespace CardBattleEngine;
 
-namespace CardBattleEngine;
-
-public class CastSpellAction : IGameAction
+public class CastSpellAction : GameActionBase
 {
-	public bool Canceled { get; set; }
+	public override EffectTrigger EffectTrigger => EffectTrigger.SpellCast;
 
-	public EffectTrigger EffectTrigger => EffectTrigger.SpellCast;
-
-	public void ConsumeParams(Dictionary<string, object> actionParam)
+	public override void ConsumeParams(Dictionary<string, object> actionParam)
 	{
 	}
 
-	public Dictionary<string, object> EmitParams()
+	public override Dictionary<string, object> EmitParams()
 	{
 		return new();
 	}
 
-	public bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context)
 	{
 		return context.SourceCard is SpellCard spellcard;
 	}
 
-	public IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
 		if (!IsValid(state, context)) {	yield break; }
 
