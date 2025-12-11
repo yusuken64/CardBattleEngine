@@ -22,6 +22,7 @@ public class MinionCard : Card
 	public bool HasWindfury { get; set; }
 	public bool HasLifeSteal { get; set; }
 	public bool HasReborn{ get; set; }
+	public bool CannotAttack { get; set; }
 	public List<TriggeredEffect> MinionTriggeredEffects { get; set; } = new();//triggered effects on summoned minion
 	public override IAttackBehavior AttackBehavior => null;
 

@@ -114,6 +114,7 @@ public class GameState
 			new EndTurnAction(),
 			new ()
 			{
+				Source = player,
 				SourcePlayer = player,
 			}));
 

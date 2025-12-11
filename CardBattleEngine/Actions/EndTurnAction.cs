@@ -31,11 +31,13 @@ public class EndTurnAction : GameActionBase
 		}
 
 		// Queue start-of-turn effects
+		Player opponent = state.OpponentOf(state.CurrentPlayer);
 		return new (IGameAction, ActionContext)[]
 		{
 			(new StartTurnAction(), new ActionContext()
 			{
-				SourcePlayer = state.OpponentOf(state.CurrentPlayer)
+				Source = opponent,
+				SourcePlayer = opponent
 			})
 		};
 	}

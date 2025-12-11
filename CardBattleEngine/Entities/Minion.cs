@@ -89,6 +89,7 @@ public class Minion : IGameEntity, ITriggerSource
 		HasWindfury = card.HasWindfury;
 		HasLifeSteal = card.HasLifeSteal;
 		HasReborn = card.HasReborn;
+		CannotAttack = card.CannotAttack;
 
 		IsAlive = true;
 		TriggeredEffects = card.MinionTriggeredEffects.Select(effect =>
