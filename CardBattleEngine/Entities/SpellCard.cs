@@ -21,6 +21,7 @@ public class SpellCard : Card
 	public override IAttackBehavior AttackBehavior => null;
 	private int OriginalManaCost;
 
+	public object CustomSFX { get; set; }
 
 	public override Card Clone()
 	{
@@ -32,7 +33,10 @@ public class SpellCard : Card
 		actionContext.SourceCard = this;
 		return new List<(IGameAction, ActionContext)>()
 		{
-			(new CastSpellAction(), actionContext)
+			(new CastSpellAction()
+			{
+				CustomSFX = CustomSFX
+			}, actionContext)
 		};
 	}
 
