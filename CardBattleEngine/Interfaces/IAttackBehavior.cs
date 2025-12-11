@@ -17,6 +17,9 @@ public class MinionAttackBehavior : IAttackBehavior
 		if (!target.IsAlive)
 			return false;
 
+		if (minion.CannotAttack)
+			return false;
+
 		// Cannot attack friendly units
 		if (minion.Owner == target.Owner)
 			return false;

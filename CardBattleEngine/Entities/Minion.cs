@@ -64,6 +64,8 @@ public class Minion : IGameEntity, ITriggerSource
 
 	public IGameEntity Entity => this;
 
+	public bool CannotAttack { get; set; } //this is an override to normal attack behavior, for special case minion which can never attack
+
 	public Minion(MinionCard card, Player owner)
 	{
 		this.OriginalCard = card;
