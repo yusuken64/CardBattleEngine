@@ -39,14 +39,19 @@ public class WeaponCard : Card
 		{
 			(new AcquireWeaponAction()
 			{
-				Weapon = new Weapon()
-				{
-					Name = Name,
-					Attack = Attack,
-					Durability = Durability,
-					TriggeredEffects = TriggeredEffects
-				}
+				Weapon = CreateWeapon()
 			}, actionContext)
+		};
+	}
+
+	public Weapon CreateWeapon()
+	{
+		return new Weapon()
+		{
+			Name = Name,
+			Attack = Attack,
+			Durability = Durability,
+			TriggeredEffects = TriggeredEffects
 		};
 	}
 
