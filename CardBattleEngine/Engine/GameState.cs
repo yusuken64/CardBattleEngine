@@ -288,7 +288,7 @@ public class GameState
 				break;
 
 			case TargetingType.FriendlyHero:
-				targets.Add(entity);
+				targets.Add(entity.Entity.Owner);
 				break;
 
 			case TargetingType.FriendlyMinion:

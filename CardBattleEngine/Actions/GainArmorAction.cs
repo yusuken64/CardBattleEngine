@@ -14,7 +14,9 @@ public class GainArmorAction : GameActionBase
 	{
 		if (actionContext.Target is Player targetPlayer)
 		{
-			targetPlayer.Armor = Amount.GetValue(state, actionContext);
+			int amount = Amount.GetValue(state, actionContext);
+			targetPlayer.Armor = amount;
+			actionContext.ArmorGained = amount;
 		}
 
 		return [];

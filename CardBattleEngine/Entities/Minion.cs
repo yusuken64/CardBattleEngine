@@ -101,6 +101,8 @@ public class Minion : IGameEntity, ITriggerSource
 
 	public bool CanAttack()
 	{
+		if (CannotAttack) { return false; }
+
 		var maxAttacks = _attackBehavior.MaxAttacks(this);
 		return (HasCharge || HasRush || !HasSummoningSickness) && (AttacksPerformedThisTurn < maxAttacks);
 	}
@@ -117,7 +119,18 @@ public class Minion : IGameEntity, ITriggerSource
 			Owner = this.Owner,
 			Taunt = this.Taunt,
 			HasSummoningSickness = this.HasSummoningSickness,
-			AttacksPerformedThisTurn = this.AttacksPerformedThisTurn
+			AttacksPerformedThisTurn = this.AttacksPerformedThisTurn,
+			IsStealth = this.IsStealth,
+			HasCharge = this.HasCharge,
+			HasDivineShield = this.HasDivineShield,
+			HasPoisonous = this.HasPoisonous,
+			HasRush = this.HasRush,
+			HasWindfury = this.HasWindfury,
+			HasLifeSteal = this.HasLifeSteal,
+			HasReborn = this.HasReborn,
+			CannotAttack = this.CannotAttack,
+
+			IsAlive = true,
 		};
 	}
 	public void AddModifier(StatModifier modifier)

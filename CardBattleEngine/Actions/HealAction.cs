@@ -14,12 +14,14 @@ public class HealAction : GameActionBase
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
 		int healAmount = Amount.GetValue(state, context);
+		var originalHealth = context.Target.Health;
+
 		context.Target.Health = Math.Min(
 			context.Target.Health + healAmount,
 			context.Target.MaxHealth
 		);
 
-		context.HealedAmount = healAmount;
+		context.HealedAmount = context.Target.Health - originalHealth;
 		return [];
 	}
 }

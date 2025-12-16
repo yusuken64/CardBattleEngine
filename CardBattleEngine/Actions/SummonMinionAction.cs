@@ -44,6 +44,7 @@ public class SummonMinionAction : GameActionBase
 		}
 
 		actionContext.SummonedMinion = minion;
+		actionContext.SummonedMinionSnapShot = minion.Clone();
 
 		return [];
 	}

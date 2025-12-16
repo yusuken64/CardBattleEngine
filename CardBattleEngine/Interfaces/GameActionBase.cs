@@ -65,4 +65,6 @@ public class ActionContext
 	public int HealedAmount { get; internal set; }
 	public int HealthDamageDealt { get; internal set; }
 	public int ArmorDamageDealt { get; internal set; }
+	public int ArmorGained { get; internal set; }
+	public Minion SummonedMinionSnapShot { get; internal set; }
 }

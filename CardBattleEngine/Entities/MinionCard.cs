@@ -70,6 +70,7 @@ public class MinionCard : Card
 				var effectContext = new ActionContext
 				{
 					SourceCard = this,
+					Source = this,
 					SourcePlayer = context.SourcePlayer,
 					Target = target,
 					PlayIndex = originalIndex
