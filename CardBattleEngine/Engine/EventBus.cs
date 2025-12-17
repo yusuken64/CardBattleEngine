@@ -26,32 +26,25 @@ public class EventBus
 				};
 
 				if (auraEffect.Condition != null && !auraEffect.Condition.Evaluate(effectContext))
+				{
 					continue;
+				}
 
-				// 3. Apply the aura's actions to valid targets
-				var actionContext = new ActionContext
+				foreach (var action in auraEffect.GameActions.ToList())
 				{
-					Source = (IGameEntity)source,
-					SourcePlayer = source.Entity.Owner
-				};
-				var targets = auraEffect.AffectedEntitySelector.Select(gameState, actionContext);
-				foreach (var target in targets)
-				{
-					foreach (var action in auraEffect.GameActions)
+					ActionContext context = new()
 					{
-						action.Resolve(gameState, new ActionContext()
-						{
-							Source = (IGameEntity)source,
-							SourcePlayer = source.Entity.Owner,
-							Target = target,
-							IsAuraEffect = true,
-						});
-					}
+						Source = (IGameEntity)source,
+						SourcePlayer = source.Entity.Owner,
+						AffectedEntitySelector = auraEffect.AffectedEntitySelector,
+						IsAuraEffect = true,
+					};
+					//this list needs to materialize to apply the effects.
+					action.Resolve(gameState, context).ToList();
 				}
 			}
 		}
 	}
-
 
 	/// <summary>
 	/// Returns all triggers for a given action, filtered by timing (Pre/Post/Other),

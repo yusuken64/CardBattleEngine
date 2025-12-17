@@ -18,9 +18,7 @@ public class DamageAction : GameActionBase
 
 		var source = actionContext.Source;
 
-		IEnumerable<IGameEntity> targets = actionContext.AffectedEntitySelector != null
-			? actionContext.AffectedEntitySelector.Select(state, actionContext)
-			: new List<IGameEntity> { actionContext.Target };
+		var targets = this.ResolveTargets(state, actionContext);
 
 		foreach (var target in targets)
 		{

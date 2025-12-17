@@ -73,7 +73,7 @@ public class BattleEffectTest
 			EffectTiming = EffectTiming.Post,
 			TargetType = TargetingType.None,
 			GameActions = [new AddStatModifierAction() {
-				AttackChange = 2,
+				AttackChange = (Value) 2,
 				//ExpirationTrigger = new TriggeredEffect()
 				//{
 				//	EffectTrigger = EffectTrigger.OnTurnEnd,
@@ -165,7 +165,6 @@ public class BattleEffectTest
 			{
 				IncludeTarget = true
 			}
-
 		});
 		cleaveCard.HasCharge = true;
 		player1.Board.Add(new Minion(cleaveCard, player1));
@@ -243,7 +242,7 @@ public class BattleEffectTest
 			GameActions = [
 				new AddStatModifierAction()
 				{
-					AttackChange = 1
+					AttackChange = (Value) 1
 				}],
 			ExpirationTrigger = new ExpirationTrigger()
 			{

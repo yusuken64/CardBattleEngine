@@ -131,7 +131,7 @@ public class AbilityTest
 			{
 				new AddStatModifierAction()
 				{
-					AttackChange = 2,
+					AttackChange = (Value)2,
 					ExpirationTrigger = new ExpirationTrigger  ()
 					{
 						EffectTrigger = EffectTrigger.OnTurnEnd,

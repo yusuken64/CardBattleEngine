@@ -35,7 +35,7 @@ public class AuraTest
 			{
 				new AddStatModifierAction()
 				{
-					AttackChange = +2
+					AttackChange = (Value)2
 				}
 			},
 			AffectedEntitySelector = new TargetOperationSelector()

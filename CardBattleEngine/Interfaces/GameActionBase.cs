@@ -21,6 +21,30 @@ public abstract class GameActionBase : IGameAction
 
 	public abstract bool IsValid(GameState gameState, ActionContext context);
 	public abstract IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context);
+	protected IReadOnlyList<IGameEntity> ResolveTargets(
+	GameState state,
+	ActionContext context)
+	{
+		IEnumerable<IGameEntity> targets;
+
+		if (context.AffectedEntitySelector != null)
+		{
+			targets = context.AffectedEntitySelector.Select(state, context);
+		}
+		else if (context.Target != null)
+		{
+			targets = [context.Target];
+		}
+		else
+		{
+			targets = Enumerable.Empty<IGameEntity>();
+		}
+
+		// Snapshot to avoid mutation during iteration
+		return targets
+			.Where(t => t != null && t.IsAlive)
+			.ToList();
+	}
 	public virtual void ConsumeParams(Dictionary<string, object> actionParam)
 	{
 	}

@@ -16,11 +16,11 @@ public class DeferredResolveAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		var targets = AffectedEntitySelector.Select(state, context);
+		var targets = context.AffectedEntitySelector.Select(state, context);
 		foreach (var target in targets)
 		{
 			var newContext = new ActionContext(context);
-			newContext.Target = target;
+			newContext.AffectedEntitySelector = AffectedEntitySelector;
 			yield return (Action, newContext);
 		}
 	}

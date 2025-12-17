@@ -30,7 +30,7 @@ public class CostReduction
 			{
 				IncludeSource = true
 			},
-			GameActions = [new AddStatModifierValueAction()
+			GameActions = [new AddStatModifierAction()
 			{
 				CostChange = new NegativeValue()
 				{

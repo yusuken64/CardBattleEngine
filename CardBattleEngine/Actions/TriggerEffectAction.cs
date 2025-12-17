@@ -22,19 +22,15 @@ public class TriggerEffectAction : GameActionBase
 
 		foreach (var action in TriggeredEffect.GameActions)
 		{
-			var affectedTargets = TriggeredEffect.AffectedEntitySelector.Select(state, EffectContext);
-
-			foreach (var target in affectedTargets)
+			yield return (action, new ActionContext
 			{
-				yield return (action, new ActionContext
-				{
-					Source = TriggerSource.Entity,
-					SourcePlayer = TriggerSource.Entity.Owner,
-					Target = target as IGameEntity,
-					OriginalAction = context.OriginalAction,
-					OriginalSource = context.Source,
-				});
-			}
+				Source = TriggerSource.Entity,
+				SourcePlayer = TriggerSource.Entity.Owner,
+				AffectedEntitySelector = TriggeredEffect.AffectedEntitySelector,
+				Target = context.Target,
+				OriginalAction = context.OriginalAction,
+				OriginalSource = context.Source,
+			});
 		}
 	}
 }
