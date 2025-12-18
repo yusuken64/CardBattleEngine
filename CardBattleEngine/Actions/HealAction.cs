@@ -5,8 +5,9 @@ public class HealAction : GameActionBase
 	public IValueProvider Amount { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnHealed;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return context.Target.IsAlive &&
 			context.Target.Health < context.Target.MaxHealth;
 	}

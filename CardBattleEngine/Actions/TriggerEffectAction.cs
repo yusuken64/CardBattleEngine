@@ -11,8 +11,9 @@ public class TriggerEffectAction : GameActionBase
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return TriggeredEffect.AffectedEntitySelector != null;
 	}
 

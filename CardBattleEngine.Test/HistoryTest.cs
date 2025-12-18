@@ -16,7 +16,7 @@ public class HistoryTest
 			ResolveFunc = (state, context) => { return []; }
 		};
 
-		Assert.IsTrue(action.IsValid(state, actionContext));
+		Assert.IsTrue(action.IsValid(state, actionContext, out string _));
 		engine.Resolve(state, actionContext, action);
 		
 		Assert.AreEqual(1, state.History.Count);

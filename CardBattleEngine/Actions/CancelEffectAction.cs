@@ -5,8 +5,9 @@ public class CancelEffectAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.SpellCountered;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return !context.OriginalAction.Canceled;
 	}
 

@@ -4,8 +4,9 @@ public class RebornAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.Reborn;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return context.Source is Minion minion &&
 			minion.HasReborn;
 	}

@@ -35,7 +35,7 @@ public class GameEngine
 			(IGameAction action, ActionContext context) current = _actionQueue.Dequeue();
 
 			// Check if action is still valid
-			if (!current.action.IsValid(gameState, current.context))
+			if (!current.action.IsValid(gameState, current.context, out string _))
 				continue;
 
 			current.context.OriginalAction = current.action;

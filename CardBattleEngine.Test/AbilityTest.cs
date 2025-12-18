@@ -303,7 +303,7 @@ public class AbilityTest
 				SourcePlayer = opponent
 			};
 
-			Assert.IsFalse(attackAction.IsValid(state, context),
+			Assert.IsFalse(attackAction.IsValid(state, context, out string _),
 				"Opponent should not be able to attack a stealth minion");
 		}
 
@@ -321,7 +321,7 @@ public class AbilityTest
 			SourcePlayer = current
 		}, new StartTurnAction());
 
-		Assert.IsTrue(attack.IsValid(state, attackContext), "Stealth minion should be able to attack normally");
+		Assert.IsTrue(attack.IsValid(state, attackContext, out string _), "Stealth minion should be able to attack normally");
 
 		engine.Resolve(state, attackContext, attack);
 
@@ -368,7 +368,7 @@ public class AbilityTest
 			Target = opponent,
 			SourcePlayer = current
 		};
-		Assert.IsTrue(attackAction.IsValid(state, attackContext), "Charge minion attack should be valid");
+		Assert.IsTrue(attackAction.IsValid(state, attackContext, out string _), "Charge minion attack should be valid");
 
 		// Resolve the attack (optional)
 		engine.Resolve(state, attackContext, attackAction);

@@ -4,13 +4,15 @@ public class DestroyWeaponAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		if (context.Target is Player player)
 		{
+			reason = null;
 			return player.EquippedWeapon != null;
 		}
 
+		reason = null;
 		return false;
 	}
 

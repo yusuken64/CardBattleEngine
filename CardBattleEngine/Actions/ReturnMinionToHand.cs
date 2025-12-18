@@ -7,15 +7,22 @@ public class ReturnMinionToCard : GameActionBase
 
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		if (context.Target is not Minion minion)
+		{
+			reason = null;
 			return false;
+		}
 
 		if (ZoneType != ZoneType.Hand ||
 			ZoneType != ZoneType.Deck)
+		{
+			reason = null;
 			return false;
+		}
 
+		reason = null;
 		return true;
 	}
 
@@ -49,7 +56,7 @@ public class ReturnMinionToCard : GameActionBase
 						Target = owner
 					});
 
-				if (gainCard.action.IsValid(state, gainCard.context))
+				if (gainCard.action.IsValid(state, gainCard.context, out string _))
 				{
 					yield return gainCard;
 				}
@@ -67,7 +74,7 @@ public class ReturnMinionToCard : GameActionBase
 						Target = owner
 					});
 
-				if (addCard.action.IsValid(state, addCard.context))
+				if (addCard.action.IsValid(state, addCard.context, out var _))
 				{
 					yield return addCard;
 				}

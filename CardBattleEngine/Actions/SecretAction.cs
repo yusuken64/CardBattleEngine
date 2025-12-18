@@ -7,8 +7,9 @@ public class SecretAction : GameActionBase
 
 	public Secret Secret { get; set; }
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		//TODO max secret exceeded, no duplicate?
 		return true;
 	}
@@ -39,9 +40,9 @@ public class SecretResolvedAction : GameActionBase
 
 	public Secret Secret { get; set; }
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
-		//TODO max secret exceeded, no duplicate?
+		reason = null;
 		return true;
 	}
 

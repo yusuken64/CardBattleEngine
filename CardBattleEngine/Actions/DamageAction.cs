@@ -5,15 +5,16 @@ public class DamageAction : GameActionBase
 	public IValueProvider Damage { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDamage;
 
-	public override bool IsValid(GameState state, ActionContext actionContext)
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
+		reason = null;
 		// Valid if target is still alive / on board
 		return actionContext.Target != null && actionContext.Target.IsAlive;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		if (!IsValid(state, actionContext))
+		if (!IsValid(state, actionContext, out string _))
 			yield break;
 
 		var source = actionContext.Source;

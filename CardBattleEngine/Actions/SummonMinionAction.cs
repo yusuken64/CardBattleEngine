@@ -8,18 +8,22 @@ public class SummonMinionAction : GameActionBase
 	public int IndexOffset { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.SummonMinion;
 
-	public override bool IsValid(GameState state, ActionContext actionContext)
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
 		// Board not full
 		if (actionContext.SourcePlayer.Board.Count >= state.MaxBoardSize)
+		{
+			reason = null;
 			return false;
+		}
 
+		reason = null;
 		return true;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		if (!IsValid(state, actionContext))
+		if (!IsValid(state, actionContext, out var _))
 			return [];
 
 		// Create minion entity

@@ -45,7 +45,7 @@ public class BattleEffectTest
 		// Act 3: Attempt attack with frozen minion
 		var attackAction = new AttackAction();
 		var attackContext = new ActionContext { Source = minion2, Target = minion1, SourcePlayer = player2 };
-		Assert.IsFalse(attackAction.IsValid(state, attackContext), "Frozen minion cannot attack");
+		Assert.IsFalse(attackAction.IsValid(state, attackContext, out string _), "Frozen minion cannot attack");
 
 		// Act 5: End frozen player's turn -> freeze should wear off
 		engine.Resolve(state, new ActionContext { SourcePlayer = player2 }, new StartTurnAction());

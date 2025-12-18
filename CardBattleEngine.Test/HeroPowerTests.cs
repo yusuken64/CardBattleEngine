@@ -24,7 +24,7 @@ public class HeroPowerTests
 		};
 
 		// Should NOT be valid
-		Assert.IsFalse(action.IsValid(state, context));
+		Assert.IsFalse(action.IsValid(state, context, out string _));
 
 		// Resolve should do nothing (no crash, no effect)
 		engine.Resolve(state, context, action);
@@ -66,7 +66,7 @@ public class HeroPowerTests
 			Target = opponent
 		};
 
-		Assert.IsTrue(action.IsValid(state, context));
+		Assert.IsTrue(action.IsValid(state, context, out string _));
 
 		engine.Resolve(state, context, action);
 

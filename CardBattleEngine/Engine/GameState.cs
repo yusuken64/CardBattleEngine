@@ -63,7 +63,7 @@ public class GameState
 					SourceCard = card,
 				};
 
-				if (playCardAction.IsValid(this, actionContext))
+				if (playCardAction.IsValid(this, actionContext, out string _))
 				{
 					actions.Add((playCardAction, actionContext));
 				}
@@ -85,7 +85,7 @@ public class GameState
 				SourcePlayer = player,
 				Target = OpponentOf(player)
 			};
-			if (attackHeroAction.IsValid(this, attackHeroActionContext))
+			if (attackHeroAction.IsValid(this, attackHeroActionContext, out string _))
 			{
 				actions.Add((attackHeroAction, attackHeroActionContext));
 			}
@@ -101,8 +101,8 @@ public class GameState
 				};
 				if (attackAction.IsValid(
 					this,
-					attackActionContext
-					))
+					attackActionContext,
+					out string _))
 				{
 					actions.Add((attackAction, attackActionContext));
 				}
@@ -144,7 +144,7 @@ public class GameState
 					SourceCard = card,
 				};
 
-				if (playCardAction.IsValid(this, actionContext))
+				if (playCardAction.IsValid(this, actionContext, out string _))
 				{
 					actions.Add((playCardAction, null));
 				}

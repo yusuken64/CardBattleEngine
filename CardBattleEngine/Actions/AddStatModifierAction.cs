@@ -8,8 +8,9 @@ public class AddStatModifierAction : GameActionBase
 	public ExpirationTrigger ExpirationTrigger { get; set;}
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState state, ActionContext actionContext)
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
+		reason = null;
 		return this.ResolveTargets(state, actionContext).Any(x => x.IsAlive);
 	}
 
@@ -63,8 +64,9 @@ public class RemoveModifierAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return context.Target.HasModifier(context.Modifier);
 	}
 

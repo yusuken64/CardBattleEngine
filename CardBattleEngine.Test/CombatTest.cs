@@ -38,10 +38,10 @@ public class CombatTest
 
 		Assert.IsTrue(rushMinion.CanAttack(),
 			"Rush minion should be able to attack minions immediately");
-		Assert.IsTrue(rushMinion.AttackBehavior.CanAttack(rushMinion, dummyMinion, state));
+		Assert.IsTrue(rushMinion.AttackBehavior.CanAttack(rushMinion, dummyMinion, state, out string _));
 
 		// ----- Rush CANNOT attack heroes -----;
-		Assert.IsFalse(rushMinion.AttackBehavior.CanAttack(rushMinion, opponent, state));
+		Assert.IsFalse(rushMinion.AttackBehavior.CanAttack(rushMinion, opponent, state, out string _));
 	}
 
 	[TestMethod]
@@ -84,7 +84,7 @@ public class CombatTest
 			Target = opponent,
 			SourcePlayer = current
 		};
-		Assert.IsTrue(new AttackAction().IsValid(state, ctx1));
+		Assert.IsTrue(new AttackAction().IsValid(state, ctx1, out string _));
 		engine.Resolve(state, ctx1, new AttackAction());
 
 		Assert.AreEqual(1, wfMinion.AttacksPerformedThisTurn,
@@ -97,7 +97,7 @@ public class CombatTest
 			Target = opponent,
 			SourcePlayer = current
 		};
-		Assert.IsTrue(new AttackAction().IsValid(state, ctx2),
+		Assert.IsTrue(new AttackAction().IsValid(state, ctx2, out string _),
 			"Windfury: Second attack should be valid");
 		engine.Resolve(state, ctx2, new AttackAction());
 
@@ -111,7 +111,7 @@ public class CombatTest
 			Target = opponent,
 			SourcePlayer = current
 		};
-		Assert.IsFalse(new AttackAction().IsValid(state, ctx3),
+		Assert.IsFalse(new AttackAction().IsValid(state, ctx3, out string _),
 			"Windfury: Third attack should NOT be valid");
 	}
 }

@@ -7,23 +7,34 @@ public class HeroAttackBehavior : IAttackBehavior
 		return 1;
 	}
 
-	public bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state)
+	public bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state, out string reason)
 	{
 		if (attacker is not Player hero || !hero.CanAttack()) // weapon, cooldown, etc.
+		{
+			reason = null;
 			return false;
+		}
 
 		if (hero.IsFrozen)
 		{
+			reason = "Hero is Frozen";
 			return false;
 		}
 
 		if (target == null || !target.IsAlive)
+		{
+			reason = null;
 			return false;
+		}
 
 		if (!AttackRules.MustAttackTaunt(attacker, target, state))
+		{
+			reason = "Must Attack Minion with Taunt";
 			return false;
+		}
 
-		return true; // Could also enforce taunt, special hero rules, etc.
+		reason = null;
+		return true;
 	}
 
 	public IEnumerable<(IGameAction, ActionContext)> GenerateDamageActions(

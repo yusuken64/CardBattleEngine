@@ -6,8 +6,9 @@ public class RequestChoiceAction : GameActionBase
 
 	public IPendingChoice PendingChoice { get; set; }
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return gameState.CurrentPlayer == context.SourcePlayer;
 	}
 

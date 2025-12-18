@@ -4,7 +4,11 @@ public class DrawCardFromDeckAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.DrawCard;
 
-	public override bool IsValid(GameState state, ActionContext actionContext) => true;
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
+	{
+		reason = null;
+		return true;
+	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
@@ -24,8 +28,9 @@ public class DrawTargetCardFromDeckAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.DrawCard;
 
-	public override bool IsValid(GameState state, ActionContext actionContext)
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
+		reason = null;
 		return actionContext.SourcePlayer.Deck.Contains(actionContext.Target);
 	}
 
@@ -45,14 +50,15 @@ public class GainCardAction : GameActionBase
 	public Card Card { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return context.SourcePlayer.Hand.Count() < 10;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		if (!IsValid(state, actionContext)) { return []; }
+		if (!IsValid(state, actionContext, out var _)) { return []; }
 
 		actionContext.SourcePlayer.Hand.Add(Card);
 
@@ -65,7 +71,7 @@ public class AddCardToDeckAction : GameActionBase
 	public Card Card { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		Player player;
 		if (context.Target is Player targetPlayer)
@@ -77,12 +83,13 @@ public class AddCardToDeckAction : GameActionBase
 			player = context.SourcePlayer;
 		}
 
+		reason = null;
 		return player != null;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		if (!IsValid(state, actionContext)) { return []; }
+		if (!IsValid(state, actionContext, out var _)) { return []; }
 
 		Player player;
 		if (actionContext.Target is Player targetPlayer)

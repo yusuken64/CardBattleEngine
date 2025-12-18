@@ -4,9 +4,9 @@ public class AttackAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.Attack;
 
-	public override bool IsValid(GameState state, ActionContext context)
+	public override bool IsValid(GameState state, ActionContext context, out string reason)
 	{
-		return context.Source.AttackBehavior.CanAttack(context.Source, context.Target, state);
+		return context.Source.AttackBehavior.CanAttack(context.Source, context.Target, state, out reason);
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)

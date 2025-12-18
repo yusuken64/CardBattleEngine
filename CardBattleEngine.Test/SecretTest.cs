@@ -58,7 +58,7 @@ public class SecretTest
 			Target = player1,
 		};
 
-		Assert.IsTrue(action.IsValid(state, actionContext));
+		Assert.IsTrue(action.IsValid(state, actionContext, out string _));
 		engine.Resolve(state, actionContext, action);
 
 		Assert.AreEqual(1, player1.Secrets.Count, "Secret should be active after playing CounterSpell.");
@@ -82,7 +82,7 @@ public class SecretTest
 		player2.Hand.Add(fireball);
 
 		// Act — enemy casts a spell
-		Assert.IsTrue(playFireball.IsValid(state, actionContext));
+		Assert.IsTrue(playFireball.IsValid(state, actionContext, out string _));
 		engine.Resolve(state, new ActionContext()
 		{
 			SourcePlayer = player2,

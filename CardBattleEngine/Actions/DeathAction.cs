@@ -4,8 +4,9 @@ public class DeathAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnDeath;
 
-	public override bool IsValid(GameState state, ActionContext actionContext)
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
+		reason = null;
 		return actionContext.Target.IsAlive;
 	}
 

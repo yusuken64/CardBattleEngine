@@ -4,13 +4,15 @@ public class HeroPowerAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnHeroPower;
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		if (context.SourcePlayer.HeroPower == null)
 		{
+			reason = null;
 			return false;
 		}
 
+		reason = null;
 		return !context.SourcePlayer.HeroPower.UsedThisTurn &&
 			context.SourcePlayer.Mana >= context.SourcePlayer.HeroPower.ManaCost;
 	}

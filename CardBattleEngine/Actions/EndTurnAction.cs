@@ -4,7 +4,11 @@ public class EndTurnAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnTurnEnd;
 
-	public override bool IsValid(GameState state, ActionContext actionContext) => true;
+	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
+	{
+		reason = null;
+		return true;
+	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{

@@ -13,14 +13,15 @@ public class CastSpellAction : GameActionBase
 		return new();
 	}
 
-	public override bool IsValid(GameState gameState, ActionContext context)
+	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		reason = null;
 		return context.SourceCard is SpellCard spellcard;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (!IsValid(state, context)) {	yield break; }
+		if (!IsValid(state, context, out var _)) {	yield break; }
 
 		if (context.SourceCard is SpellCard spellcard) {
 			foreach (SpellCastEffect spellCastEffect in spellcard.SpellCastEffects)

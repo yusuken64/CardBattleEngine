@@ -63,7 +63,7 @@ public class AuraTest
 		PlayCardAction action = new() { Card = card };
 		ActionContext actionContext = new() { SourcePlayer = current };
 
-		Assert.IsTrue(action.IsValid(state, actionContext));
+		Assert.IsTrue(action.IsValid(state, actionContext, out string _));
 
 		engine.Resolve(state, actionContext , action);
 		engine.Resolve(state, actionContext, new PlayCardAction() { Card = card2 });
