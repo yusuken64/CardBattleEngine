@@ -40,6 +40,11 @@ public abstract class GameActionBase : IGameAction
 		{
 			targets = [context.Target];
 		}
+		else if (context.SourcePlayer != null)
+		{
+			//fallback for effects that imply affects the sourceplayer i.e. draw card
+			targets = [context.SourcePlayer];
+		}
 		else
 		{
 			targets = Enumerable.Empty<IGameEntity>();

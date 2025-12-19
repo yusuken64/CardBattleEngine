@@ -23,7 +23,8 @@ public class SpellTest
 		engine.Resolve(state, new ActionContext
 		{
 			SourcePlayer = current,
-			SourceCard = spellCard
+			SourceCard = spellCard,
+			Target = current
 		}, new PlayCardAction { Card = spellCard });
 		
 		Assert.AreEqual(initialHandCount + 2, current.Hand.Count, "Player should have drawn three cards.");
@@ -100,4 +101,64 @@ public class SpellTest
 		}
 	}
 
+	[TestMethod]
+	public void WhirlwindTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 7;
+		var opponent = state.OpponentOf(current);
+
+		var card = new MinionCard("Test", 1, 4, 4);
+		current.Board.Add(new Minion(card, opponent));
+		current.Board.Add(new Minion(card, opponent));
+		current.Board.Add(new Minion(card, opponent));
+		opponent.Board.Add(new Minion(card, opponent));
+		opponent.Board.Add(new Minion(card, opponent));
+		opponent.Board.Add(new Minion(card, opponent));
+
+		var spell = new SpellCard("WhirlWind", 1);
+		spell.SpellCastEffects.Add(new SpellCastEffect()
+		{
+			GameActions = [ new DamageAction() {
+				Damage = (Value)1
+			}],
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				ResolutionTiming = TargetResolutionTiming.Once,
+				Operations = [new SelectBoardEntitiesOperation() {
+					Group = TargetGroup.All,
+					Side = TeamRelationship.Any
+				}]
+			}
+		});
+
+		ActionContext context = new()
+		{
+			SourceCard = spell,
+			Source = current,
+			SourcePlayer = current,
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				ResolutionTiming = TargetResolutionTiming.Once,
+				Operations = [new SelectBoardEntitiesOperation() {
+					Group = TargetGroup.All,
+					Side = TeamRelationship.Any
+				}]
+			}
+		};
+		engine.Resolve(state, context, new CastSpellAction());
+		
+		foreach (var minion in current.Board)
+		{
+			Assert.AreEqual(3, minion.Health, "Current player minion did not take 1 damage");
+		}
+
+		foreach (var minion in opponent.Board)
+		{
+			Assert.AreEqual(3, minion.Health, "Opponent minion did not take 1 damage");
+		}
+	}
 }

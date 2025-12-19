@@ -21,36 +21,52 @@ public class CastSpellAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (!IsValid(state, context, out var _)) {	yield break; }
+		if (!IsValid(state, context, out var _)) { yield break; }
 
-		if (context.SourceCard is SpellCard spellcard) {
-			foreach (SpellCastEffect spellCastEffect in spellcard.SpellCastEffects)
+		if (context.SourceCard is not SpellCard spellcard)
+		{
+			yield break;
+		}
+
+		foreach (SpellCastEffect spellCastEffect in spellcard.SpellCastEffects)
+		{
+			var selector = spellCastEffect.AffectedEntitySelector;
+
+			if (selector == null ||
+				selector.ResolutionTiming == TargetResolutionTiming.Once)
 			{
-				IEnumerable<IGameEntity> targets;
-				if (spellCastEffect.AffectedEntitySelector != null)
-				{
-					targets = spellCastEffect.AffectedEntitySelector.Select(state, context);
-				}
-				else
-				{
-					targets = [context.Target];
-				}
+				context.AffectedEntitySelector = selector;
+				var targets = ResolveTargets(state, context);
 
 				foreach (var target in targets)
 				{
-					ActionContext spellActionContext = new()
+					var spellActionContext = new ActionContext
 					{
 						SourcePlayer = context.SourcePlayer,
 						Source = context.Source,
 						Target = target,
 						SourceCard = context.SourceCard,
-						AffectedEntitySelector = spellCastEffect.AffectedEntitySelector,
+						AffectedEntitySelector = null,
 					};
 
 					foreach (var action in spellCastEffect.GameActions)
-					{
 						yield return (action, spellActionContext);
-					}
+				}
+			}
+			else
+			{
+				var spellActionContext = new ActionContext
+				{
+					SourcePlayer = context.SourcePlayer,
+					Source = context.Source,
+					Target = null,
+					SourceCard = context.SourceCard,
+					AffectedEntitySelector = selector,
+				};
+
+				foreach (var action in spellCastEffect.GameActions)
+				{
+					yield return (action, spellActionContext);
 				}
 			}
 		}

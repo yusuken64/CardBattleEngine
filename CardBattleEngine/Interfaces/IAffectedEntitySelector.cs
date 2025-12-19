@@ -2,6 +2,7 @@
 
 public interface IAffectedEntitySelector
 {
+	TargetResolutionTiming ResolutionTiming { get; set; }
 	Dictionary<string, object> EmitParams();
 	void ConsumeParams(Dictionary<string, object> Params);
 	IEnumerable<IGameEntity> Select(GameState state, ActionContext context);
@@ -9,6 +10,8 @@ public interface IAffectedEntitySelector
 
 public abstract class AffectedEntitySelectorBase : IAffectedEntitySelector
 {
+	public TargetResolutionTiming ResolutionTiming { get; set; }
+
 	public virtual void ConsumeParams(Dictionary<string, object> Params)
 	{
 	}
