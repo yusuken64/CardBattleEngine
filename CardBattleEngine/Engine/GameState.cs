@@ -70,8 +70,10 @@ public class GameState
 			}
 		}
 
+		List<IGameEntity> attackers = [player, ..player.Board];
+
 		// Attacks (creatures that can attack)
-		foreach (var attacker in player.Board)
+		foreach (var attacker in attackers)
 		{
 			if (!attacker.CanAttack())
 			{
@@ -151,10 +153,7 @@ public class GameState
 			}
 		}
 
-		// Attacks (creatures that can attack)
-		var attackers = new List<IGameEntity>();
-		attackers.AddRange([player as IGameEntity]);
-		attackers.AddRange(player.Board.Cast<IGameEntity>());
+		List<IGameEntity> attackers = [player, .. player.Board];
 
 		foreach (var attacker in attackers)
 		{
