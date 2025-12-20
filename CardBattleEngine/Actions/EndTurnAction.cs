@@ -20,7 +20,7 @@ public class EndTurnAction : GameActionBase
 			player.MissedAttackFromFrozen = false;
 		}
 
-		foreach (var minion in actionContext.SourcePlayer.Board)
+		foreach (var minion in player.Board)
 		{
 			if (minion.IsFrozen &&
 				minion.MissedAttackFromFrozen)

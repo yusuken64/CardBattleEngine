@@ -8,8 +8,9 @@ public class DamageAction : GameActionBase
 	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
 		reason = null;
-		// Valid if target is still alive / on board
-		return actionContext.Target != null && actionContext.Target.IsAlive;
+		return
+			actionContext.AffectedEntitySelector != null ||
+			(actionContext.Target != null && actionContext.Target.IsAlive);
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
@@ -48,6 +49,7 @@ public class DamageAction : GameActionBase
 			actionContext.DamageDealt = actualDamageDealt + armorBlocked;
 			actionContext.HealthDamageDealt = actualDamageDealt;
 			actionContext.ArmorDamageDealt = armorBlocked;
+			actionContext.Target = target;
 
 			// Lifesteal: heal source for actual damage dealt
 			if (source is not null &&

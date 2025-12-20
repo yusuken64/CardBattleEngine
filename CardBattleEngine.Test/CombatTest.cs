@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine.Test;
+﻿using System.Net.Http.Headers;
+
+namespace CardBattleEngine.Test;
 
 [TestClass]
 public class CombatTest
@@ -113,5 +115,44 @@ public class CombatTest
 		};
 		Assert.IsFalse(new AttackAction().IsValid(state, ctx3, out string _),
 			"Windfury: Third attack should NOT be valid");
+	}
+
+	[TestMethod]
+	public void EndOfTurnMinion()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		var opponent = state.OpponentOf(current);
+
+		var eotCard = new MinionCard("EndOfTurn", 1, 1, 1);
+		eotCard.Owner = current;
+		eotCard.MinionTriggeredEffects.Add(
+			new TriggeredEffect()
+			{
+				EffectTiming = EffectTiming.Pre,
+				EffectTrigger = EffectTrigger.OnTurnEnd,
+				AffectedEntitySelector = new TargetOperationSelector()
+				{
+					ResolutionTiming = TargetResolutionTiming.PerAction,
+					Operations = new List<ITargetOperation>()
+					{
+						new SelectBoardEntitiesOperation()
+						{
+							Group = TargetGroup.All,
+							Side = TeamRelationship.Enemy
+						}
+					}
+				},
+				GameActions = [new DamageAction() {
+					Damage = (Value)8
+				}]
+			});
+		current.Mana = 1;
+		current.Board.Add(new Minion(eotCard, current));
+
+		engine.Resolve(state, new ActionContext(), new EndTurnAction());
+
 	}
 }
