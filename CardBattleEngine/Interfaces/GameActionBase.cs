@@ -101,4 +101,26 @@ public class ActionContext
 	public int ArmorDamageDealt { get; internal set; }
 	public int ArmorGained { get; internal set; }
 	public Minion SummonedMinionSnapShot { get; internal set; }
+
+	public List<StatusDelta> ResolvedStatusChanges { get; } = new();
+}
+
+public class StatusDelta
+{
+	public IGameEntity Target { get; }
+	public StatusType Status { get; }
+	public bool Gained { get; }
+
+	public StatusDelta(IGameEntity target, StatusType status, bool gained)
+	{
+		Target = target;
+		Status = status;
+		Gained = gained;
+	}
+}
+
+public enum StatusType
+{
+	Freeze,
+	Stealth
 }

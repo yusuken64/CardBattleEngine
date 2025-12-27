@@ -21,6 +21,8 @@ public class FreezeAction : GameActionBase
 		{
 			minion.IsFrozen = true;
 			minion.MissedAttackFromFrozen = false;
+			context.ResolvedStatusChanges.Add(
+				new StatusDelta(minion, StatusType.Freeze, true));
 		}
 		else if (context.Target is Player hero)
 		{

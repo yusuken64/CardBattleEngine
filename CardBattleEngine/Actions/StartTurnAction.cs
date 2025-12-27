@@ -26,6 +26,8 @@ public class StartTurnAction : GameActionBase
 		{
 			player.IsFrozen = false;
 			player.MissedAttackFromFrozen = false;
+			actionContext.ResolvedStatusChanges.Add(
+				new StatusDelta(player, StatusType.Freeze, false));
 		}
 		else if (player.IsFrozen &&
 			!player.MissedAttackFromFrozen)
@@ -44,6 +46,8 @@ public class StartTurnAction : GameActionBase
 			{
 				minion.IsFrozen = false;
 				minion.MissedAttackFromFrozen = false;
+				actionContext.ResolvedStatusChanges.Add(
+					new StatusDelta(minion, StatusType.Freeze, false));
 			}
 			else if (minion.IsFrozen &&
 				!minion.MissedAttackFromFrozen)

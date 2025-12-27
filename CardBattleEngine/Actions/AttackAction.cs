@@ -1,5 +1,4 @@
 ﻿namespace CardBattleEngine;
-
 public class AttackAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.Attack;
@@ -16,6 +15,8 @@ public class AttackAction : GameActionBase
 			minion.HasSummoningSickness = false;
 			minion.IsStealth = false;
 			minion.AttacksPerformedThisTurn++;
+			context.ResolvedStatusChanges.Add(
+				new StatusDelta(minion, StatusType.Stealth, false));
 		}
 		else if (context.Source is Player player)
 		{
