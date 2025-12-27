@@ -16,6 +16,7 @@ public class DrawCardFromDeckAction : GameActionBase
 		{
 			var card = actionContext.SourcePlayer.Deck[0];
 			actionContext.SourcePlayer.Deck.RemoveAt(0);
+			actionContext.CardsLeftInDeck = actionContext.SourcePlayer.Deck.Count;
 			yield return (new GainCardAction() { Card = card }, actionContext);
 		}
 		else

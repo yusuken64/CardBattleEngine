@@ -103,6 +103,7 @@ public class ActionContext
 	public Minion SummonedMinionSnapShot { get; internal set; }
 
 	public List<StatusDelta> ResolvedStatusChanges { get; } = new();
+	public int CardsLeftInDeck { get; internal set; }
 }
 
 public class StatusDelta
