@@ -25,7 +25,10 @@ public class SpellCard : Card
 
 	public override Card Clone()
 	{
-		throw new NotImplementedException();
+		return new SpellCard(Name, ManaCost)
+		{
+			Id = Id,
+		};
 	}
 
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext actionContext)

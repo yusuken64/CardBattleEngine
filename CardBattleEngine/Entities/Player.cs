@@ -56,6 +56,7 @@ public class Player : IGameEntity, ITriggerSource
 	{
 		var clone = new Player(Name)
 		{
+			Id = Id,
 			MaxMana = MaxMana,
 			Health = Health,
 			Mana = Mana,

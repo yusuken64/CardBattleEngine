@@ -86,6 +86,7 @@ public class MinionCard : Card
 	{
 		return new MinionCard(Name, ManaCost, Attack, Health)
 		{
+			Id = Id,
 			Owner = Owner,
 			IsStealth = IsStealth,
 			HasCharge = HasCharge,

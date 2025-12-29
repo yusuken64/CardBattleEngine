@@ -29,7 +29,10 @@ public class WeaponCard : Card
 
 	public override Card Clone()
 	{
-		throw new NotImplementedException();
+		return new WeaponCard(Name, ManaCost, Attack, Durability)
+		{
+			Id = Id,
+		};
 	}
 
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext actionContext)

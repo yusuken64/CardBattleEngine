@@ -69,8 +69,6 @@ public class GameEngine
 			{
 				_actionQueue.Enqueue(trigger);
 			}
-
-			_eventBus.EvaluatePersistentEffects(gameState);
 		}
 		ActionResolvedCallback?.Invoke(gameState);
 	}
@@ -86,7 +84,8 @@ public class GameEngine
 		});
 
 		// Resolve action and enqueue returned side effects
-		var ret =  current.action.Resolve(gameState, current.context);
+		var ret =  current.action.Resolve(gameState, current.context).ToList();
+		_eventBus.EvaluatePersistentEffects(gameState);
 		ActionPlaybackCallback?.Invoke(gameState, current);
 		return ret;
 	}
