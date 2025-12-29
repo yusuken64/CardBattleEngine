@@ -1,4 +1,5 @@
-﻿namespace CardBattleEngine;
+﻿
+namespace CardBattleEngine;
 
 public class Weapon : ITriggerSource
 {
@@ -8,4 +9,15 @@ public class Weapon : ITriggerSource
 	public Player Owner { get; set; }
 	public IGameEntity Entity => Owner;
 	public List<TriggeredEffect> TriggeredEffects { get; set; }
+
+	internal Weapon Clone()
+	{
+		return new Weapon()
+		{
+			Attack = Attack,
+			Durability = Durability,
+			Owner = Owner,
+			TriggeredEffects = TriggeredEffects
+		};
+	}
 }

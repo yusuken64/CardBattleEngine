@@ -19,6 +19,7 @@ public class EndTurnAction : GameActionBase
 			player.IsFrozen = false;
 			player.MissedAttackFromFrozen = false;
 		}
+		player.Attack = 0;
 
 		foreach (var minion in player.Board)
 		{

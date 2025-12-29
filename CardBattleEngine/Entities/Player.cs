@@ -65,6 +65,8 @@ public class Player : IGameEntity, ITriggerSource
 			IsAlive = IsAlive
 		};
 
+		clone.EquippedWeapon = EquippedWeapon?.Clone();
+
 		// Deep copy the collections
 		foreach (var card in Deck)
 			clone.Deck.Add(card.Clone());
