@@ -28,6 +28,7 @@ public class SpellCard : Card
 		return new SpellCard(Name, ManaCost)
 		{
 			Id = Id,
+			Owner = Owner,
 		};
 	}
 

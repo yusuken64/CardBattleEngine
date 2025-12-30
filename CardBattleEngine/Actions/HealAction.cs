@@ -8,6 +8,11 @@ public class HealAction : GameActionBase
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		reason = null;
+		if (context.Target == null)
+		{
+			return false;
+		}
+
 		return context.Target.IsAlive &&
 			context.Target.Health < context.Target.MaxHealth;
 	}
