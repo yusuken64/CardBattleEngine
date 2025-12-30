@@ -129,8 +129,9 @@ public class Minion : IGameEntity, ITriggerSource
 			HasLifeSteal = this.HasLifeSteal,
 			HasReborn = this.HasReborn,
 			CannotAttack = this.CannotAttack,
+			IsFrozen = this.IsFrozen,
 
-			IsAlive = true,
+			IsAlive = IsAlive,
 		};
 	}
 	public void AddModifier(StatModifier modifier)
