@@ -62,7 +62,8 @@ public class Player : IGameEntity, ITriggerSource
 			Mana = Mana,
 			//EquippedWeapon = EquippedWeapon.Clone,
 			HasAttackedThisTurn = HasAttackedThisTurn,
-			IsAlive = IsAlive
+			IsAlive = IsAlive,
+			IsFrozen = IsFrozen
 		};
 
 		clone.EquippedWeapon = EquippedWeapon?.Clone();
