@@ -76,5 +76,19 @@ public class HeroAttackBehavior : IAttackBehavior
 					});
 			}
 		}
+		
+		// Defender deals retaliatory damage if possible
+		if (target is Minion defendingMinion && defendingMinion.IsAlive)
+		{
+			yield return (new DamageAction()
+			{
+				Damage = (Value)defendingMinion.Attack
+			}, new ActionContext()
+			{
+				SourcePlayer = defendingMinion.Owner,
+				Target = hero,
+				Source = defendingMinion,
+			});
+		}
 	}
 }
