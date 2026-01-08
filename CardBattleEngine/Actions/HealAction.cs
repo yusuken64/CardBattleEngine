@@ -5,29 +5,34 @@ public class HealAction : GameActionBase
 	public IValueProvider Amount { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.OnHealed;
 
-	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
+	public override bool IsValid(GameState gameState, ActionContext actionContext, out string reason)
 	{
 		reason = null;
-		if (context.Target == null)
-		{
-			return false;
-		}
-
-		return context.Target.IsAlive &&
-			context.Target.Health < context.Target.MaxHealth;
+		return
+			actionContext.AffectedEntitySelector != null ||
+			(actionContext.Target != null &&
+			 actionContext.Target.IsAlive &&
+			 actionContext.Target.Health < actionContext.Target.MaxHealth);
 	}
 
-	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
+	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		int healAmount = Amount.GetValue(state, context);
-		var originalHealth = context.Target.Health;
+		var targets = this.ResolveTargets(state, actionContext);
 
-		context.Target.Health = Math.Min(
-			context.Target.Health + healAmount,
-			context.Target.MaxHealth
-		);
+		int healTotal = 0;
+		foreach (var target in targets)
+		{
+			int healAmount = Amount.GetValue(state, actionContext);
+			var originalHealth = target.Health;
 
-		context.HealedAmount = context.Target.Health - originalHealth;
+			target.Health = Math.Min(
+				target.Health + healAmount,
+				target.MaxHealth
+			);
+
+			healTotal = target.Health - originalHealth;
+		}
+		actionContext.HealedAmount = healTotal;
 		return [];
 	}
 }

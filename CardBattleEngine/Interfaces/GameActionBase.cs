@@ -94,7 +94,7 @@ public class ActionContext
 	public HeroPower SourceHeroPower { get; set; }
 	public bool IsReborn { get; set; } = false;
 	public bool IsAuraEffect { get; internal set; }
-	public IGameEntity OriginalSource { get; internal set; }
+	public IGameEntity OriginalSource { get; set; }
 	public int DamageDealt { get; internal set; }
 	public int HealedAmount { get; internal set; }
 	public int HealthDamageDealt { get; internal set; }

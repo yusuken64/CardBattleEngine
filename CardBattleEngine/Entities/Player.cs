@@ -59,6 +59,7 @@ public class Player : IGameEntity, ITriggerSource
 			Id = Id,
 			MaxMana = MaxMana,
 			Health = Health,
+			MaxHealth = MaxHealth,
 			Mana = Mana,
 			//EquippedWeapon = EquippedWeapon.Clone,
 			HasAttackedThisTurn = HasAttackedThisTurn,

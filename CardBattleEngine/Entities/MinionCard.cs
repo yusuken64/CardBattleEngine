@@ -33,6 +33,7 @@ public class MinionCard : Card
 		ManaCost = cost;
 		Attack = attack;
 		Health = health;
+		MaxHealth = health;
 
 		OriginalManaCost = cost;
 		OriginalAttack = attack;
@@ -94,6 +95,7 @@ public class MinionCard : Card
 			HasPoisonous = HasPoisonous,
 			HasTaunt = HasTaunt,
 			MinionTribes = MinionTribes.ToList(),
+			MaxHealth = Health,
 		};
 	}
 

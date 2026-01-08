@@ -239,6 +239,11 @@ public class GameState
 		return all;
 	}
 
+	public IGameEntity GetEntityById(Guid id)
+	{
+		return GetAllEntities().FirstOrDefault(x => x.Id == id);
+	}
+
 	public IEnumerable<ITriggerSource> GetAllTriggerSources()
 	{
 		var all = new List<ITriggerSource>();
