@@ -12,13 +12,14 @@ internal class StartGameAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		state.Shuffle(actionContext.SourcePlayer.Deck);
+		if (!state.SkipShuffle)
+		{
+			state.Shuffle(actionContext.SourcePlayer.Deck);
+		}
 
-		return
-		[
-			(new DrawCardFromDeckAction(),actionContext),
-			(new DrawCardFromDeckAction(),actionContext),
-			(new DrawCardFromDeckAction(),actionContext),
-		];
+		for (int i = 0; i < state.InitialCards; i++)
+		{
+			yield return (new DrawCardFromDeckAction(), actionContext);
+		}
 	}
 }

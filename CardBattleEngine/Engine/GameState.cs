@@ -19,6 +19,9 @@ public class GameState
 	private readonly IRNG rNG;
 
 	public IReadOnlyList<Card> CardDB { get; private set; }
+	public bool SkipShuffle; // must be called before start game
+	public bool SkipMulligan; // must be called before start game
+	public int InitialCards = 3; // must be called before start game
 
 	public GameState(Player p1, Player p2, IRNG rng, IEnumerable<Card> cardDB)
 	{

@@ -117,7 +117,14 @@ public class GameEngine
 		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction());
 		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction());
 
-		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new PromptMulliganGameAction());
+		if (!gameState.SkipMulligan)
+		{
+			Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new PromptMulliganGameAction());
+		}
+		else
+		{
+			Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartTurnAction());
+		}
 
 		//Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartTurnAction());
 	}
