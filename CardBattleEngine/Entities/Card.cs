@@ -4,6 +4,7 @@ public abstract class Card : ITriggerSource, IGameEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 	public string Name { get; protected set; }
+	public string SpriteID { get; set; }//doesn't affectgameplay
 	public string Description { get; set; }//doesn't affectgameplay
 	public int ManaCost { get; protected set; }
 	public abstract CardType Type { get; }
