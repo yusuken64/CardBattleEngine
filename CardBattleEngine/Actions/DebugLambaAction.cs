@@ -12,9 +12,9 @@ public class DebugLambaAction : GameActionBase
 		return IsValidFunc(gameState, context);
 	}
 
-	public Func<GameState, ActionContext, IEnumerable<(IGameAction, ActionContext)>> ResolveFuce;
+	public Func<GameState, ActionContext, IEnumerable<(IGameAction, ActionContext)>> ResolveFunc;
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		return ResolveFuce(state, context);
+		return ResolveFunc(state, context);
 	}
 }

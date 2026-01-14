@@ -61,6 +61,7 @@ public class GainCardAction : GameActionBase
 	{
 		if (!IsValid(state, actionContext, out var _)) { return []; }
 
+		Card.Owner = actionContext.SourcePlayer;
 		actionContext.SourcePlayer.Hand.Add(Card);
 
 		return [];

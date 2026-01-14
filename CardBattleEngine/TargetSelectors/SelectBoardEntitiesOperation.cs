@@ -20,7 +20,7 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 			switch (Group)
 			{
 				case TargetGroup.Minions:
-					foreach (var minion in player.Board)
+					foreach (var minion in player.Board.Where(x => x.Health > 0))
 						if (!ExcludeSelf || minion != context.Source)
 							yield return minion;
 					break;
@@ -28,7 +28,7 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 					yield return player;
 					break;
 				case TargetGroup.All:
-					foreach (var minion in player.Board)
+					foreach (var minion in player.Board.Where(x => x.Health > 0))
 						yield return minion;
 					yield return player;
 					break;

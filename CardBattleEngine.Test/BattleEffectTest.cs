@@ -277,4 +277,40 @@ public class BattleEffectTest
 
 		Assert.AreEqual(2, testMinion.Attack);
 	}
+
+	[TestMethod]
+	public void DearthrattleGainCardTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		MinionCard testCard = new MinionCard("testCard", 1, 1, 10);
+		testCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Deathrattle,
+			EffectTiming = EffectTiming.Post,
+			TargetType = TargetingType.None,
+			GameActions = 
+			[
+				new GainCardAction()
+				{
+					Card = testCard,
+				}
+			],
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeSourcePlayer = true
+			}
+		});
+
+		Minion minion = new(testCard, player1);
+		player1.Board.Add(minion);
+
+		engine.Resolve(state, new ActionContext()
+		{
+			Target = minion
+		}, new DeathAction());
+	}
 }
