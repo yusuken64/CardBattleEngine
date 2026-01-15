@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Net.Http.Headers;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Security;
 
 namespace CardBattleEngine.Test;
@@ -15,11 +17,7 @@ public class WeaponTest
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
 
-		var weapon = new Weapon
-		{
-			Attack = 3,
-			Durability = 2
-		};
+		var weapon = new Weapon("test", 3, 2);
 
 		engine.Resolve(state, new ActionContext()
 		{
@@ -56,13 +54,13 @@ public class WeaponTest
 		var current = state.CurrentPlayer;
 		var opponent = state.OpponentOf(current);
 
-		var weapon = new Weapon
+		var weapon = new Weapon("test", 3, 2)
 		{
 			Attack = 3,
 			Durability = 2
 		};
-		
-		var weapon2 = new Weapon
+
+		var weapon2 = new Weapon("test", 1, 2)
 		{
 			Attack = 1,
 			Durability = 2
@@ -100,7 +98,7 @@ public class WeaponTest
 
 		bool deathrattleTriggered = false;
 
-		var weapon = new Weapon
+		var weapon = new Weapon("test", 1, 2)
 		{
 			Attack = 1,
 			Durability = 2,
@@ -158,5 +156,60 @@ public class WeaponTest
 		//Assert.IsTrue(weapon.IsDestroyed, "Weapon should be marked as destroyed after breaking.");
 		Assert.IsNull(attacker.EquippedWeapon, "Weapon should no longer be equipped after breaking.");
 		Assert.IsTrue(deathrattleTriggered, "Weapon deathrattle should trigger when it breaks.");
+	}
+
+	[TestMethod]
+	public void WeaponBuffTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var attacker = state.CurrentPlayer;
+		var defender = state.OpponentOf(attacker);
+
+		var weapon = new Weapon("test", 1, 2)
+		{
+			Attack = 1,
+			Durability = 2,
+		};
+		var current = state.CurrentPlayer;
+
+		current.EquipWeapon(weapon);
+
+		var spell = new SpellCard("deadly poison", 1);
+		spell.SpellCastEffects.Add(new SpellCastEffect()
+		{
+			GameActions = [new AddStatModifierAction() {
+				AttackChange = (Value)2
+			}],
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				Operations = [ new SelectWeaponOperation()
+				{
+					Side = TeamRelationship.Friendly
+				}],
+				ResolutionTiming = TargetResolutionTiming.Once
+			}
+		});
+		spell.Owner = current;
+		spell.Owner.Hand.Add(spell);
+
+		current.Mana = 1;
+
+		Assert.AreEqual(1, current.Attack);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				Source = current,
+				SourcePlayer = current,
+			},
+			new PlayCardAction()
+			{
+				Card = spell
+			});
+
+		Assert.AreEqual(3, current.Attack);
 	}
 }

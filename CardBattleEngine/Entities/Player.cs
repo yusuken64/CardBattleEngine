@@ -106,10 +106,11 @@ public class Player : IGameEntity, ITriggerSource
 		return clone;
 	}
 
-	internal void EquipWeapon(Weapon weapon)
+	public void EquipWeapon(Weapon weapon)
 	{
+		weapon.Owner = this;
 		this.EquippedWeapon = weapon;
-		RecalculateStats();
+		this.EquippedWeapon.RecalculateStats();
 	}
 
 	internal void UnequipWeapon()
@@ -118,7 +119,7 @@ public class Player : IGameEntity, ITriggerSource
 		RecalculateStats();
 	}
 
-	private void RecalculateStats()
+	internal void RecalculateStats()
 	{
 		Attack = EquippedWeapon?.Attack ?? 0;
 		//Health = card.Health;

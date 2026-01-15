@@ -50,11 +50,9 @@ public class WeaponCard : Card
 
 	public Weapon CreateWeapon()
 	{
-		return new Weapon()
+		return new Weapon(Name, Attack, Durability)
 		{
 			Name = Name,
-			Attack = Attack,
-			Durability = Durability,
 			TriggeredEffects = TriggeredEffects
 		};
 	}
