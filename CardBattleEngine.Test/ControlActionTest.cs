@@ -189,14 +189,6 @@ public class ControlActionTest
 							}]
 						}
 					},
-					new SequentialEffect()
-					{
-						GameActions = [new DestroyWeaponAction()],
-						AffectedEntitySelector = new ContextSelector()
-						{
-							IncludeSourcePlayer = true,
-						}
-					}
 				]
 			}],
 			AffectedEntitySelector = new ContextSelector()
@@ -204,12 +196,25 @@ public class ControlActionTest
 				IncludeSourcePlayer = true,
 			}
 		});
+		spellCard.SpellCastEffects.Add(new SpellCastEffect()
+		{
+			GameActions = [
+				new DeferredResolveAction()
+				{
+					Action = new DestroyWeaponAction(),
+					AffectedEntitySelector = new ContextSelector()
+					{
+						IncludeSourcePlayer = true
+					}
+				}],
+		});
 
 		spellCard.Owner = player1;
 		player1.Hand.Add(spellCard);
 
 		Assert.IsNotNull(player1.EquippedWeapon);
 		Assert.AreEqual(3, player2.Board.Count);
+		Assert.AreEqual(30, player2.Health);
 
 		engine.Resolve(
 			state,
@@ -225,5 +230,6 @@ public class ControlActionTest
 
 		Assert.AreEqual(1, player2.Board.Count);
 		Assert.IsNull(player1.EquippedWeapon);
+		Assert.AreEqual(28, player2.Health);
 	}
 }

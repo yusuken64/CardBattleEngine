@@ -19,10 +19,7 @@ public class SequentialAction : GameActionBase
 			foreach (var action in effect.GameActions)
 			{
 				context.AffectedEntitySelector = effect.AffectedEntitySelector;
-				foreach(var result in action.Resolve(state, context))
-				{
-					yield return result;
-				}
+				yield return (action, context);
 			}
 		}
 	}

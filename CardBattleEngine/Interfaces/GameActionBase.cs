@@ -105,7 +105,7 @@ public class ActionContext
 	public int ArmorGained { get; internal set; }
 	public Minion SummonedMinionSnapShot { get; internal set; }
 
-	public List<StatusDelta> ResolvedStatusChanges { get; } = new();
+	public List<StatusDelta> ResolvedStatusChanges { get; internal set; } = new();
 	public int CardsLeftInDeck { get; internal set; }
 
 	internal void SetVar(string variableName, object value)
@@ -129,6 +129,28 @@ public class ActionContext
 		return _variables.TryGetValue(variableName, out var value)
 			? value
 			: 0; // Missing vars default to 0
+	}
+
+	public ActionContext ShallowCopy()
+	{
+		var newContext = new ActionContext(this);
+		newContext.SummonedMinionSnapShot = this.SummonedMinionSnapShot;
+		newContext.ArmorGained = this.ArmorGained;
+		newContext.ArmorDamageDealt = this.ArmorDamageDealt;
+		newContext.HealthDamageDealt = this.HealthDamageDealt;
+		newContext.HealedAmount = this.HealedAmount;
+		newContext.DamageDealt = this.DamageDealt;
+		newContext.SourceHeroPower = this.SourceHeroPower;
+		newContext.IsAuraEffect = this.IsAuraEffect;
+		newContext.IsReborn = this.IsReborn;
+		newContext.ResolvedStatusChanges = this.ResolvedStatusChanges;
+		newContext.PlayIndex = this.PlayIndex;
+		newContext.SummonedMinion = this.SummonedMinion;
+		newContext.OriginalAction = this.OriginalAction;
+		newContext.OriginalSource = this.OriginalSource;
+		newContext.CardsLeftInDeck = this.CardsLeftInDeck;
+
+		return newContext;
 	}
 }
 
