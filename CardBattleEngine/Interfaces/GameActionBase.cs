@@ -77,6 +77,8 @@ public class ActionContext
 
 	public IAffectedEntitySelector AffectedEntitySelector;
 
+	private Dictionary<string, object> _variables = new();
+
 	public ActionContext() { }
 
 	public ActionContext(ActionContext context)
@@ -86,6 +88,7 @@ public class ActionContext
 		this.Source = context.Source;
 		this.Target = context.Target;
 		this.Modifier = context.Modifier;
+		this._variables = new(context._variables);
 	}
 
 	public IGameAction OriginalAction { get; internal set; }
@@ -104,6 +107,29 @@ public class ActionContext
 
 	public List<StatusDelta> ResolvedStatusChanges { get; } = new();
 	public int CardsLeftInDeck { get; internal set; }
+
+	internal void SetVar(string variableName, object value)
+	{
+		if (string.IsNullOrEmpty(variableName))
+			throw new ArgumentException(nameof(variableName));
+
+		// For now: numbers only
+		if (value is not int)
+			throw new InvalidOperationException(
+				$"Variable '{variableName}' must be an int");
+
+		_variables[variableName] = value;
+	}
+
+	internal object GetVar(string variableName)
+	{
+		if (string.IsNullOrEmpty(variableName))
+			throw new ArgumentException(nameof(variableName));
+
+		return _variables.TryGetValue(variableName, out var value)
+			? value
+			: 0; // Missing vars default to 0
+	}
 }
 
 public class StatusDelta
