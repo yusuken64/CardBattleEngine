@@ -2,7 +2,7 @@
 
 public class VariableValue : IValueProvider
 {
-	public string VariableName;
+	public string VariableName { get; set; }
 
 	public int GetValue(GameState state, ActionContext context)
 	{

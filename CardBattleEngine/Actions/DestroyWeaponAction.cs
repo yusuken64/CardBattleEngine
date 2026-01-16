@@ -6,62 +6,68 @@ public class DestroyWeaponAction : GameActionBase
 
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
-		if (context.Target is Player player)
-		{
-			reason = null;
-			return player.EquippedWeapon != null;
-		}
+		var destroyWeaponTargets = this.ResolveTargets(gameState, context);
+		var valid = destroyWeaponTargets.Any(x => x is Player player && player.EquippedWeapon != null);
 
 		reason = null;
-		return false;
+		return valid;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (context.Target is not Player player)
-			yield break;
+		var destroyWeaponTargets = this.ResolveTargets(state, context);
 
-		var weapon = player.EquippedWeapon;
-		if (weapon == null || weapon.TriggeredEffects == null)
-			yield break;
-
-		// Trigger deathrattle effects
-		foreach (var effect in weapon.TriggeredEffects
-			.Where(e => e.EffectTrigger == EffectTrigger.Deathrattle))
+		foreach (var destroyWeaponTarget in destroyWeaponTargets)
 		{
-			foreach (var gameAction in effect.GameActions)
+			if (destroyWeaponTarget is not Player player)
+				yield break;
+
+			context.Target = player;
+			var weapon = player.EquippedWeapon;
+			if (weapon == null || weapon.TriggeredEffects == null)
 			{
-				// Build a selector context for the effect
-				var selectorContext = new ActionContext
-				{
-					SourcePlayer = weapon.Owner,
-					Source = weapon.Owner,
-				};
+				player.UnequipWeapon();
+				yield break;
+			}
 
-				// Get the targets for this effect
-				IEnumerable<IGameEntity> targets;
-				if (effect.AffectedEntitySelector != null)
+			// Trigger deathrattle effects
+			foreach (var effect in weapon.TriggeredEffects
+				.Where(e => e.EffectTrigger == EffectTrigger.Deathrattle))
+			{
+				foreach (var gameAction in effect.GameActions)
 				{
-					targets = effect.AffectedEntitySelector.Select(state, selectorContext);
-				}
-				else
-				{
-					targets = [weapon.Owner];
-				}
-
-				foreach (var target in targets)
-				{
-					yield return (gameAction, new ActionContext
+					// Build a selector context for the effect
+					var selectorContext = new ActionContext
 					{
 						SourcePlayer = weapon.Owner,
 						Source = weapon.Owner,
-						Target = target
-					});
+					};
+
+					// Get the targets for this effect
+					IEnumerable<IGameEntity> targets;
+					if (effect.AffectedEntitySelector != null)
+					{
+						targets = effect.AffectedEntitySelector.Select(state, selectorContext);
+					}
+					else
+					{
+						targets = [weapon.Owner];
+					}
+
+					foreach (var target in targets)
+					{
+						yield return (gameAction, new ActionContext
+						{
+							SourcePlayer = weapon.Owner,
+							Source = weapon.Owner,
+							Target = target
+						});
+					}
 				}
 			}
-		}
 
-		// Unequip weapon after triggering effects
-		player.UnequipWeapon();
+			// Unequip weapon after triggering effects
+			player.UnequipWeapon();
+		}
 	}
 }

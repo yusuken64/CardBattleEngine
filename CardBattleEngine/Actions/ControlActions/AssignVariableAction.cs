@@ -2,8 +2,8 @@
 
 public class AssignVariableAction : GameActionBase
 {
-	public string VariableName;
-	public IValueProvider Value;
+	public string VariableName { get; set; }
+	public IValueProvider Value { get; set; }
 
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 

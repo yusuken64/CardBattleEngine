@@ -1,9 +1,10 @@
 ﻿
 namespace CardBattleEngine;
 
-public class SequentialAction : ControlActionBase
+public class SequentialAction : GameActionBase
 {
-	public override EffectTrigger EffectTrigger => throw new NotImplementedException();
+	public List<SequentialEffect> Effects { get; set; }
+	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public override bool IsValid(GameState state, ActionContext context, out string reason)
 	{
@@ -13,9 +14,22 @@ public class SequentialAction : ControlActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		foreach (var action in ChildActions)
+		foreach (var effect in Effects)
 		{
-			yield return (action, context);
+			foreach (var action in effect.GameActions)
+			{
+				context.AffectedEntitySelector = effect.AffectedEntitySelector;
+				foreach(var result in action.Resolve(state, context))
+				{
+					yield return result;
+				}
+			}
 		}
 	}
+}
+
+public class SequentialEffect
+{
+	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
+	public List<IGameAction> GameActions { get; set; } = new();
 }
