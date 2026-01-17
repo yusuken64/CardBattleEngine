@@ -31,6 +31,7 @@ public class HealAction : GameActionBase
 			);
 
 			healTotal = target.Health - originalHealth;
+			actionContext.AffectedEntities.Add((target, healTotal));
 		}
 		actionContext.HealedAmount = healTotal;
 		return [];

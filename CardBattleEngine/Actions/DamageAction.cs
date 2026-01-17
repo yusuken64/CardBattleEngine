@@ -50,6 +50,7 @@ public class DamageAction : GameActionBase
 			actionContext.HealthDamageDealt = actualDamageDealt;
 			actionContext.ArmorDamageDealt = armorBlocked;
 			actionContext.Target = target;
+			actionContext.AffectedEntities.Add((target, actionContext.DamageDealt));
 
 			// Lifesteal: heal source for actual damage dealt
 			if (source is not null &&
