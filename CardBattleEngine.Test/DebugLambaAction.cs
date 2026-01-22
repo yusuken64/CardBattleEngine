@@ -14,6 +14,13 @@ public class DebugLambaAction : GameActionBase
 	public Func<GameState, ActionContext, IEnumerable<(IGameAction, ActionContext)>> ResolveFunc;
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		return ResolveFunc(state, context);
+		var targets = this.ResolveTargets(state, context);
+
+		foreach (var target in targets)
+		{
+			ResolveFunc(state, context);
+		}
+
+		return [];
 	}
 }

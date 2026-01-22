@@ -185,6 +185,63 @@ public class BattleEffectTest
 	}
 
 	[TestMethod]
+	public void CleaveTest2()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		var testCard = new MinionCard("Test", 1, 5, 5);
+		player2.Board.Add(new Minion(testCard, player2) { Name = "minion1" });
+
+		var cleaveCard = new MinionCard("Cleave", 1, 4, 4);
+		cleaveCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			TargetType = TargetingType.None,
+			EffectTiming = EffectTiming.Pre,
+			EffectTrigger = EffectTrigger.Attack,
+			Condition = new OriginalSourceCondition(),
+			GameActions =
+			[
+				new DeferredResolveAction()
+				{
+					Action = new DamageAction()
+					{
+						Damage = new StatValue()
+						{
+							EntityStat = Stat.Attack,
+							EntityContextProvider = ContextProvider.Source
+						}
+					},
+					AffectedEntitySelector = new TargetOperationSelector()
+					{
+						Operations =
+						[new CleaveOperation()
+						{
+							IncludeCenter = false
+						}]
+					}
+				}
+			],
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeTarget = true
+			}
+		});
+		cleaveCard.HasCharge = true;
+		player1.Board.Add(new Minion(cleaveCard, player1));
+
+		var attackAction = new AttackAction();
+		var actionContext = new ActionContext()
+		{
+			Source = player1.Board[0],
+			Target = player2.Board[0],
+		};
+		engine.Resolve(state, actionContext, attackAction);
+	}
+
+	[TestMethod]
 	public void SummonTest()
 	{
 		var state = GameFactory.CreateTestGame();

@@ -46,6 +46,13 @@ public class MinionCard : Card
 		{
 			Card = this
 		};
+
+		if (summonMinionAction.IsValid(state, context, out _))
+		{
+			var minion = new Minion(summonMinionAction.Card, context.SourcePlayer);
+			context.SummonedMinion = minion;
+		}
+
 		yield return (summonMinionAction, context);
 
 		int originalIndex = context.PlayIndex;
@@ -71,7 +78,7 @@ public class MinionCard : Card
 				var effectContext = new ActionContext
 				{
 					SourceCard = this,
-					Source = this,
+					Source = context.SummonedMinion,
 					SourcePlayer = context.SourcePlayer,
 					Target = target,
 					PlayIndex = originalIndex

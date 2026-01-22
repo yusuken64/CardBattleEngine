@@ -27,7 +27,8 @@ public class SummonMinionAction : GameActionBase
 			return [];
 
 		// Create minion entity
-		var minion = new Minion(Card, actionContext.SourcePlayer);
+		var minion = actionContext.SummonedMinion
+			?? new Minion(Card, actionContext.SourcePlayer);
 
 		var list = actionContext.SourcePlayer.Board;
 		int requested = actionContext.PlayIndex + IndexOffset;

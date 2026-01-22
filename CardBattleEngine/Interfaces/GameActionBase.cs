@@ -52,7 +52,7 @@ public abstract class GameActionBase : IGameAction
 
 		// Snapshot to avoid mutation during iteration
 		return targets
-			.Where(t => t != null && t.IsAlive)
+			.Where(t => t != null && t.IsAlive && t.Health > 0)
 			.ToList();
 	}
 	public virtual void ConsumeParams(Dictionary<string, object> actionParam)

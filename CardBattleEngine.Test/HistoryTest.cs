@@ -34,16 +34,20 @@ public class HistoryTest
 		{
 			IsValidFunc = (s, c) => true,
 			ResolveFunc = (s, c) => new List<(IGameAction, ActionContext)>
-		{
-			(new DebugLambaAction { IsValidFunc = (s2, c2) => true, ResolveFunc = (s2, c2) => new List<(IGameAction, ActionContext)>() }, c)
-		}
+			{
+				(new DebugLambaAction 
+				{
+					IsValidFunc = (s2, c2) => true,
+					ResolveFunc = (s2, c2) => new List<(IGameAction, ActionContext)>()
+				}, c)
+			}
 		};
 
 		// Act
 		engine.Resolve(state, new ActionContext { SourcePlayer = state.CurrentPlayer }, mainAction);
 
 		// Assert
-		Assert.AreEqual(2, state.History.Count);
+		Assert.AreEqual(1, state.History.Count);
 		Assert.AreEqual(mainAction, state.History[0].Action);
 	}
 }

@@ -8,9 +8,9 @@ public class DamageAction : GameActionBase
 	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
 		reason = null;
-		return
-			actionContext.AffectedEntitySelector != null ||
-			(actionContext.Target != null && actionContext.Target.IsAlive);
+
+		var targets = this.ResolveTargets(state, actionContext);
+		return targets.Any();
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
