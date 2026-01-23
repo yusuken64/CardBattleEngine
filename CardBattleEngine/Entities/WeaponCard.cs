@@ -53,7 +53,8 @@ public class WeaponCard : Card
 		return new Weapon(Name, Attack, Durability)
 		{
 			Name = Name,
-			TriggeredEffects = TriggeredEffects
+			TriggeredEffects = TriggeredEffects,
+			OriginalCard = this
 		};
 	}
 

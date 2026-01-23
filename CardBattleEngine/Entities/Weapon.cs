@@ -17,6 +17,8 @@ public class Weapon : ITriggerSource, IGameEntity
 
 	public IAttackBehavior AttackBehavior => (Owner as IGameEntity).AttackBehavior;
 
+	public WeaponCard OriginalCard { get; internal set; }
+
 	private List<StatModifier> _modifiers = new();
 	private List<StatModifier> _auraModifiers = new();
 
@@ -109,7 +111,8 @@ public class Weapon : ITriggerSource, IGameEntity
 			Attack = Attack,
 			Durability = Durability,
 			Owner = Owner,
-			TriggeredEffects = TriggeredEffects
+			TriggeredEffects = TriggeredEffects,
+			OriginalCard = OriginalCard,
 		};
 	}
 }
