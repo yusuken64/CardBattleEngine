@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 // Basic effect/action that can be executed on a GameState
 public interface IGameAction

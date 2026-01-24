@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 public class TargetOperationSelector : AffectedEntitySelectorBase
 {
 	public List<ITargetOperation> Operations { get; set; } = new();

@@ -1,6 +1,4 @@
-﻿using CardBattleEngine;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class PlayCardAction : GameActionBase
 {
@@ -13,6 +11,11 @@ public class PlayCardAction : GameActionBase
 		if (!player.Hand.Contains(Card))
 		{
 			reason = null;
+			return false;
+		}
+
+		if (Card.CastRestriction?.CanPlay(state, actionContext.SourcePlayer, Card, out reason) == false)
+		{
 			return false;
 		}
 

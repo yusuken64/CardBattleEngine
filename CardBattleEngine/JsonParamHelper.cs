@@ -1,7 +1,4 @@
-﻿using CardBattleEngine;
-using Newtonsoft.Json.Linq;
-
-public static class JsonParamHelper
+﻿public static class JsonParamHelper
 {
 	public static Dictionary<string, object> Normalize(Dictionary<string, object> raw)
 	{

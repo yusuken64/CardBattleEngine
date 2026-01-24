@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class SummonMinionAction : GameActionBase
 {

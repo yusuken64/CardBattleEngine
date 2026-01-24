@@ -1,6 +1,4 @@
-﻿using System.Transactions;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class DeferredResolveAction : GameActionBase
 {

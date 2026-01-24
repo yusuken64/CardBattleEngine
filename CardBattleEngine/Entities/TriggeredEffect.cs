@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json.Converters;
 
 namespace CardBattleEngine;
 
@@ -7,7 +6,7 @@ public class TriggeredEffect : ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
-	public TargetingType TargetType { get; set; }
+	public TargetingType TargetType { get; set; } //TODO remove
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
