@@ -107,6 +107,7 @@ public class MinionAttackBehavior : IAttackBehavior
 			SourcePlayer = attackingMinion.Owner,
 			Source = attackingMinion,
 			Target = target,
+			IsAttack = true,
 		});
 
 		// Defender deals retaliatory damage if possible

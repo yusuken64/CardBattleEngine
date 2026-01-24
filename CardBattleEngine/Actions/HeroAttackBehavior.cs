@@ -54,7 +54,8 @@ public class HeroAttackBehavior : IAttackBehavior
 			{
 				SourcePlayer = hero,
 				Source = hero,
-				Target = target
+				Target = target,
+				IsAttack = true,
 			});
 
 		hero.HasAttackedThisTurn = true;

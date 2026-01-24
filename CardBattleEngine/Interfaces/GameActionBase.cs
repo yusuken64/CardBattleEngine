@@ -90,6 +90,7 @@ public class ActionContext
 		this.Modifier = context.Modifier;
 		this._variables = new(context._variables);
 		this.AffectedEntities = [.. context.AffectedEntities];
+		this.IsAttack = IsAttack;
 	}
 
 	public IGameAction OriginalAction { get; internal set; }
@@ -109,6 +110,7 @@ public class ActionContext
 	public List<StatusDelta> ResolvedStatusChanges { get; internal set; } = new();
 	public int CardsLeftInDeck { get; internal set; }
 	public List<(IGameEntity, int)> AffectedEntities { get; internal set; } = new();
+	public bool IsAttack { get; internal set; }
 
 	internal void SetVar(string variableName, object value)
 	{
@@ -151,6 +153,7 @@ public class ActionContext
 		newContext.OriginalAction = this.OriginalAction;
 		newContext.OriginalSource = this.OriginalSource;
 		newContext.CardsLeftInDeck = this.CardsLeftInDeck;
+		newContext.IsAttack = this.IsAttack;
 
 		return newContext;
 	}
