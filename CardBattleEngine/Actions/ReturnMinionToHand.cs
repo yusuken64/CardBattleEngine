@@ -2,8 +2,8 @@
 
 public class ReturnMinionToCard : GameActionBase
 {
-	public TeamRelationship TeamRelationship;
-	public ZoneType ZoneType;
+	public TeamRelationship TeamRelationship { get; set; }
+	public ZoneType ZoneType { get; set; }
 
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
@@ -15,7 +15,7 @@ public class ReturnMinionToCard : GameActionBase
 			return false;
 		}
 
-		if (ZoneType != ZoneType.Hand ||
+		if (ZoneType != ZoneType.Hand &&
 			ZoneType != ZoneType.Deck)
 		{
 			reason = null;
@@ -53,6 +53,7 @@ public class ReturnMinionToCard : GameActionBase
 					(new GainCardAction() { Card = minion.OriginalCard.Clone() },
 					new ActionContext(context)
 					{
+						SourcePlayer = owner,
 						Target = owner
 					});
 

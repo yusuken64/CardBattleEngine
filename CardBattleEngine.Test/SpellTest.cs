@@ -161,4 +161,49 @@ public class SpellTest
 			Assert.AreEqual(3, minion.Health, "Opponent minion did not take 1 damage");
 		}
 	}
+
+
+	[TestMethod]
+	public void SapTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 7;
+		var opponent = state.OpponentOf(current);
+
+		var card = new MinionCard("Test", 1, 4, 4);
+		current.Board.Add(new Minion(card, opponent));
+		opponent.Board.Add(new Minion(card, opponent));
+
+		var spell = new SpellCard("Sap", 1);
+		spell.SpellCastEffects.Add(new SpellCastEffect()
+		{
+			GameActions = [ new ReturnMinionToCard() 
+			{
+				TeamRelationship = TeamRelationship.Friendly,
+				ZoneType = ZoneType.Hand
+			} ],
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeTarget = true
+			}
+		});
+
+		ActionContext context = new()
+		{
+			SourceCard = spell,
+			Source = current,
+			SourcePlayer = current,
+			Target = opponent.Board[0]
+		};
+
+		Assert.AreEqual(0, opponent.Hand.Count(), "Hand is empty");
+
+		engine.Resolve(state, context, new CastSpellAction());
+		
+		Assert.AreEqual(0, opponent.Board.Count(), "Minion should return to hand");
+		Assert.AreEqual(1, opponent.Hand.Count(), "Minion should return to hand");
+	}
 }

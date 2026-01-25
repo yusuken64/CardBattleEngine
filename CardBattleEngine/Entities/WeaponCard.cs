@@ -33,6 +33,8 @@ public class WeaponCard : Card
 		{
 			Id = Id,
 			Owner = Owner,
+			SpriteID = SpriteID,
+			Description = Description,
 		};
 	}
 

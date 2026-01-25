@@ -103,6 +103,8 @@ public class MinionCard : Card
 			HasTaunt = HasTaunt,
 			MinionTribes = MinionTribes.ToList(),
 			MaxHealth = Health,
+			SpriteID = SpriteID,
+			Description = Description,
 		};
 	}
 

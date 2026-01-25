@@ -28,6 +28,8 @@ public class SpellCard : Card
 		{
 			Id = Id,
 			Owner = Owner,
+			SpriteID = SpriteID,
+			Description = Description,
 		};
 	}
 
