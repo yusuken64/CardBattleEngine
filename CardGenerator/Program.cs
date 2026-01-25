@@ -29,7 +29,6 @@
 var cardID = "CardID";
 var card = new SpellCard("FlameStrike", 5)
 {
-	TargetingType = TargetingType.None,
 };
 card.SpellCastEffects.Add(new SpellCastEffect()
 {

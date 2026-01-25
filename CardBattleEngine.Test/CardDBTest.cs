@@ -38,7 +38,6 @@ public class CardDBTest
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetingType.AnyEnemy,
 			GameActions = new List<IGameAction>()
 			{
 				new DamageAction()
@@ -60,8 +59,6 @@ public class CardDBTest
 		Assert.AreEqual(1, loadedMinion.TriggeredEffects.Count());
 		Assert.AreEqual(EffectTrigger.Battlecry, loadedMinion.TriggeredEffects[0].EffectTrigger);
 		Assert.AreEqual(EffectTiming.Post, loadedMinion.TriggeredEffects[0].EffectTiming);
-		Assert.AreEqual(TargetingType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
-		Assert.AreEqual(TargetingType.AnyEnemy, loadedMinion.TriggeredEffects[0].TargetType);
 		Assert.AreEqual(1, loadedMinion.TriggeredEffects[0].GameActions.Count());
 		Assert.IsInstanceOfType(loadedMinion.TriggeredEffects[0].GameActions[0], typeof(DamageAction));
 		Assert.AreEqual(1, ((DamageAction)loadedMinion.TriggeredEffects[0].GameActions[0]).Damage.GetValue(testGame, null));
@@ -109,7 +106,6 @@ public class CardDBTest
 		var effect = card.TriggeredEffects[0];
 		Assert.AreEqual(EffectTrigger.Battlecry, effect.EffectTrigger);
 		Assert.AreEqual(EffectTiming.Post, effect.EffectTiming);
-		Assert.AreEqual(TargetingType.AnyEnemy, effect.TargetType);
 		Assert.AreEqual(1, effect.GameActions.Count);
 		Assert.IsInstanceOfType(effect.GameActions[0], typeof(DamageAction));
 	}
@@ -157,7 +153,6 @@ public class CardDBTest
 	public void CreateSpellDefinitionTest()
 	{
 		SpellCard card = new SpellCard("TestSpell_DrawCards", 1);
-		card.TargetingType = TargetingType.None;
 		card.SpellCastEffects.Add(new SpellCastEffect());
 
 		card.SpellCastEffects[0] = new SpellCastEffect()
@@ -178,7 +173,6 @@ public class CardDBTest
 	{
 		// Arrange
 		SpellCard card = new SpellCard("TestSpell_AOEDamage", 1);
-		card.TargetingType = TargetingType.None;
 
 		card.SpellCastEffects.Add(new SpellCastEffect()
 		{
@@ -217,7 +211,6 @@ public class CardDBTest
 		Assert.AreEqual("SaveTestSpell", spellDef.Id, "Card Id should match");
 		Assert.AreEqual(card.Name, spellDef.Name, "Card name should match");
 		Assert.AreEqual(card.ManaCost, spellDef.Cost, "Mana cost should match");
-		Assert.AreEqual(TargetingType.None, spellDef.TargetingType, "TargetingType should match");
 		Assert.AreEqual(CardType.Spell, spellDef.Type, "Type should be Spell");
 
 		// Check that SpellCastEffectDefinitions was serialized correctly
@@ -247,7 +240,6 @@ public class CardDBTest
 	{
 		// Arrange
 		SpellCard card = new SpellCard("TestSpell_DealDamage", 1);
-		card.TargetingType = TargetingType.Any;
 		card.SpellCastEffects.Add(new SpellCastEffect()
 		{
 			GameActions = new()
@@ -270,7 +262,6 @@ public class CardDBTest
 		Assert.AreEqual("SaveTestSpell", spellDef.Id, "Card Id should match");
 		Assert.AreEqual(card.Name, spellDef.Name, "Card name should match");
 		Assert.AreEqual(card.ManaCost, spellDef.Cost, "Mana cost should match");
-		Assert.AreEqual(card.TargetingType, spellDef.TargetingType, "TargetingType should match");
 		Assert.AreEqual(CardType.Spell, spellDef.Type, "Type should be Spell");
 
 		// Check that SpellCastEffects were serialized and deserialized correctly

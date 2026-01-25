@@ -22,36 +22,36 @@ public class HumanAgent : IGameAgent
 		var context = new ActionContext();
 
 		// Step 2: if the action requires a target, prompt for one
-		if (selectedAction.Item1 is PlayCardAction playCardAction &&
-			playCardAction.Card.TriggeredEffects.Any(x => x.TargetType != TargetingType.None))
-		{
-			var effect = playCardAction.Card.TriggeredEffects[0];
-			var possibleTargets = state.GetValidTargets(_player, effect.TargetType).ToList();
-			if (possibleTargets.Count > 0)
-			{
-				var selectedTarget = SelectFromList(possibleTargets, "Select a target:");
-				context.SourcePlayer = _player;
-				context.SourceCard = playCardAction.Card;
-				context.Target = selectedTarget as IGameEntity;
-			}
-		}
-		else if (selectedAction.Item1 is AttackAction attackAction)
-		{
-			//var effect = attackAction.Card.TriggeredEffects[0];
-			var possibleTargets = state.GetValidTargets(_player, TargetingType.AnyEnemy).ToList();
-			if (possibleTargets.Count > 0)
-			{
-				var selectedTarget = SelectFromList(possibleTargets, "Select a target:");
-				context.SourcePlayer = _player;
-				context.SourceCard = null;
-				context.Source = selectedAction.Item2.Source;
-				context.Target = selectedTarget as IGameEntity;
-			}
-		}
-		else
-		{
-			context .SourcePlayer = _player;
-		}
+		//if (selectedAction.Item1 is PlayCardAction playCardAction &&
+		//	playCardAction.Card.TriggeredEffects.Any(x => x.TargetType != TargetingType.None))
+		//{
+		//	var effect = playCardAction.Card.TriggeredEffects[0];
+		//	var possibleTargets = state.GetValidTargets(_player, effect.TargetType).ToList();
+		//	if (possibleTargets.Count > 0)
+		//	{
+		//		var selectedTarget = SelectFromList(possibleTargets, "Select a target:");
+		//		context.SourcePlayer = _player;
+		//		context.SourceCard = playCardAction.Card;
+		//		context.Target = selectedTarget as IGameEntity;
+		//	}
+		//}
+		//else if (selectedAction.Item1 is AttackAction attackAction)
+		//{
+		//	//var effect = attackAction.Card.TriggeredEffects[0];
+		//	var possibleTargets = state.GetValidTargets(_player, TargetingType.AnyEnemy).ToList();
+		//	if (possibleTargets.Count > 0)
+		//	{
+		//		var selectedTarget = SelectFromList(possibleTargets, "Select a target:");
+		//		context.SourcePlayer = _player;
+		//		context.SourceCard = null;
+		//		context.Source = selectedAction.Item2.Source;
+		//		context.Target = selectedTarget as IGameEntity;
+		//	}
+		//}
+		//else
+		//{
+		//	context .SourcePlayer = _player;
+		//}
 
 		selectedAction.Item2 = context;
 		return selectedAction;

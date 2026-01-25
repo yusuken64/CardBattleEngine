@@ -274,49 +274,6 @@ public class GameState
 		return all;
 	}
 
-	public List<ITriggerSource> GetValidTargets(ITriggerSource entity, TargetingType type)
-	{
-		var targets = new List<ITriggerSource>();
-		var opponent = OpponentOf(entity.Entity.Owner);
-
-		switch (type)
-		{
-			case TargetingType.EnemyHero:
-				targets.Add(opponent);
-				break;
-
-			case TargetingType.EnemyMinion:
-				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
-				break;
-
-			case TargetingType.AnyEnemy:
-				targets.Add(opponent);
-				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
-				break;
-
-			case TargetingType.FriendlyHero:
-				targets.Add(entity.Entity.Owner);
-				break;
-
-			case TargetingType.FriendlyMinion:
-				targets.AddRange(entity.Entity.Owner.Board.Where(m => m.IsAlive));
-				break;
-
-			case TargetingType.Self:
-				if (entity != null) targets.Add(entity);
-				break;
-
-			case TargetingType.Any:
-				targets.Add(entity);
-				targets.AddRange(entity.Entity.Owner.Board.Where(m => m.IsAlive));
-				targets.Add(opponent);
-				targets.AddRange(opponent.Board.Where(m => m.IsAlive));
-				break;
-		}
-
-		return targets;
-	}
-	
 	public T ChooseRandom<T>(IReadOnlyList<T> options)
 	{
 		if (options.Count == 0) return default!;

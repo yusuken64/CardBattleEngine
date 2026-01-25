@@ -24,7 +24,6 @@ public class CostReduction
 		mountainGiantCard.TriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Aura,
-			TargetType = TargetingType.None,
 			EffectTiming = EffectTiming.Persistant,
 			AffectedEntitySelector = new ContextSelector()
 			{

@@ -6,7 +6,6 @@ public class TriggeredEffect : ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
-	public TargetingType TargetType { get; set; } //TODO remove
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
@@ -17,7 +16,6 @@ public class TriggeredEffect : ITriggeredEffect
 		{
 			EffectTiming = this.EffectTiming,
 			EffectTrigger = this.EffectTrigger,
-			TargetType = TargetType,
 			AffectedEntitySelector = AffectedEntitySelector,
 			Condition = Condition,
 			GameActions = GameActions.ToList(), //TODO implement deep clone for effects
@@ -38,21 +36,6 @@ public interface ITriggeredEffect
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
 	public ITriggerCondition Condition { get; set; }
-}
-
-
-[JsonConverter(typeof(StringEnumConverter))]
-public enum TargetingType
-{
-	Any,
-	FriendlyMinion,
-	FriendlyHero,
-	EnemyMinion,
-	EnemyHero,
-	AnyEnemy,
-	Self,
-	None, //Spell with not target
-	AnyMinion,
 }
 
 [JsonConverter(typeof(StringEnumConverter))]

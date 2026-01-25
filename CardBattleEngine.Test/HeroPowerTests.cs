@@ -43,7 +43,6 @@ public class HeroPowerTests
 		current.Mana = 2;
 		current.HeroPower = new HeroPower()
 		{
-			TargetingType = TargetingType.Any,
 			ManaCost = 2,
 			UsedThisTurn = false,
 			GameActions =
@@ -91,7 +90,6 @@ public class HeroPowerTests
 		// Give the player a hero power
 		current.HeroPower = new HeroPower()
 		{
-			TargetingType = TargetingType.None,
 			ManaCost = 2,
 			UsedThisTurn = false,
 			GameActions = []

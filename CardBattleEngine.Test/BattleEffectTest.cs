@@ -71,7 +71,6 @@ public class BattleEffectTest
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetingType.None,
 			GameActions = [new AddStatModifierAction() {
 				AttackChange = (Value) 2,
 				//ExpirationTrigger = new TriggeredEffect()
@@ -135,7 +134,6 @@ public class BattleEffectTest
 		var cleaveCard = new MinionCard("Cleave", 1, 4, 4);
 		cleaveCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
-			TargetType = TargetingType.None,
 			EffectTiming = EffectTiming.Pre,
 			EffectTrigger = EffectTrigger.Attack,
 			Condition = new OriginalSourceCondition(),
@@ -198,7 +196,6 @@ public class BattleEffectTest
 		var cleaveCard = new MinionCard("Cleave", 1, 4, 4);
 		cleaveCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
-			TargetType = TargetingType.None,
 			EffectTiming = EffectTiming.Pre,
 			EffectTrigger = EffectTrigger.Attack,
 			Condition = new OriginalSourceCondition(),
@@ -253,7 +250,6 @@ public class BattleEffectTest
 		testCard.MinionTriggeredEffects.Add(
 			new TriggeredEffect()
 			{
-				TargetType = TargetingType.None,
 				EffectTiming = EffectTiming.Post,
 				EffectTrigger = EffectTrigger.Battlecry,
 				GameActions =
@@ -348,7 +344,6 @@ public class BattleEffectTest
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetingType.None,
 			GameActions = 
 			[
 				new GainCardAction()

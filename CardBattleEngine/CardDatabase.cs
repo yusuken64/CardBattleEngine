@@ -64,7 +64,6 @@ public class CardDatabase
 				{
 					EffectTiming = x.EffectTiming,
 					EffectTrigger = x.EffectTrigger,
-					TargetType = x.TargetType,
 					TriggerConditionDefintion = cond,
 					ActionDefintion = new ActionDefinition
 					{
@@ -97,7 +96,6 @@ public class CardDatabase
 			Name = card.Name,
 			Cost = card.ManaCost,
 			Type = card.Type,
-			TargetingType = card.TargetingType,
 			SpellCastEffectDefinitions = card.SpellCastEffects.Select(x =>
 			{
 				AffectedEntitySelectorDefinition? affectedEntitySelectorDefinition = null;
@@ -248,7 +246,6 @@ public class CardDatabase
 			{
 				EffectTiming = triggeredEffectDefinition.EffectTiming,
 				EffectTrigger = triggeredEffectDefinition.EffectTrigger,
-				TargetType = triggeredEffectDefinition.TargetType,
 				Condition = condition,
 				GameActions = [action],
 				AffectedEntitySelector = CreateAffectedEntitySelectorFromDefinition(
@@ -268,7 +265,6 @@ public class CardDatabase
 
 		var card = new SpellCard(def.Name, def.Cost);
 		card.Owner = owner;
-		card.TargetingType = def.TargetingType;
 
 		foreach (var spellCastEffectDefinition in def.SpellCastEffectDefinitions)
 		{
@@ -357,7 +353,6 @@ public abstract class CardDefinition
 
 public class SpellCardDefinition : CardDefinition
 {
-	public TargetingType TargetingType { get; set; }
 	public List<SpellCastEffectDefinition> SpellCastEffectDefinitions { get; set; }
 }
 
@@ -379,7 +374,6 @@ public class TriggeredEffectDefinition
 {
 	public EffectTiming EffectTiming { get; set; }
 	public EffectTrigger EffectTrigger { get; set; }
-	public TargetingType TargetType { get; set; }
 	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
 	public ActionDefinition ActionDefintion { get; set; }
 	public AffectedEntitySelectorDefinition AffectedEntitySelectorDefinition { get; set; }

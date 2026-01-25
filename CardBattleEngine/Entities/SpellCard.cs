@@ -11,7 +11,6 @@ public class SpellCard : Card
 	}
 
 	public override CardType Type => CardType.Spell;
-	public TargetingType TargetingType { get; set; }
 	public List<SpellCastEffect> SpellCastEffects { get; } = new();
 	public override int Health { get; set; }
 	public override int MaxHealth { get; set; }

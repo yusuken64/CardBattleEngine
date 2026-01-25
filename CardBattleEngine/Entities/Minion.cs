@@ -26,7 +26,6 @@ public class Minion : IGameEntity, ITriggerSource
 				{
 					EffectTrigger = mod.ExpirationTrigger.EffectTrigger,
 					EffectTiming = mod.ExpirationTrigger.EffectTiming,
-					TargetType = TargetingType.Self,
 					GameActions = new List<IGameAction>
 					{
 						new RemoveModifierAction()

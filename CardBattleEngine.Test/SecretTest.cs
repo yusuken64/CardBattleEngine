@@ -29,7 +29,6 @@ public class SecretTest
 							{
 								EffectTrigger = EffectTrigger.SpellCast,
 								EffectTiming = EffectTiming.Pre,
-								TargetType = TargetingType.None,
 								GameActions = [new CancelEffectAction()],
 								Condition= new SourceOwnerCondition()
 								{

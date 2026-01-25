@@ -20,7 +20,6 @@ public class AbilityTest
 		{
 			EffectTrigger = EffectTrigger.Battlecry,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetingType.AnyEnemy,
 			GameActions = new List<IGameAction>() 
 			{
 				new DamageAction() { Damage = (Value)1 }
@@ -64,7 +63,6 @@ public class AbilityTest
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
-			TargetType = TargetingType.AnyEnemy,
 			AffectedEntitySelector = new TargetOperationSelector
 			{
 				Operations = [
@@ -126,7 +124,6 @@ public class AbilityTest
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
-			TargetType = TargetingType.FriendlyMinion,
 			GameActions = new List<IGameAction>
 			{
 				new AddStatModifierAction()
@@ -178,7 +175,6 @@ public class AbilityTest
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
-			TargetType = TargetingType.FriendlyHero,
 			GameActions = new List<IGameAction>
 			{
 				new GainCardAction()
@@ -233,7 +229,6 @@ public class AbilityTest
 		{
 			EffectTiming = EffectTiming.Post,
 			EffectTrigger = EffectTrigger.Battlecry,
-			TargetType = TargetingType.EnemyMinion,
 			GameActions = new List<IGameAction>
 		{
 			new FreezeAction() // assumed to exist
