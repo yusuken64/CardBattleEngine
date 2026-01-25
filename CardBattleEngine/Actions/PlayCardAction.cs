@@ -18,6 +18,14 @@ public class PlayCardAction : GameActionBase
 		{
 			return false;
 		}
+		
+		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card);
+		if (validTargets != null &&
+			!validTargets.Contains(actionContext.Target))
+		{
+			reason = "Invalid Target";
+			return false;
+		}
 
 		if (Card.ManaCost > player.Mana)
 		{

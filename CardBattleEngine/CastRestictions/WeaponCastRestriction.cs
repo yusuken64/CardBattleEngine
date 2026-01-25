@@ -1,9 +1,8 @@
 ﻿namespace CardBattleEngine;
 
-//the player or opponent needs a weapons, a property should determine the logic
 public class WeaponCastRestriction : ICastRestriction
 {
-	public TeamRelationship TeamRelationship;
+	public TeamRelationship TeamRelationship { get; set; }
 
 	public bool CanPlay(GameState gameState, Player player, Card castingCard, out string reason)
 	{
