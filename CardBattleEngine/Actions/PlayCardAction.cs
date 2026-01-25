@@ -7,6 +7,26 @@ public class PlayCardAction : GameActionBase
 
 	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
+		var canCast = CanCast(state, actionContext, out reason);
+		if (!canCast)
+		{
+			return false;
+		}
+
+		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card);
+		if (validTargets != null &&
+			!validTargets.Contains(actionContext.Target))
+		{
+			reason = "Invalid Target";
+			return false;
+		}
+
+		reason = null;
+		return true;
+	}
+
+	public bool CanCast(GameState state, ActionContext actionContext, out string reason)
+	{
 		var player = Card.Owner;
 		if (!player.Hand.Contains(Card))
 		{
@@ -14,16 +34,13 @@ public class PlayCardAction : GameActionBase
 			return false;
 		}
 
-		if (Card.CastRestriction?.CanPlay(state, actionContext.SourcePlayer, Card, out reason) == false)
+		if (Card.CastRestriction != null &&
+			!Card.CastRestriction.CanPlay(
+				state,
+				actionContext.SourcePlayer,
+				Card,
+				out reason))
 		{
-			return false;
-		}
-		
-		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card);
-		if (validTargets != null &&
-			!validTargets.Contains(actionContext.Target))
-		{
-			reason = "Invalid Target";
 			return false;
 		}
 

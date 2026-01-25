@@ -25,11 +25,8 @@
 					Assert.AreEqual(orignalActions[i].ToString(), clonedActions[i].ToString());
 				}
 
-				//orignalActions[0].Item2.AffectedEntitySelector = (gs, player, targetType) =>
-				//{
-				//	return gs.GetValidTargets(player, targetType)[0];
-				//};
-				
+				Assert.IsTrue(orignalActions[0].Item1.IsValid(gameState, orignalActions[0].Item2, out _));
+
 				engine.Resolve(gameState, orignalActions[0].Item2, orignalActions[0].Item1);
 
 				GameEngine.PrintState(gameState, null);

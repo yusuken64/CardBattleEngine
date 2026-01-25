@@ -56,20 +56,19 @@ public class GameState
 		// Playable cards
 		foreach (var card in player.Hand)
 		{
-			if (card.ManaCost <= player.Mana)
+			var playCardAction = new PlayCardAction() { Card = card };
+
+			ActionContext actionContext = new()
 			{
-				var playCardAction = new PlayCardAction() { Card = card };
+				SourcePlayer = player,
+				SourceCard = card,
+			};
 
-				ActionContext actionContext = new()
-				{
-					SourcePlayer = player,
-					SourceCard = card,
-				};
-
-				if (playCardAction.IsValid(this, actionContext, out string _))
-				{
-					actions.Add((playCardAction, actionContext));
-				}
+			if (playCardAction.CanCast(this,
+					actionContext,
+					out _))
+			{
+				actions.Add((playCardAction, actionContext));
 			}
 		}
 
