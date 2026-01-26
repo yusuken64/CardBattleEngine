@@ -41,6 +41,7 @@ public class WeaponCard : Card
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext actionContext)
 	{
 		actionContext.SourceCard = this;
+		actionContext.Target = actionContext.SourcePlayer;
 		return new List<(IGameAction, ActionContext)>()
 		{
 			(new AcquireWeaponAction()
