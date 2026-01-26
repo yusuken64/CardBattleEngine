@@ -19,6 +19,9 @@ public class SourceOwnerCondition : TriggerConditionBase
 			case SourceType.Source:
 				entity = context.Source.Owner;
 				break;
+			case SourceType.TriggerSource:
+				entity = context.Source;
+				break;
 			default:
 				entity = context.Source;
 				break;
@@ -44,7 +47,8 @@ public enum SourceType
 {
 	Card,
 	Player,
-	Source
+	Source,
+	TriggerSource
 }
 
 public class OriginalSourceOwnerCondition : TriggerConditionBase

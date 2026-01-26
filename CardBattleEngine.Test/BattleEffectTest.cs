@@ -286,7 +286,7 @@ public class BattleEffectTest
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
-		MinionCard testCard = new MinionCard("testCard", 1, 1, 10);
+		MinionCard testCard = new MinionCard("questingCard", 1, 1, 10);
 		testCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTiming = EffectTiming.Post,
@@ -339,12 +339,12 @@ public class BattleEffectTest
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
-		MinionCard testCard = new MinionCard("testCard", 1, 1, 10);
+		MinionCard testCard = new MinionCard("questingCard", 1, 1, 10);
 		testCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
 			EffectTiming = EffectTiming.Post,
-			GameActions = 
+			GameActions =
 			[
 				new GainCardAction()
 				{
@@ -364,5 +364,186 @@ public class BattleEffectTest
 		{
 			Target = minion
 		}, new DeathAction());
+	}
+
+	[TestMethod]
+	public void QuestingTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		player1.Mana = 10;
+		player2.Mana = 10;
+
+		MinionCard questingCard = new MinionCard("questing", 1, 1, 1);
+		questingCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.OnPlay,
+			EffectTiming = EffectTiming.Post,
+			GameActions = [new AddStatModifierAction() {
+				AttackChange = (Value)1,
+				HealthChange = (Value)1,
+			}],
+			Condition = new OriginalSourceOwnerCondition()
+			{
+				TeamRelationship = TeamRelationship.Friendly,
+			},
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeSource = true,
+				ResolutionTiming = TargetResolutionTiming.Once
+			}
+		});
+
+		player1.Hand.Add(questingCard);
+		questingCard.Owner = player1;
+
+		MinionCard testCard1 = new MinionCard("test", 1, 1, 1);
+		MinionCard testCard2 = new MinionCard("test", 1, 1, 1);
+		MinionCard testCard3 = new MinionCard("test", 1, 1, 1);
+		MinionCard testCard4 = new MinionCard("test", 1, 1, 1);
+
+		player1.Hand.Add(testCard1);
+		testCard1.Owner = player1;
+		player1.Hand.Add(testCard2);
+		testCard2.Owner = player1;
+		player1.Hand.Add(testCard3);
+		testCard3.Owner = player1;
+		player1.Hand.Add(testCard4);
+		testCard4.Owner = player1;
+
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = player1,
+			},
+			new PlayCardAction()
+			{
+				Card = questingCard
+			});
+
+		Assert.AreEqual(1, player1.Board.Count());
+		Assert.AreEqual(1, player1.Board[0].Attack);
+		Assert.AreEqual(1, player1.Board[0].Health);
+
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = player1,
+			},
+			new PlayCardAction()
+			{
+				Card = testCard1
+			});
+
+		Assert.AreEqual(2, player1.Board.Count());
+		Assert.AreEqual(2, player1.Board[0].Attack);
+		Assert.AreEqual(2, player1.Board[0].Health);
+
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = player1,
+			},
+			new PlayCardAction()
+			{
+				Card = testCard2
+			});
+
+		Assert.AreEqual(3, player1.Board.Count());
+		Assert.AreEqual(3, player1.Board[0].Attack);
+		Assert.AreEqual(3, player1.Board[0].Health);
+
+		player2.Hand.Add(testCard4);
+		testCard4.Owner = player2;
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = player2,
+				Source = player2,
+			},
+			new PlayCardAction()
+			{
+				Card = testCard4
+			});
+
+		Assert.AreEqual(3, player1.Board.Count());
+		Assert.AreEqual(3, player1.Board[0].Attack);
+		Assert.AreEqual(3, player1.Board[0].Health);
+	}
+
+	[TestMethod]
+	public void FrostWolfTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		player1.Mana = 10;
+		player2.Mana = 10;
+
+		MinionCard questingCard = new MinionCard("frostwolf", 1, 1, 1);
+		questingCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Battlecry,
+			EffectTiming = EffectTiming.Post,
+			GameActions = [new AddStatModifierAction() {
+				AttackChange = new EntityCount()
+				{
+					AffectedEntitySelector = new TargetOperationSelector()
+					{
+						Operations = [new SelectBoardEntitiesOperation() {
+							Group = TargetGroup.Minions,
+							Side = TeamRelationship.Friendly,
+							ExcludeSelf = true
+						}]
+					}
+				},
+				HealthChange = new EntityCount()
+				{
+					AffectedEntitySelector = new TargetOperationSelector()
+					{
+						Operations = [new SelectBoardEntitiesOperation() {
+							Group = TargetGroup.Minions,
+							Side = TeamRelationship.Friendly,
+							ExcludeSelf = true
+						}]
+					}
+				},
+			}],
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeSummonedMinion = true
+			}
+		});
+
+		player1.Hand.Add(questingCard);
+		questingCard.Owner = player1;
+
+		MinionCard testCard = new MinionCard("test", 1, 1, 1);
+		player1.Board.Add(new Minion(testCard, player1));
+		player1.Board.Add(new Minion(testCard, player1));
+		player1.Board.Add(new Minion(testCard, player1));
+
+		engine.Resolve(state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = player1,
+			},
+			new PlayCardAction()
+			{
+				Card = questingCard
+			});
+
+		Assert.AreEqual(4, player1.Board.Count);
+		Assert.AreEqual(4, player1.Board[3].Attack);
+		Assert.AreEqual(4, player1.Board[3].Health);
 	}
 }

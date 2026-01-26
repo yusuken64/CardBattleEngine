@@ -6,6 +6,7 @@ public class ContextSelector : AffectedEntitySelectorBase
 	public bool IncludeSource { get; set; }
 	public bool IncludeSourcePlayer { get; set; }
 	public bool IncludeTargetOwner { get; set; }
+	public bool IncludeSummonedMinion { get; set; }
 
 	public override IEnumerable<IGameEntity> Select(GameState state, ActionContext context)
 	{
@@ -20,6 +21,9 @@ public class ContextSelector : AffectedEntitySelectorBase
 
 		if (IncludeTargetOwner && context.Target?.Owner != null)
 			yield return context.Target.Owner;
+
+		if (IncludeSummonedMinion && context.SummonedMinion != null)
+			yield return context.SummonedMinion;
 	}
 
 	public override Dictionary<string, object> EmitParams()

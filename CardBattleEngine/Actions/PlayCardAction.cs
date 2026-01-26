@@ -15,6 +15,7 @@ public class PlayCardAction : GameActionBase
 
 		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card);
 		if (validTargets != null &&
+			validTargets.Any() &&
 			!validTargets.Contains(actionContext.Target))
 		{
 			reason = "Invalid Target";

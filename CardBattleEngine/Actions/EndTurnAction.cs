@@ -20,6 +20,10 @@ public class EndTurnAction : GameActionBase
 			player.MissedAttackFromFrozen = false;
 		}
 		player.Attack = 0;
+		foreach(var mod in player._modifiers)
+		{
+			mod.AttackChange = 0;
+		}
 
 		foreach (var minion in player.Board)
 		{
