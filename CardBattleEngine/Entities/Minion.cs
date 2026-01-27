@@ -201,6 +201,56 @@ public class Minion : IGameEntity, ITriggerSource
 	{
 		return $"{Name} {Attack}/{Health}";
 	}
+
+	public bool Matches(Keyword keyword, bool hasKeyword)
+	{
+		// Stealth
+		if (keyword.HasFlag(Keyword.Stealth) &&
+			IsStealth != hasKeyword)
+			return false;
+
+		// Charge
+		if (keyword.HasFlag(Keyword.Charge) &&
+			HasCharge != hasKeyword)
+			return false;
+
+		// Divine Shield
+		if (keyword.HasFlag(Keyword.DivineShield) &&
+			HasDivineShield != hasKeyword)
+			return false;
+
+		// Poisonous
+		if (keyword.HasFlag(Keyword.Poisonous) &&
+			HasPoisonous != hasKeyword)
+			return false;
+
+		// Rush
+		if (keyword.HasFlag(Keyword.Rush) &&
+			HasRush != hasKeyword)
+			return false;
+
+		// Windfury
+		if (keyword.HasFlag(Keyword.Windfury) &&
+			HasWindfury != hasKeyword)
+			return false;
+
+		// Lifesteal
+		if (keyword.HasFlag(Keyword.LifeSteal) &&
+			HasLifeSteal != hasKeyword)
+			return false;
+
+		// Reborn
+		if (keyword.HasFlag(Keyword.Reborn) &&
+			HasReborn != hasKeyword)
+			return false;
+
+		// Taunt
+		if (keyword.HasFlag(Keyword.Taunt) &&
+			Taunt != hasKeyword)
+			return false;
+
+		return true;
+	}
 }
 
 [JsonConverter(typeof(StringEnumConverter))]
