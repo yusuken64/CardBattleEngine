@@ -286,7 +286,7 @@ public class BattleEffectTest
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
-		MinionCard testCard = new MinionCard("questingCard", 1, 1, 10);
+		MinionCard testCard = new MinionCard("defenderCard", 1, 1, 10);
 		testCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTiming = EffectTiming.Post,
@@ -339,7 +339,7 @@ public class BattleEffectTest
 		var player1 = state.Players[0];
 		var player2 = state.Players[1];
 
-		MinionCard testCard = new MinionCard("questingCard", 1, 1, 10);
+		MinionCard testCard = new MinionCard("defenderCard", 1, 1, 10);
 		testCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
 			EffectTrigger = EffectTrigger.Deathrattle,
@@ -545,5 +545,139 @@ public class BattleEffectTest
 		Assert.AreEqual(4, player1.Board.Count);
 		Assert.AreEqual(4, player1.Board[3].Attack);
 		Assert.AreEqual(4, player1.Board[3].Health);
+	}
+
+	[TestMethod]
+	public void ArgusTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		MinionCard testCard = new MinionCard("test", 1, 1, 1);
+		player1.Board.Add(new Minion(testCard, player1));
+		player1.Board.Add(new Minion(testCard, player1));
+		player1.Board.Add(new Minion(testCard, player1));
+
+		MinionCard defenderCard = new MinionCard("defender", 1, 1, 1);
+		defenderCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.Battlecry,
+			GameActions = [new ChangeKeywordAction() {
+				ChangeType = ChangeType.Add,
+				Keyword = Keyword.Taunt
+			}],
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				Operations = [
+					new ContextOperation()
+					{
+						IncludeSummonedMinion = true,
+					},
+					new AdjacentOperation()
+					{
+						IncludeCenter = false,
+						UsePlayIndexInstead = true
+					}
+				]
+			}
+		});
+
+		defenderCard.Owner = player1;
+		player1.Hand.Add(defenderCard);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = defenderCard,
+				SourceCard = defenderCard,
+				PlayIndex = 2
+			},
+			new PlayCardAction()
+			{
+				Card = defenderCard
+			});
+
+		Assert.AreEqual(4, player1.Board.Count());
+		Assert.IsTrue(!player1.Board[0].Taunt);
+		Assert.IsTrue(player1.Board[1].Taunt);
+		Assert.IsTrue(!player1.Board[2].Taunt);
+		Assert.IsTrue(player1.Board[3].Taunt);
+	}
+
+	[TestMethod]
+	public void ArgusTest2()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+		player1.Mana = 10;
+
+		MinionCard defenderCard = new MinionCard("defender", 1, 1, 1);
+		defenderCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.Battlecry,
+			GameActions = [new ChangeKeywordAction() {
+				ChangeType = ChangeType.Add,
+				Keyword = Keyword.Taunt
+			}],
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				Operations = [
+					new ContextOperation()
+					{
+						IncludeSummonedMinion = true,
+					},
+					new AdjacentOperation()
+					{
+						IncludeCenter = false,
+						UsePlayIndexInstead = true
+					}
+				]
+			}
+		});
+
+		defenderCard.Owner = player1;
+		player1.Hand.Add(defenderCard);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = defenderCard,
+				SourceCard = defenderCard,
+			},
+			new PlayCardAction()
+			{
+				Card = defenderCard
+			});
+
+		Assert.AreEqual(1, player1.Board.Count());
+
+		defenderCard.Owner = player1;
+		player1.Hand.Add(defenderCard);
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = player1,
+				Source = defenderCard,
+				SourceCard = defenderCard,
+			},
+			new PlayCardAction()
+			{
+				Card = defenderCard
+			});
+
+		Assert.AreEqual(2, player1.Board.Count());
+		Assert.IsTrue(player1.Board[0].Taunt);
+		Assert.IsTrue(!player1.Board[1].Taunt);
 	}
 }

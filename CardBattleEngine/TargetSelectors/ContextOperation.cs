@@ -4,6 +4,7 @@ public class ContextOperation : ITargetOperation
 {
 	public bool IncludeTarget { get; set; }
 	public bool IncludeSource { get; set; }
+	public bool IncludeSummonedMinion { get; set; }
 	public ContextOperation() { }
 
 	public IEnumerable<IGameEntity> Apply(IEnumerable<IGameEntity> input, GameState state, ActionContext context)
@@ -13,6 +14,9 @@ public class ContextOperation : ITargetOperation
 
 		if (IncludeSource)
 			yield return context.Source;
+
+		if (IncludeSummonedMinion)
+			yield return context.SummonedMinion;
 	}
 
 	public void ConsumeParams(Dictionary<string, object> actionParam)
