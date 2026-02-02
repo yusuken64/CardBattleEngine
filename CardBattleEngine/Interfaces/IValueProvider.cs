@@ -15,6 +15,11 @@ public abstract class Value : IValueProvider
 
 public static class ValueProviderExtensions
 {
+	public static int? GetValueOrNull(this IValueProvider provider, GameState state, ActionContext context)
+	{
+		return provider?.GetValue(state, context);
+	}
+
 	public static int GetValueOrZero(this IValueProvider provider, GameState state, ActionContext context)
 	{
 		return provider?.GetValue(state, context) ?? 0;

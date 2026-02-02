@@ -94,4 +94,105 @@ public class AuraTest
 		Assert.AreEqual(1, murloc.Attack, "Murloc should lose aura buff when AuraMurloc dies");
 		Assert.AreEqual(1, nonMurloc.Attack, "Non-Murloc remains unchanged");
 	}
+
+	[TestMethod]
+	public void StatModiferTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		MinionCard testMinion = new MinionCard("Test", 1, 3, 3);
+		Minion minion = new(testMinion, current);
+		current.Board.Add(minion);
+
+		engine.Resolve(state, new ActionContext() { Target = minion }, new AddStatModifierAction()
+		{
+			AttackChange = (Value)1,
+			HealthChange = (Value)1,
+			StatModifierType = StatModifierType.Additive
+		});
+	}
+
+	[TestMethod]
+	public void StatModifier_MixedAdditiveAndSet_ResolvesInOrder()
+	{
+		// Arrange
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		var testCard = new MinionCard("Test", attack: 3, health: 5, cost: 1);
+		var minion = new Minion(testCard, current);
+		current.Board.Add(minion);
+
+		// Base sanity check
+		Assert.AreEqual(3, minion.Attack);
+		Assert.AreEqual(5, minion.MaxHealth);
+		Assert.AreEqual(5, minion.Health);
+
+		// Act 1: +2/+2 (additive)
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new AddStatModifierAction
+			{
+				AttackChange = (Value)2,
+				HealthChange = (Value)2,
+				StatModifierType = StatModifierType.Additive
+			});
+
+		// Assert 1
+		Assert.AreEqual(5, minion.Attack);
+		Assert.AreEqual(7, minion.MaxHealth);
+		Assert.AreEqual(7, minion.Health);
+
+		// Act 2: Set attack to 1 (set, attack only)
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new AddStatModifierAction
+			{
+				AttackChange = (Value)1,
+				HealthChange = null,
+				StatModifierType = StatModifierType.Set
+			});
+
+		// Assert 2
+		Assert.AreEqual(1, minion.Attack, "Set should override previous additive attack");
+		Assert.AreEqual(7, minion.MaxHealth, "Health should be untouched by attack-only set");
+		Assert.AreEqual(7, minion.Health);
+
+		// Act 3: +3 attack (additive after set)
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new AddStatModifierAction
+			{
+				AttackChange = (Value)3,
+				HealthChange = null,
+				StatModifierType = StatModifierType.Additive
+			});
+
+		// Assert 3
+		Assert.AreEqual(4, minion.Attack, "Additive after set should apply");
+		Assert.AreEqual(7, minion.MaxHealth);
+		Assert.AreEqual(7, minion.Health);
+
+		// Act 4: Set health to 4 (set health only)
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new AddStatModifierAction
+			{
+				AttackChange = null,
+				HealthChange = (Value)4,
+				StatModifierType = StatModifierType.Set
+			});
+
+		// Assert 4
+		Assert.AreEqual(4, minion.Attack, "Attack should be untouched by health-only set");
+		Assert.AreEqual(4, minion.MaxHealth);
+		Assert.AreEqual(4, minion.Health);
+	}
 }

@@ -22,7 +22,7 @@ public class EndTurnAction : GameActionBase
 		player.Attack = 0;
 		foreach(var mod in player._modifiers)
 		{
-			mod.AttackChange = 0;
+			mod.AttackChange = null;
 		}
 
 		foreach (var minion in player.Board)

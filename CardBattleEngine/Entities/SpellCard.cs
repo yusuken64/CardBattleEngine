@@ -47,19 +47,12 @@ public class SpellCard : Card
 
 	internal override void RecalculateStats()
 	{
-		ManaCost = OriginalManaCost;
+		var manaCost = OriginalManaCost;
 
 		// Apply modifiers
-		foreach (var mod in _modifiers)
+		foreach (var mod in _modifiers.Concat(_auraModifiers))
 		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
-		}
-
-		foreach (var mod in _auraModifiers)
-		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
+			mod.ApplyValue(ref manaCost, mod.CostChange);
 		}
 
 		ManaCost = Math.Max(0, ManaCost);

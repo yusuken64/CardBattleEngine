@@ -110,28 +110,21 @@ public class MinionCard : Card
 
 	internal override void RecalculateStats()
 	{
-		Attack = OriginalAttack;
-		MaxHealth = OriginalHealth;
-		ManaCost = OriginalManaCost;
+		var attack = OriginalAttack;
+		var maxHealth = OriginalHealth;
+		var manaCost = OriginalManaCost;
 
 		// Apply modifiers
-		foreach (var mod in _modifiers)
+		foreach (var mod in _modifiers.Concat(_auraModifiers))
 		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
-			ManaCost += mod.CostChange;
+			mod.ApplyValue(ref attack, mod.AttackChange);
+			mod.ApplyValue(ref maxHealth, mod.HealthChange);
+			mod.ApplyValue(ref manaCost, mod.CostChange);
 		}
 
-		foreach (var mod in _auraModifiers)
-		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
-			ManaCost += mod.CostChange;
-		}
-
-		Attack = Math.Max(0, Attack);
-		MaxHealth = Math.Max(0, MaxHealth);
+		Attack = Math.Max(0, attack);
+		MaxHealth = Math.Max(0, maxHealth);
 		Health = MaxHealth;
-		ManaCost = Math.Max(0, ManaCost);
+		ManaCost = Math.Max(0, manaCost);
 	}
 }

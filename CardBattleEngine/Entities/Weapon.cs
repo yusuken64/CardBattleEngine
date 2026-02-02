@@ -74,25 +74,18 @@ public class Weapon : ITriggerSource, IGameEntity
 			oldDamageTaken = 0; // safety for weird states
 
 		// --- Rebuild base stats ---
-		Attack = OriginalAttack;
-		MaxHealth = OriginalDurability; // start from base max health
+		var attack = OriginalAttack;
+		var maxHealth = OriginalDurability; // start from base max health
 
-		// Apply modifiers
-		foreach (var mod in _modifiers)
+		foreach (var mod in _modifiers.Concat(_auraModifiers))
 		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
-		}
-
-		foreach (var mod in _auraModifiers)
-		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
+			mod.ApplyValue(ref attack, mod.AttackChange);
+			mod.ApplyValue(ref maxHealth, mod.HealthChange);
 		}
 
 		// Clamp final stats
-		Attack = Math.Max(0, Attack);
-		MaxHealth = Math.Max(0, MaxHealth);
+		Attack = Math.Max(0, attack);
+		MaxHealth = Math.Max(0, maxHealth);
 
 		// --- Reapply damage taken ---
 		int newHealth = MaxHealth - oldDamageTaken;

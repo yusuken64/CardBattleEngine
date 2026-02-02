@@ -121,16 +121,15 @@ public class Player : IGameEntity, ITriggerSource
 
 	internal void RecalculateStats()
 	{
-		Attack = EquippedWeapon?.Attack ?? 0;
+		var attack = EquippedWeapon?.Attack ?? 0;
 		//Health = card.Health;
 
-		foreach (var mod in _modifiers)
+		foreach (var mod in _modifiers.Concat(_auraModifiers))
 		{
-			Attack += mod.AttackChange;
-			//Health += mod.HealthChange;
+			mod.ApplyValue(ref attack, mod.AttackChange);
 		}
 
-		Attack = Math.Max(0, Attack);
+		Attack = Math.Max(0, attack);
 		//Health = Math.Max(0, Health);
 	}
 

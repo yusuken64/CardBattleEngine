@@ -159,25 +159,19 @@ public class Minion : IGameEntity, ITriggerSource
 			oldDamageTaken = 0; // safety for weird states
 
 		// --- Rebuild base stats ---
-		Attack = OriginalCard.Attack;
-		MaxHealth = OriginalCard.Health; // start from base max health
+		var attack = OriginalCard.Attack;
+		var maxHealth = OriginalCard.Health; // start from base max health
 
 		// Apply modifiers
-		foreach (var mod in _modifiers)
+		foreach (var mod in _modifiers.Concat(_auraModifiers))
 		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
-		}
-
-		foreach (var mod in _auraModifiers)
-		{
-			Attack += mod.AttackChange;
-			MaxHealth += mod.HealthChange;
+			mod.ApplyValue(ref attack, mod.AttackChange);
+			mod.ApplyValue(ref maxHealth, mod.HealthChange);
 		}
 
 		// Clamp final stats
-		Attack = Math.Max(0, Attack);
-		MaxHealth = Math.Max(0, MaxHealth);
+		Attack = Math.Max(0, attack);
+		MaxHealth = Math.Max(0, maxHealth);
 
 		// --- Reapply damage taken ---
 		int newHealth = MaxHealth - oldDamageTaken;

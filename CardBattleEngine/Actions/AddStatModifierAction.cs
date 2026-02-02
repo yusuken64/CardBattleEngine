@@ -2,6 +2,7 @@
 
 public class AddStatModifierAction : GameActionBase
 {
+	public StatModifierType StatModifierType {  get; set; }
 	public IValueProvider AttackChange { get; set; }
 	public IValueProvider HealthChange { get; set; }
 	public IValueProvider CostChange { get; set; }
@@ -16,14 +17,7 @@ public class AddStatModifierAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		//if (!IsValid(state, actionContext))
-		//{
-		//	yield break;
-		//}
-
-		var sideEffects = new List<(IGameAction, ActionContext)>();
-
-		foreach (var target in this.ResolveTargets(state, actionContext).ToList())
+		foreach (var target in this.ResolveTargets(state, actionContext).Where(x => x.IsAlive).ToList())
 		{
 			if (target == null)
 			{
@@ -32,9 +26,10 @@ public class AddStatModifierAction : GameActionBase
 
 			StatModifier statModifier = new()
 			{
-				AttackChange = AttackChange.GetValueOrZero(state, actionContext),
-				HealthChange = HealthChange.GetValueOrZero(state, actionContext),
-				CostChange = CostChange.GetValueOrZero(state, actionContext),
+				StatModifierType = StatModifierType,
+				AttackChange = AttackChange.GetValueOrNull(state, actionContext),
+				HealthChange = HealthChange.GetValueOrNull(state, actionContext),
+				CostChange = CostChange.GetValueOrNull(state, actionContext),
 				ExpirationTrigger = ExpirationTrigger,
 			};
 
@@ -80,9 +75,33 @@ public class RemoveModifierAction : GameActionBase
 
 public class StatModifier
 {
-	public int AttackChange;
-	public int HealthChange;
-	public int CostChange;
+	public StatModifierType StatModifierType;
+	public int? AttackChange;
+	public int? HealthChange;
+	public int? CostChange;
 
 	public ExpirationTrigger ExpirationTrigger;
+
+	public void ApplyValue(ref int stat, int? change)
+	{
+		if (!change.HasValue)
+		{
+			return;
+		}
+
+		if (StatModifierType == StatModifierType.Additive)
+		{
+			stat += change.Value;
+		}
+		else
+		{
+			stat = change.Value;
+		}
+	}
+}
+
+public enum StatModifierType
+{
+	Additive,
+	Set
 }
