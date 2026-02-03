@@ -1,8 +1,8 @@
 ﻿namespace CardBattleEngine;
 
-public class FreezeAction : GameActionBase
+public class SilenceAction : GameActionBase
 {
-	public override EffectTrigger EffectTrigger => EffectTrigger.OnFreeze;
+	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
@@ -19,14 +19,19 @@ public class FreezeAction : GameActionBase
 		// Apply freeze
 		if (context.Target is Minion minion)
 		{
-			minion.IsFrozen = true;
-			minion.MissedAttackFromFrozen = false;
-			context.ResolvedStatusChanges.Add(
-				new StatusDelta(minion, StatusType.Freeze, true));
-		}
-		else if (context.Target is Player hero)
-		{
-			hero.IsFrozen = true;
+			minion.IsFrozen = false;
+			minion.IsStealth = false;
+			minion.HasCharge = false;
+			minion.HasDivineShield = false;
+			minion.HasPoisonous = false;
+			minion.Taunt = false;
+			minion.HasRush = false;
+			minion.HasWindfury = false;
+			minion.HasLifeSteal = false;
+			minion.HasReborn = false;
+			minion.CannotAttack = false;
+			minion.ClearModifiers();
+			minion.TriggeredEffects.Clear();
 		}
 
 		yield break; // no side-effects

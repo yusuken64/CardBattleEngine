@@ -34,7 +34,7 @@ public class Minion : IGameEntity, ITriggerSource
 			}
 		}
 	}
-	public List<TriggeredEffect> TriggeredEffects { get; }
+	public List<TriggeredEffect> TriggeredEffects { get; internal set; }
 
 	private IAttackBehavior _attackBehavior;
 	public IAttackBehavior AttackBehavior
@@ -128,6 +128,7 @@ public class Minion : IGameEntity, ITriggerSource
 			HasReborn = this.HasReborn,
 			CannotAttack = this.CannotAttack,
 			IsFrozen = this.IsFrozen,
+			TriggeredEffects = this.TriggeredEffects,
 
 			IsAlive = IsAlive,
 		};
@@ -148,6 +149,14 @@ public class Minion : IGameEntity, ITriggerSource
 	{
 		_modifiers.Remove(modifier);
 		RecalculateStats();
+	}
+
+	public void ClearModifiers()
+	{
+		var originalHealth = Health;
+		_modifiers.Clear();
+		RecalculateStats();
+		Health = originalHealth;
 	}
 
 	private void RecalculateStats()
