@@ -10,7 +10,7 @@ public class TriggeredEffect : ITriggeredEffect
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
 	public ExpirationTrigger ExpirationTrigger { get; set; }
-	internal TriggeredEffect CloneFor(Minion minion)
+	internal TriggeredEffect Clone()
 	{
 		return new TriggeredEffect()
 		{

@@ -92,7 +92,7 @@ public class Minion : IGameEntity, ITriggerSource
 		IsAlive = true;
 		TriggeredEffects = card.MinionTriggeredEffects.Select(effect =>
 		{
-			var instance = effect.CloneFor(this);
+			var instance = effect.Clone();
 			return instance;
 		}).ToList();
 	}
@@ -156,7 +156,7 @@ public class Minion : IGameEntity, ITriggerSource
 		var originalHealth = Health;
 		_modifiers.Clear();
 		RecalculateStats();
-		Health = originalHealth;
+		Health = Utils.Clamp(originalHealth, 0, MaxHealth);
 	}
 
 	private void RecalculateStats()
