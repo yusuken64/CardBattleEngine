@@ -160,7 +160,8 @@ public class Minion : IGameEntity, ITriggerSource
 
 		// --- Rebuild base stats ---
 		var attack = OriginalCard.Attack;
-		var maxHealth = OriginalCard.Health; // start from base max health
+		var maxHealth = OriginalCard.Health;
+		var originalHealth = Health;
 
 		// Apply modifiers
 		foreach (var mod in _modifiers.Concat(_auraModifiers))
@@ -175,6 +176,10 @@ public class Minion : IGameEntity, ITriggerSource
 
 		// --- Reapply damage taken ---
 		int newHealth = MaxHealth - oldDamageTaken;
+		if (newHealth < originalHealth)
+		{
+			newHealth = originalHealth;
+		}
 
 		// Clamp health to valid range
 		Health = Utils.Clamp(newHealth, 0, MaxHealth);

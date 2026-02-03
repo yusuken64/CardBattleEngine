@@ -65,7 +65,7 @@ public class AuraTest
 
 		Assert.IsTrue(action.IsValid(state, actionContext, out string _));
 
-		engine.Resolve(state, actionContext , action);
+		engine.Resolve(state, actionContext, action);
 		engine.Resolve(state, actionContext, new PlayCardAction() { Card = card2 });
 
 		var murloc = current.Board.First(m => m.Name == "Murloc");
@@ -194,5 +194,63 @@ public class AuraTest
 		Assert.AreEqual(4, minion.Attack, "Attack should be untouched by health-only set");
 		Assert.AreEqual(4, minion.MaxHealth);
 		Assert.AreEqual(4, minion.Health);
+	}
+
+	[TestMethod]
+	public void StatModifier_NegativeHealth()
+	{
+		// Arrange
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		var testCard = new MinionCard("Test", attack: 3, health: 5, cost: 1);
+		var minion = new Minion(testCard, current);
+		current.Board.Add(minion);
+
+		// Base sanity check
+		Assert.AreEqual(3, minion.Attack);
+		Assert.AreEqual(5, minion.MaxHealth);
+		Assert.AreEqual(5, minion.Health);
+
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new DamageAction
+			{
+				Damage = (Value)3
+			});
+
+		Assert.AreEqual(3, minion.Attack);
+		Assert.AreEqual(5, minion.MaxHealth);
+		Assert.AreEqual(2, minion.Health);
+
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new AddStatModifierAction
+			{
+				HealthChange = (Value)1,
+				StatModifierType = StatModifierType.Set
+			});
+
+		Assert.AreEqual(3, minion.Attack);
+		Assert.AreEqual(1, minion.MaxHealth);
+		Assert.AreEqual(1, minion.Health);
+
+		engine.Resolve(
+			state,
+			new ActionContext { Target = minion },
+			new AddStatModifierAction
+			{
+				HealthChange = (Value)(-1),
+				StatModifierType = StatModifierType.Additive
+			});
+
+		Assert.AreEqual(3, minion.Attack);
+		Assert.AreEqual(0, minion.MaxHealth);
+		Assert.AreEqual(0, minion.Health);
+
+		Assert.IsFalse(minion.IsAlive);
 	}
 }

@@ -49,6 +49,7 @@ public class AddStatModifierAction : GameActionBase
 				{
 					SourcePlayer = target.Owner,
 					Source = target,
+					Target = target,
 				});
 			}
 		}
