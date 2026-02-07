@@ -14,5 +14,6 @@ public interface IGameEntity
 	public void AddAuraModifier(StatModifier statModifier);
 	public void RemoveModifier(StatModifier modifier);
 	public bool HasModifier(StatModifier modifier);
-	public void ClearAuras();
+	public void ClearAuras(bool skipRecalculate);
+	public void RecalculateStats();
 }

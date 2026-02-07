@@ -46,7 +46,7 @@ public abstract class Card : ITriggerSource, IGameEntity
 	public void AddAuraModifier(StatModifier auraStatModifier)
 	{
 		_auraModifiers.Add(auraStatModifier);
-		RecalculateStats();
+		//RecalculateStats();
 	}
 
 	public void RemoveModifier(StatModifier modifier)
@@ -62,10 +62,20 @@ public abstract class Card : ITriggerSource, IGameEntity
 		return _modifiers.Contains(modifier);
 	}
 
-	public void ClearAuras()
+	public void ClearAuras(bool skipRecalculate)
 	{
 		_auraModifiers.Clear();
+
+		if (!skipRecalculate)
+		{
+			RecalculateStats();
+		}
+	}
+
+	void IGameEntity.RecalculateStats()
+	{
 		RecalculateStats();
 	}
+
 	#endregion
 }

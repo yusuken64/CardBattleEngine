@@ -253,4 +253,103 @@ public class AuraTest
 
 		Assert.IsFalse(minion.IsAlive);
 	}
+
+	[TestMethod]
+	public void DamagePersistsThroughAuraTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 10; // ensure enough for all summons
+		var opponent = state.OpponentOf(current);
+
+		// Create normal Murloc
+		var card = new MinionCard("Murloc", cost: 0, attack: 1, health: 1);
+		card.MinionTribes = [MinionTribe.Murloc];
+		card.Owner = current;
+
+		// Create aura Murloc
+		var auraCard = new MinionCard("AuraMurloc", cost: 0, attack: 1, health: 1);
+		card.MinionTribes = [MinionTribe.Murloc];
+		auraCard.Owner = current;
+		auraCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Aura,
+			EffectTiming = EffectTiming.Persistant,
+			GameActions = new List<IGameAction>()
+			{
+				new AddStatModifierAction()
+				{
+					AttackChange = (Value)2,
+					HealthChange = (Value)2
+				}
+			},
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				Operations = new List<ITargetOperation>()
+				{
+					new SelectBoardEntitiesOperation() {
+						Group = TargetGroup.Minions,
+						Side = TeamRelationship.Friendly,
+						ExcludeSelf = true,
+					},
+				}
+			}
+		});
+
+		current.Hand.Add(card);
+		current.Hand.Add(auraCard);
+
+		// Summon the normal Murloc and non-Murloc first
+		PlayCardAction action = new() { Card = card };
+		ActionContext actionContext = new() { SourcePlayer = current };
+
+		Assert.IsTrue(action.IsValid(state, actionContext, out string _));
+
+		engine.Resolve(state, actionContext, action);
+
+		var murloc = current.Board.First(m => m.Name == "Murloc");
+
+		Assert.AreEqual(1, murloc.Attack);
+
+		// Now summon the aura Murloc — its aura should immediately apply
+		engine.Resolve(state, actionContext, new PlayCardAction() { Card = auraCard });
+
+		var auraMurloc = current.Board.First(m => m.Name == "AuraMurloc");
+
+		// Aura should buff only other friendly Murlocs
+		Assert.AreEqual(3, murloc.Attack, "Murloc should gain +2 attack from aura");
+		Assert.AreEqual(3, murloc.Health, "Murloc should gain +2 health from aura");
+
+		engine.Resolve(state, new ActionContext()
+		{
+			Target = murloc
+		}, new DamageAction()
+		{
+			Damage = (Value)1
+		});
+
+		Assert.AreEqual(2, murloc.Health);
+
+		engine.Resolve(state, new ActionContext()
+		{
+			Target = murloc
+		}, new DamageAction()
+		{
+			Damage = (Value)1
+		});
+
+		Assert.AreEqual(1, murloc.Health);
+
+		engine.Resolve(state, new ActionContext()
+		{
+			Target = murloc
+		}, new DamageAction()
+		{
+			Damage = (Value)1
+		});
+
+		Assert.AreEqual(0, murloc.Health);
+	}
 }

@@ -142,7 +142,7 @@ public class Minion : IGameEntity, ITriggerSource
 	public void AddAuraModifier(StatModifier auraStatModifier)
 	{
 		_auraModifiers.Add(auraStatModifier);
-		RecalculateStats();
+		//RecalculateStats();
 	}
 
 	public void RemoveModifier(StatModifier modifier)
@@ -159,7 +159,7 @@ public class Minion : IGameEntity, ITriggerSource
 		Health = Utils.Clamp(originalHealth, 0, MaxHealth);
 	}
 
-	private void RecalculateStats()
+	public void RecalculateStats()
 	{
 		// Before recalculating, compute how much damage the unit has taken.
 		// (damageTaken = MaxHealth_before - Health_before)
@@ -199,10 +199,14 @@ public class Minion : IGameEntity, ITriggerSource
 		return _modifiers.Contains(modifier);
 	}
 
-	public void ClearAuras()
+	public void ClearAuras(bool skipRecalculate)
 	{
 		_auraModifiers.Clear();
-		RecalculateStats();
+
+		if (!skipRecalculate)
+		{
+			RecalculateStats();
+		}
 	}
 
 	public override string ToString()

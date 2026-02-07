@@ -145,7 +145,7 @@ public class Player : IGameEntity, ITriggerSource
 	public void AddAuraModifier(StatModifier auraStatModifier)
 	{
 		_auraModifiers.Add(auraStatModifier);
-		RecalculateStats();
+		//RecalculateStats();
 	}
 
 	public void RemoveModifier(StatModifier modifier)
@@ -159,9 +159,18 @@ public class Player : IGameEntity, ITriggerSource
 		return _modifiers.Contains(modifier);
 	}
 
-	public void ClearAuras()
+	public void ClearAuras(bool skipRecalculate)
 	{
 		_auraModifiers.Clear();
+
+		if (!skipRecalculate)
+		{
+			RecalculateStats();
+		}
+	}
+
+	void IGameEntity.RecalculateStats()
+	{
 		RecalculateStats();
 	}
 }
