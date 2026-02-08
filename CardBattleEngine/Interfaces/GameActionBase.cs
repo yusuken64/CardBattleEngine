@@ -109,6 +109,7 @@ public class ActionContext
 	public int CardsLeftInDeck { get; internal set; }
 	public List<(IGameEntity, int)> AffectedEntities { get; internal set; } = new();
 	public bool IsAttack { get; internal set; }
+	public Card CardGained { get; internal set; }
 
 	internal void SetVar(string variableName, object value)
 	{
@@ -152,6 +153,7 @@ public class ActionContext
 		newContext.OriginalSource = this.OriginalSource;
 		newContext.CardsLeftInDeck = this.CardsLeftInDeck;
 		newContext.IsAttack = this.IsAttack;
+		newContext.CardGained = this.CardGained;
 
 		return newContext;
 	}

@@ -31,7 +31,7 @@ public class PlayCardAction : GameActionBase
 		var player = Card.Owner;
 		if (!player.Hand.Contains(Card))
 		{
-			reason = null;
+			reason = "Invalid Card";
 			return false;
 		}
 

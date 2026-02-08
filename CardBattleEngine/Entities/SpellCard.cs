@@ -11,7 +11,7 @@ public class SpellCard : Card
 	}
 
 	public override CardType Type => CardType.Spell;
-	public List<SpellCastEffect> SpellCastEffects { get; } = new();
+	public List<SpellCastEffect> SpellCastEffects { get; internal set; } = new();
 	public override int Health { get; set; }
 	public override int MaxHealth { get; set; }
 	public override bool IsAlive { get; set; } = true;
@@ -24,13 +24,19 @@ public class SpellCard : Card
 
 	public override Card Clone()
 	{
-		return new SpellCard(Name, ManaCost)
+		var spellCard = new SpellCard(Name, ManaCost)
 		{
 			Id = Id,
 			Owner = Owner,
 			SpriteID = SpriteID,
 			Description = Description,
+			CastRestriction = CastRestriction,
+			ValidTargetSelector = ValidTargetSelector,
+			SpellCastEffects = SpellCastEffects,
+			TriggeredEffects = TriggeredEffects
 		};
+
+		return spellCard;
 	}
 
 	internal override IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext actionContext)

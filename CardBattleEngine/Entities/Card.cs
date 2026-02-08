@@ -17,7 +17,7 @@ public abstract class Card : ITriggerSource, IGameEntity
 	#region ITriggerSource
 	public IGameEntity Entity => this;
 
-	public List<TriggeredEffect> TriggeredEffects { get; } = new List<TriggeredEffect>();
+	public List<TriggeredEffect> TriggeredEffects { get; internal set; } = new List<TriggeredEffect>();
 
 	#endregion
 

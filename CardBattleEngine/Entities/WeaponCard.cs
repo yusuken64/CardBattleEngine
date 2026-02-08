@@ -35,6 +35,9 @@ public class WeaponCard : Card
 			Owner = Owner,
 			SpriteID = SpriteID,
 			Description = Description,
+			CastRestriction = CastRestriction,
+			ValidTargetSelector = ValidTargetSelector,
+			TriggeredEffects = TriggeredEffects,
 		};
 	}
 

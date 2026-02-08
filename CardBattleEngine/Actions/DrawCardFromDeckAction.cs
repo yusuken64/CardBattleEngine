@@ -49,6 +49,7 @@ public class DrawTargetCardFromDeckAction : GameActionBase
 public class GainCardAction : GameActionBase
 {
 	public Card Card { get; set; }
+	public bool GenerateNewCard { get; set; }
 	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
@@ -61,8 +62,20 @@ public class GainCardAction : GameActionBase
 	{
 		if (!IsValid(state, actionContext, out var _)) { return []; }
 
-		Card.Owner = actionContext.SourcePlayer;
-		actionContext.SourcePlayer.Hand.Add(Card);
+		Card card;
+		if (GenerateNewCard)
+		{
+			card = Card.Clone();
+			card.Id = Guid.NewGuid();
+		}
+		else
+		{
+			card = Card;
+		}
+
+		card.Owner = actionContext.SourcePlayer;
+		actionContext.CardGained = card;
+		actionContext.SourcePlayer.Hand.Add(card);
 
 		return [];
 	}

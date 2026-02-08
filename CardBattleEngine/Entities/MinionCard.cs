@@ -105,6 +105,10 @@ public class MinionCard : Card
 			MaxHealth = Health,
 			SpriteID = SpriteID,
 			Description = Description,
+			CastRestriction = CastRestriction,
+			ValidTargetSelector = ValidTargetSelector,
+			TriggeredEffects = TriggeredEffects,
+			MinionTriggeredEffects = MinionTriggeredEffects
 		};
 	}
 

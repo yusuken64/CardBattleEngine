@@ -26,9 +26,9 @@ public class SpellTest
 			SourceCard = spellCard,
 			Target = current
 		}, new PlayCardAction { Card = spellCard });
-		
+
 		Assert.AreEqual(initialHandCount + 2, current.Hand.Count, "Player should have drawn three cards.");
-		Assert.AreEqual(initialDeckCount - 3, current.Deck.Count, "Deck should have one less card.");
+		Assert.AreEqual(initialDeckCount - 3, current.Deck.Count, "Deck should have one less minionCard.");
 	}
 
 	[TestMethod]
@@ -150,7 +150,7 @@ public class SpellTest
 			}
 		};
 		engine.Resolve(state, context, new CastSpellAction());
-		
+
 		foreach (var minion in current.Board)
 		{
 			Assert.AreEqual(3, minion.Health, "Current player minion did not take 1 damage");
@@ -180,7 +180,7 @@ public class SpellTest
 		var spell = new SpellCard("Sap", 1);
 		spell.SpellCastEffects.Add(new SpellCastEffect()
 		{
-			GameActions = [ new ReturnMinionToCard() 
+			GameActions = [ new ReturnMinionToCard()
 			{
 				TeamRelationship = TeamRelationship.Friendly,
 				ZoneType = ZoneType.Hand
@@ -202,8 +202,149 @@ public class SpellTest
 		Assert.AreEqual(0, opponent.Hand.Count(), "Hand is empty");
 
 		engine.Resolve(state, context, new CastSpellAction());
-		
+
 		Assert.AreEqual(0, opponent.Board.Count(), "Minion should return to hand");
 		Assert.AreEqual(1, opponent.Hand.Count(), "Minion should return to hand");
+	}
+
+	[TestMethod]
+	public void GenerateCostTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 7;
+		var opponent = state.OpponentOf(current);
+
+		SpellCard fireball = new ("FireBall", 0);
+		fireball.ValidTargetSelector = new EntityTypeSelector()
+		{
+			EntityTypes = EntityType.Player | EntityType.Minion,
+			TeamRelationship = TeamRelationship.Any,
+		};
+		fireball.SpellCastEffects.Add(
+			new SpellCastEffect()
+			{
+				AffectedEntitySelector = new ContextSelector()
+				{
+					IncludeTarget = true
+				},
+				GameActions = [new DamageAction()
+				{
+					Damage = (Value)6,
+				}]
+			}
+		);
+
+		SpellCard test = new("test", 0);
+		fireball.SpellCastEffects.Add(
+			new SpellCastEffect()
+			{
+				AffectedEntitySelector = new ContextSelector()
+				{
+					IncludeSourcePlayer	= true,
+				},
+				GameActions = [new GainManaAction() {
+					Amount = (Value)1,
+				}]
+			}
+		);
+		test.Owner = current;
+		current.Hand.Add(test);
+
+		var minionCard = new MinionCard("Test", 1, 4, 4)
+		{
+			MinionTriggeredEffects = [
+				new TriggeredEffect()
+				{
+					EffectTiming = EffectTiming.Post,
+					EffectTrigger = EffectTrigger.SpellCast,
+					AffectedEntitySelector = new ContextSelector()
+					{
+						IncludeSourcePlayer = true,
+					},
+					GameActions = [
+						new GainCardAction()
+						{
+							Card = fireball,
+							GenerateNewCard = true
+						}
+					]
+				}
+			]
+		};
+		current.Board.Add(new Minion(minionCard, current));
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				Target = current,
+				SourcePlayer = current,
+			},
+			new PlayCardAction()
+			{
+				Card = test
+			});
+
+		Assert.IsTrue(current.Hand.Any(x => x.Name == "FireBall"));
+		Assert.AreEqual(1, current.Hand.Count());
+		
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				Target = current,
+				SourcePlayer = current,
+			},
+			new PlayCardAction()
+			{
+				Card = test
+			});
+
+		fireball.SpellCastEffects.Add(
+			new SpellCastEffect()
+			{
+				AffectedEntitySelector = new ContextSelector()
+				{
+					IncludeSourcePlayer = true,
+				},
+				GameActions = [new GainManaAction() {
+					Amount = (Value)1,
+				}]
+			}
+		);
+		test.Owner = current;
+		current.Hand.Add(test);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				Target = current,
+				SourcePlayer = current,
+			},
+			new PlayCardAction()
+			{
+				Card = test
+			});
+
+		Assert.AreEqual(2, current.Hand.Count(x => x.Name == "FireBall"));
+		Assert.IsFalse(current.Hand[0] == current.Hand[1]);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				Target = current,
+				SourcePlayer = current,
+			},
+			new PlayCardAction()
+			{
+				Card = current.Hand[0]
+			});
+
+		Assert.AreEqual(2, current.Hand.Count(x => x.Name == "FireBall"));
 	}
 }
