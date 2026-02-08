@@ -69,6 +69,7 @@ public class PlayCardAction : GameActionBase
 		yield return (new SpendManaAction { Amount = Card.ManaCost }, actionContext);
 
 		Card.Owner.Hand.Remove(Card);
+		actionContext.SourceCard = Card;
 
 		foreach (var effect in Card.GetPlayEffects(state, actionContext))
 			yield return effect;

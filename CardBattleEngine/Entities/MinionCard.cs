@@ -44,7 +44,8 @@ public class MinionCard : Card
 	{
 		SummonMinionAction summonMinionAction = new()
 		{
-			Card = this
+			Card = (MinionCard)this.Clone(),
+			//Card = this,
 		};
 
 		if (summonMinionAction.IsValid(state, context, out _))
@@ -77,7 +78,7 @@ public class MinionCard : Card
 			{
 				var effectContext = new ActionContext
 				{
-					SourceCard = this,
+					SourceCard = null,
 					Source = context.SummonedMinion,
 					SourcePlayer = context.SourcePlayer,
 					Target = target,
@@ -101,6 +102,11 @@ public class MinionCard : Card
 			HasDivineShield = HasDivineShield,
 			HasPoisonous = HasPoisonous,
 			HasTaunt = HasTaunt,
+			HasReborn = HasReborn,
+			HasRush = HasRush,
+			HasWindfury = HasWindfury,
+			CannotAttack = CannotAttack,
+			HasLifeSteal = HasLifeSteal,
 			MinionTribes = MinionTribes.ToList(),
 			MaxHealth = Health,
 			SpriteID = SpriteID,
@@ -108,7 +114,7 @@ public class MinionCard : Card
 			CastRestriction = CastRestriction,
 			ValidTargetSelector = ValidTargetSelector,
 			TriggeredEffects = TriggeredEffects,
-			MinionTriggeredEffects = MinionTriggeredEffects
+			MinionTriggeredEffects = MinionTriggeredEffects,
 		};
 	}
 

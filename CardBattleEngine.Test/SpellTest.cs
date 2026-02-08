@@ -208,7 +208,7 @@ public class SpellTest
 	}
 
 	[TestMethod]
-	public void GenerateCostTest()
+	public void GenerateCardTest()
 	{
 		var state = GameFactory.CreateTestGame();
 		var engine = new GameEngine();

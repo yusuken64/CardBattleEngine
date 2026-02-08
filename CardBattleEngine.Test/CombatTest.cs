@@ -153,6 +153,87 @@ public class CombatTest
 		current.Board.Add(new Minion(eotCard, current));
 
 		engine.Resolve(state, new ActionContext(), new EndTurnAction());
+	}
 
+	[TestMethod]
+	public void OnyxiaTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 10;
+		var opponent = state.OpponentOf(current);
+
+		MinionCard whelpCard = new MinionCard("Whelp", 1, 1, 1);
+
+		MinionCard onyxia = new MinionCard("Onyxia", 1, 8, 8);
+		TriggeredEffect item = new TriggeredEffect()
+		{
+			EffectTiming = EffectTiming.Post,
+			EffectTrigger = EffectTrigger.Battlecry,
+			AffectedEntitySelector = new ContextSelector()
+			{
+				IncludeSourcePlayer = true,
+			},
+			GameActions = [new RepeatAction()
+			{
+				Count = (Value)6,
+				ChildActions = new List<IGameAction>() {
+					new SummonMinionAction()
+					{
+						Card = whelpCard,
+					}
+				}
+			}]
+		};
+		onyxia.MinionTriggeredEffects.Add(item);
+
+		onyxia.Owner = current;
+		current.Hand.Add(onyxia);
+
+		Assert.AreEqual(0, current.Board.Count);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+			},
+			new PlayCardAction()
+			{
+				Card = onyxia
+			});
+
+		Assert.AreEqual(7, current.Board.Count);
+		Assert.AreEqual(8, current.Board[0].Health);
+		Assert.AreEqual(1, current.Board[1].Health);
+		Assert.AreEqual(1, current.Board[2].Health);
+		Assert.AreEqual(1, current.Board[3].Health);
+		Assert.AreEqual(1, current.Board[4].Health);
+		Assert.AreEqual(1, current.Board[5].Health);
+		Assert.AreEqual(1, current.Board[6].Health);
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+				Target = current.Board[1]
+			},
+			new DamageAction
+			{
+				Damage = (Value)1
+			});
+
+		Assert.AreEqual(6, current.Board.Count);
+		Assert.AreEqual(8, current.Board[0].Health);
+		Assert.AreEqual(1, current.Board[1].Health);
+		Assert.AreEqual(1, current.Board[2].Health);
+		Assert.AreEqual(1, current.Board[3].Health);
+		Assert.AreEqual(1, current.Board[4].Health);
+		Assert.AreEqual(1, current.Board[5].Health);
+
+		Assert.AreNotEqual(current.Board[1], current.Board[2]);
 	}
 }

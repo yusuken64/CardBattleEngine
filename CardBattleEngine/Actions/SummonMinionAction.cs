@@ -29,16 +29,22 @@ public class SummonMinionAction : GameActionBase
 			?? new Minion(Card, actionContext.SourcePlayer);
 
 		var list = actionContext.SourcePlayer.Board;
-		int requested = actionContext.PlayIndex + IndexOffset;
+		int playIndex = actionContext.PlayIndex;
 
 		int clampedIndex =
-			(requested == -1 || requested < 0 || requested > list.Count)
+			(playIndex == -1 || playIndex < 0 || playIndex > list.Count)
 				? list.Count
-				: requested;
+				: playIndex;
+		var offsetIndex = clampedIndex + IndexOffset;
+
+		clampedIndex =
+			(offsetIndex == -1 || offsetIndex < 0 || offsetIndex > list.Count)
+				? list.Count
+				: offsetIndex;
 
 		list.Insert(clampedIndex, minion);
 
-		actionContext.PlayIndex = clampedIndex;
+		actionContext.PlayIndex = list.IndexOf(minion);
 
 		if (actionContext.IsReborn)
 		{

@@ -133,6 +133,7 @@ public class Minion : IGameEntity, ITriggerSource
 			IsAlive = IsAlive,
 		};
 	}
+
 	public void AddModifier(StatModifier modifier)
 	{
 		_modifiers.Add(modifier);
