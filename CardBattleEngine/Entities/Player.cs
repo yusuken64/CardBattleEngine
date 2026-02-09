@@ -42,6 +42,7 @@ public class Player : IGameEntity, ITriggerSource
 	public IGameEntity Entity => this;
 
 	public int Fatigue { get; internal set; } = 0;
+	public VariableSet VariableSet { get; set; } = new();
 
 	public Player(string name) 
 	{

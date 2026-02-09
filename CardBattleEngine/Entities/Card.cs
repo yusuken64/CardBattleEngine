@@ -78,4 +78,5 @@ public abstract class Card : ITriggerSource, IGameEntity
 	}
 
 	#endregion
+	public VariableSet VariableSet { get; set; } = new();
 }

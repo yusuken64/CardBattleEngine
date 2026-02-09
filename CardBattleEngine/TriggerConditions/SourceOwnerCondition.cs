@@ -11,13 +11,13 @@ public class SourceOwnerCondition : TriggerConditionBase
 		switch (SourceType)
 		{
 			case SourceType.Card:
-				entity = context.SourceCard.Owner;
+				entity = context.SourceCard?.Owner;
 				break;
 			case SourceType.Player:
-				entity = context.OriginalSource.Owner;
+				entity = context.OriginalSource?.Owner;
 				break;
 			case SourceType.Source:
-				entity = context.Source.Owner;
+				entity = context.Source?.Owner;
 				break;
 			case SourceType.TriggerSource:
 				entity = context.Source;

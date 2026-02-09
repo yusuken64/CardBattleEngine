@@ -44,8 +44,7 @@ public class MinionCard : Card
 	{
 		SummonMinionAction summonMinionAction = new()
 		{
-			Card = (MinionCard)this.Clone(),
-			//Card = this,
+			Card = (MinionCard)this.Clone()
 		};
 
 		if (summonMinionAction.IsValid(state, context, out _))
@@ -59,9 +58,10 @@ public class MinionCard : Card
 		int originalIndex = context.PlayIndex;
 		foreach (var effect in MinionTriggeredEffects)
 		{
-			if (effect.EffectTrigger != EffectTrigger.OnPlay &&
-				effect.EffectTrigger != EffectTrigger.Battlecry)
+			if (effect.EffectTrigger != EffectTrigger.Battlecry)
+			{
 				continue;
+			}
 
 			IEnumerable<IGameEntity> targets;
 			// If this play action provided a selector, ask it for a target

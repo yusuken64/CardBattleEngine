@@ -347,4 +347,91 @@ public class SpellTest
 
 		Assert.AreEqual(2, current.Hand.Count(x => x.Name == "FireBall"));
 	}
+
+	[TestMethod]
+	public void ShadowFlameTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 7;
+		var opponent = state.OpponentOf(current);
+
+		SpellCard shadowFlame = new("ShadowFlame", 0);
+		shadowFlame.ValidTargetSelector = new EntityTypeSelector()
+		{
+			EntityTypes = EntityType.Minion,
+			TeamRelationship = TeamRelationship.Friendly,
+		};
+		shadowFlame.SpellCastEffects.Add(
+			new SpellCastEffect()
+			{
+				AffectedEntitySelector = new ContextSelector()
+				{
+					IncludeTarget = true
+				},
+				GameActions = [
+				new AssignVariableAction() {
+					VariableName = "ShadowFlameDamage",
+					VariableScope = VariableScope.Entity,
+					Value = new StatValue()
+					{
+						EntityStat = Stat.Attack,
+						EntityContextProvider = ContextProvider.Target,
+					}
+				},
+				new DeathAction() {}
+				]
+			});
+		shadowFlame.SpellCastEffects.Add(
+			new SpellCastEffect()
+			{
+				AffectedEntitySelector = new TargetOperationSelector()
+				{
+					Operations = [new SelectBoardEntitiesOperation(){
+						Group = TargetGroup.Minions,
+						Side = TeamRelationship.Enemy,
+					}]
+				},
+				GameActions = [new DamageAction() {
+					Damage = new VariableValue()
+					{
+						VariableName = "ShadowFlameDamage",
+						VariableScope = VariableScope.Entity
+					}
+				}]
+			}
+		);
+
+		MinionCard testMinion = new MinionCard("test", 1, 3, 4);
+		current.Board.Add(new Minion(testMinion, current));
+		current.Board.Add(new Minion(testMinion, current));
+
+		opponent.Board.Add(new Minion(testMinion, opponent));
+		opponent.Board.Add(new Minion(testMinion, opponent));
+		opponent.Board.Add(new Minion(testMinion, opponent));
+
+		current.Hand.Add(shadowFlame);
+		shadowFlame.Owner = current;
+
+		engine.Resolve(
+			state,
+			new ActionContext() 
+			{
+				SourcePlayer = current,
+				Source = shadowFlame,
+				Target = current.Board[0],
+			},
+			new PlayCardAction()
+			{
+				Card = shadowFlame
+			});
+
+		Assert.AreEqual(1, current.Board.Count());
+		Assert.AreEqual(4, current.Board[0].Health);
+		Assert.AreEqual(1, opponent.Board[0].Health);
+		Assert.AreEqual(1, opponent.Board[0].Health);
+		Assert.AreEqual(1, opponent.Board[0].Health);
+	}
 }

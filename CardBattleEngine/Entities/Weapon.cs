@@ -14,6 +14,7 @@ public class Weapon : ITriggerSource, IGameEntity
 	public bool IsAlive { get; set; }
 	public int OriginalAttack { get; }
 	public int OriginalDurability { get; }
+	public VariableSet VariableSet { get; set; } = new();
 
 	public IAttackBehavior AttackBehavior => (Owner as IGameEntity).AttackBehavior;
 
