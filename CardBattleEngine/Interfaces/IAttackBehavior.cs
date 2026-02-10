@@ -57,6 +57,12 @@ public class MinionAttackBehavior : IAttackBehavior
 			return false;
 		}
 
+		if (minion.Attack <= 0)
+		{
+			reason = "";
+			return false;
+		}
+
 		// ----- WIND FURY / ATTACK COUNT -----
 		if (minion.AttacksPerformedThisTurn >= MaxAttacks(attacker))
 		{
