@@ -23,7 +23,6 @@ public class AcquireWeaponAction : GameActionBase
 				new ActionContext { Source = player, Target = player });
 		}
 
-		// After destruction resolves (deathrattle etc.), engine continues
 		yield return (new EquipWeaponAction { Weapon = Weapon },
 			new ActionContext { Source = context.Source, Target = player });
 	}

@@ -68,7 +68,40 @@ public class GameState
 					actionContext,
 					out _))
 			{
-				actions.Add((playCardAction, actionContext));
+				if (playCardAction.Card is WeaponCard weaponCard)
+				{
+					actionContext = new CardBattleEngine.ActionContext()
+					{
+						SourcePlayer = actionContext.SourcePlayer,
+						Target = actionContext.SourcePlayer
+					};
+					actions.Add((playCardAction, actionContext));
+					continue;
+				}
+
+				var validTargets = playCardAction.Card.ValidTargetSelector?.Select(this, player, playCardAction.Card);
+				if (validTargets != null)
+				{
+					foreach(var target in validTargets)
+					{
+						ActionContext actionContextTarget = new()
+						{
+							SourcePlayer = player,
+							SourceCard = card,
+							Target = target,
+						};
+						actions.Add((playCardAction, actionContextTarget));
+					}
+				}
+				else
+				{
+					ActionContext actionContextNoTarget = new()
+					{
+						SourcePlayer = player,
+						SourceCard = card,
+					};
+					actions.Add((playCardAction, actionContextNoTarget));
+				}
 			}
 		}
 

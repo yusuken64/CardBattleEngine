@@ -27,7 +27,9 @@ public class DamageAction : GameActionBase
 			int damageToApply = Damage.GetValue(state, actionContext);
 
 			// Divine Shield negates damage completely
-			if (target is Minion targetMinion && targetMinion.HasDivineShield)
+			if (target is Minion targetMinion &&
+				targetMinion.HasDivineShield &&
+				damageToApply > 0)
 			{
 				targetMinion.HasDivineShield = false;
 				damageToApply = 0; // no damage actually applied
