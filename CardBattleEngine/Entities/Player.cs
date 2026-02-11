@@ -73,35 +73,31 @@ public class Player : IGameEntity, ITriggerSource
 
 		// Deep copy the collections
 		foreach (var card in Deck)
-			clone.Deck.Add(card.Clone());
-
-		foreach(var card in clone.Deck)
 		{
-			card.Owner = clone;
+			Card clonedCard = card.Clone();
+			clone.Deck.Add(clonedCard);
+			clonedCard.Owner = clone;
 		}
 
 		foreach (var card in Hand)
-			clone.Hand.Add(card.Clone());
-
-		foreach (var card in clone.Hand)
 		{
-			card.Owner = clone;
+			Card clonedCard = card.Clone();
+			clone.Hand.Add(clonedCard);
+			clonedCard.Owner = clone;
 		}
 
 		foreach (var minion in Board)
-			clone.Board.Add(minion.Clone());
-
-		foreach (var minion in clone.Board)
 		{
-			minion.Owner = clone;
+			Minion clonedMinion = minion.Clone();
+			clone.Board.Add(clonedMinion);
+			clonedMinion.Owner = clone;
 		}
 
 		foreach (var minion in Graveyard)
-			clone.Graveyard.Add(minion.Clone());
-
-		foreach (var minion in clone.Graveyard)
 		{
-			minion.Owner = clone;
+			Minion clonedMinion = minion.Clone();
+			clone.Graveyard.Add(clonedMinion);
+			clonedMinion.Owner = clone;
 		}
 
 		return clone;

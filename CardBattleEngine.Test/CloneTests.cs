@@ -1,4 +1,6 @@
-﻿namespace CardBattleEngine.Test
+﻿using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+
+namespace CardBattleEngine.Test
 {
 	[TestClass]
 	public sealed class CloneTests
@@ -68,6 +70,106 @@
 				Assert.AreEqual(card.Owner, player);
 				Assert.AreEqual(clonedCard.Owner, clonedPlayer);
 			}
+		}
+
+		[TestMethod]
+		public void CloneActionTest()
+		{
+			var gameState = GameFactory.CreateTestGame();
+			var engine = new GameEngine();
+			var current = gameState.Players[0];
+
+			MinionCard testCard = new MinionCard("Test", 1, 1, 1);
+			testCard.Owner = current;
+			current.Hand.Add(testCard);
+			{
+				PlayCardAction playCardAction = new PlayCardAction()
+				{
+					Card = testCard
+				};
+
+				ActionContext context = new ActionContext()
+				{
+					Source = current,
+				};
+				var isValid = playCardAction.IsValid(gameState, context, out string reason);
+				Assert.IsTrue(isValid, reason);
+			}
+			{
+				var clonedState = gameState.Clone();
+
+				Card clonedTestCard = (Card)clonedState.GetEntityById(testCard.Id);
+				Player clonedPlayer = clonedState.Players[0];
+				Assert.IsTrue(clonedPlayer.Hand.Contains(clonedTestCard));
+				Assert.AreEqual(clonedTestCard.Owner, clonedPlayer);
+
+				PlayCardAction playCardAction = new PlayCardAction()
+				{
+					Card = clonedTestCard
+				};
+				ActionContext context = new ActionContext()
+				{
+					SourcePlayer = clonedPlayer,
+					Source = clonedPlayer,
+				};
+				var isValid = playCardAction.IsValid(clonedState, context, out string reason);
+				Assert.IsTrue(isValid, reason);
+
+				engine.Resolve(clonedState, context, playCardAction);
+
+				Assert.IsTrue(!clonedPlayer.Hand.Contains(clonedTestCard));
+			}
+		}
+
+		[TestMethod]
+		public void CloneActionTest2()
+		{
+			var gameState = GameFactory.CreateTestGame();
+			var engine = new GameEngine();
+			var current = gameState.Players[0];
+
+			MinionCard testCard = new MinionCard("Test", 1, 1, 1);
+			testCard.Owner = current;
+			current.Hand.Add(testCard);
+
+			var actions = gameState.GetValidActions(current);
+
+			Assert.IsTrue(actions.Any(x => x.Item1 is PlayCardAction));
+			var originalPlaycardAction = actions.First(x => x.Item1 is PlayCardAction);
+
+			{
+				var clonedState = gameState.Clone();
+
+				Card clonedTestCard = (Card)clonedState.GetEntityById(testCard.Id);
+				Player clonedPlayer = clonedState.Players[0];
+				Assert.IsTrue(clonedPlayer.Hand.Contains(clonedTestCard));
+				Assert.AreEqual(clonedTestCard.Owner, clonedPlayer);
+
+				PlayCardAction playCardAction = new PlayCardAction()
+				{
+					Card = clonedTestCard
+				};
+				ActionContext context = new ActionContext()
+				{
+					SourcePlayer = clonedPlayer,
+					Source = clonedPlayer,
+				};
+				var isValid = playCardAction.IsValid(clonedState, context, out string reason);
+				Assert.IsTrue(isValid, reason);
+
+				engine.Resolve(clonedState, context, playCardAction);
+
+				Assert.IsTrue(!clonedPlayer.Hand.Contains(clonedTestCard));
+			}
+
+		}
+
+		[TestMethod]
+		public void CloneVariable()
+		{
+			ActionContext context = new ActionContext();
+
+			context.SetVar();
 		}
 	}
 }

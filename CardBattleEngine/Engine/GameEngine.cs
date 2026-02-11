@@ -5,7 +5,6 @@ public class GameEngine
 	private readonly EventBus _eventBus;
 	private readonly Queue<(IGameAction, ActionContext)> _actionQueue = new();
 
-	public Action<GameState, IGameAction> ActionCallback;
 	public Action<GameState, (IGameAction action, ActionContext context)> ActionPlaybackCallback;
 	public Action<GameState> ActionResolvedCallback;
 

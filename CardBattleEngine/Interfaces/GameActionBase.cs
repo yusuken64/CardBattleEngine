@@ -111,7 +111,7 @@ public class ActionContext
 	public bool IsAttack { get; internal set; }
 	public Card CardGained { get; internal set; }
 
-	internal void SetVar(string variableName, object value)
+	public void SetVar(string variableName, object value)
 	{
 		if (string.IsNullOrEmpty(variableName))
 			throw new ArgumentException(nameof(variableName));
@@ -124,7 +124,7 @@ public class ActionContext
 		_variables[variableName] = value;
 	}
 
-	internal object GetVar(string variableName)
+	public object GetVar(string variableName)
 	{
 		if (string.IsNullOrEmpty(variableName))
 			throw new ArgumentException(nameof(variableName));
@@ -154,6 +154,7 @@ public class ActionContext
 		newContext.CardsLeftInDeck = this.CardsLeftInDeck;
 		newContext.IsAttack = this.IsAttack;
 		newContext.CardGained = this.CardGained;
+		newContext._variables = this._variables;
 
 		return newContext;
 	}
