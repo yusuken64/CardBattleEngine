@@ -163,13 +163,5 @@ namespace CardBattleEngine.Test
 			}
 
 		}
-
-		[TestMethod]
-		public void CloneVariable()
-		{
-			ActionContext context = new ActionContext();
-
-			context.SetVar();
-		}
 	}
 }

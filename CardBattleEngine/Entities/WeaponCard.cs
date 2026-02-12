@@ -37,7 +37,8 @@ public class WeaponCard : Card
 			Description = Description,
 			CastRestriction = CastRestriction,
 			ValidTargetSelector = ValidTargetSelector,
-			TriggeredEffects = TriggeredEffects,
+			TriggeredEffects = TriggeredEffects.ToList(),
+			VariableSet = new VariableSet(VariableSet),
 		};
 	}
 

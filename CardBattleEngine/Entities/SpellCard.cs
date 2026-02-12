@@ -32,8 +32,9 @@ public class SpellCard : Card
 			Description = Description,
 			CastRestriction = CastRestriction,
 			ValidTargetSelector = ValidTargetSelector,
-			SpellCastEffects = SpellCastEffects,
-			TriggeredEffects = TriggeredEffects
+			SpellCastEffects = SpellCastEffects.ToList(),
+			TriggeredEffects = TriggeredEffects.ToList(),
+			VariableSet = new VariableSet(VariableSet),
 		};
 
 		return spellCard;

@@ -23,6 +23,15 @@ public class VariableSet
 {
 	private readonly Dictionary<string, int> _vars = new();
 
+	public VariableSet(VariableSet variableSet)
+	{
+		_vars = new(variableSet._vars);
+	}
+
+	public VariableSet()
+	{
+	}
+
 	public void SetVar(string name, int value)
 	{
 		if (string.IsNullOrWhiteSpace(name))

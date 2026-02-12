@@ -8,6 +8,8 @@ public class GameEngine
 	public Action<GameState, (IGameAction action, ActionContext context)> ActionPlaybackCallback;
 	public Action<GameState> ActionResolvedCallback;
 
+	public bool IsSimulation = false; //if true skips features for speed
+
 	public GameEngine()
 	{
 		_eventBus = new();
@@ -69,23 +71,32 @@ public class GameEngine
 				_actionQueue.Enqueue(trigger);
 			}
 		}
-		ActionResolvedCallback?.Invoke(gameState);
+		if (!IsSimulation)
+		{
+			ActionResolvedCallback?.Invoke(gameState);
+		}
 	}
 
 	private IEnumerable<(IGameAction, ActionContext)> ResolveAction(GameState gameState, (IGameAction action, ActionContext context) current)
 	{
-		gameState.History.Add(new HistoryEntry()
+		if (!IsSimulation)
 		{
-			Turn = gameState.turn,
-			Player = current.context.SourcePlayer,
-			Action = current.action,
-			Context = current.context
-		});
+			gameState.History.Add(new HistoryEntry()
+			{
+				Turn = gameState.turn,
+				Player = current.context.SourcePlayer,
+				Action = current.action,
+				Context = current.context
+			});
+		}
 
 		// Resolve action and enqueue returned side effects
 		var ret =  current.action.Resolve(gameState, current.context).ToList();
-		_eventBus.EvaluatePersistentEffects(gameState);
-		ActionPlaybackCallback?.Invoke(gameState, current);
+		if (!IsSimulation)
+		{
+			_eventBus.EvaluatePersistentEffects(gameState);
+			ActionPlaybackCallback?.Invoke(gameState, current);
+		}
 		return ret;
 	}
 

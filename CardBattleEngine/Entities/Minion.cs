@@ -14,7 +14,7 @@ public class Minion : IGameEntity, ITriggerSource
 	public List<MinionTribe> Tribes { get; set; }
 	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
-	public bool HasSummoningSickness { get; internal set; }
+	public bool HasSummoningSickness { get; set; }
 	public IEnumerable<(TriggeredEffect, StatModifier)> ModifierTriggeredEffects
 	{
 		get
@@ -97,6 +97,8 @@ public class Minion : IGameEntity, ITriggerSource
 			var instance = effect.Clone();
 			return instance;
 		}).ToList();
+
+		VariableSet = new VariableSet(card.VariableSet);
 	}
 
 	public bool CanAttack()
@@ -130,7 +132,7 @@ public class Minion : IGameEntity, ITriggerSource
 			HasReborn = this.HasReborn,
 			CannotAttack = this.CannotAttack,
 			IsFrozen = this.IsFrozen,
-			TriggeredEffects = this.TriggeredEffects,
+			TriggeredEffects = this.TriggeredEffects.ToList(),
 
 			IsAlive = IsAlive,
 		};

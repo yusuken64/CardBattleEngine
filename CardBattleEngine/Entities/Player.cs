@@ -32,7 +32,7 @@ public class Player : IGameEntity, ITriggerSource
 	public Player Owner { get; set; }
 
 	public bool IsAlive { get; set; }
-	public List<TriggeredEffect> TriggeredEffects { get; }
+	public List<TriggeredEffect> TriggeredEffects { get; set; }
 	public bool IsFrozen { get; internal set; }
 	public bool HasAttackedThisTurn { get; set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
@@ -67,6 +67,8 @@ public class Player : IGameEntity, ITriggerSource
 			IsAlive = IsAlive,
 			IsFrozen = IsFrozen,
 			Fatigue = Fatigue,
+			TriggeredEffects = TriggeredEffects.ToList(),
+			VariableSet = new VariableSet(VariableSet),
 		};
 
 		clone.EquippedWeapon = EquippedWeapon?.Clone();
@@ -99,6 +101,58 @@ public class Player : IGameEntity, ITriggerSource
 			clone.Graveyard.Add(clonedMinion);
 			clonedMinion.Owner = clone;
 		}
+
+		return clone;
+	}
+
+	internal Player LightClone()
+	{
+		var clone = new Player(Name)
+		{
+			Id = Id,
+			MaxMana = MaxMana,
+			Health = Health,
+			MaxHealth = MaxHealth,
+			Mana = Mana,
+			//EquippedWeapon = EquippedWeapon.Clone,
+			HasAttackedThisTurn = HasAttackedThisTurn,
+			IsAlive = IsAlive,
+			IsFrozen = IsFrozen,
+			Fatigue = Fatigue,
+			TriggeredEffects = TriggeredEffects.ToList(),
+			VariableSet = new VariableSet(VariableSet),
+		};
+
+		clone.EquippedWeapon = EquippedWeapon?.Clone();
+
+		// Deep copy the collections
+		foreach (var card in Deck.Take(1))
+		{
+			Card clonedCard = card.Clone();
+			clone.Deck.Add(clonedCard);
+			clonedCard.Owner = clone;
+		}
+
+		foreach (var card in Hand)
+		{
+			Card clonedCard = card.Clone();
+			clone.Hand.Add(clonedCard);
+			clonedCard.Owner = clone;
+		}
+
+		foreach (var minion in Board)
+		{
+			Minion clonedMinion = minion.Clone();
+			clone.Board.Add(clonedMinion);
+			clonedMinion.Owner = clone;
+		}
+
+		//foreach (var minion in Graveyard)
+		//{
+		//	Minion clonedMinion = minion.Clone();
+		//	clone.Graveyard.Add(clonedMinion);
+		//	clonedMinion.Owner = clone;
+		//}
 
 		return clone;
 	}

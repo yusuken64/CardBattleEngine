@@ -11,7 +11,7 @@ public class HumanAgent : IGameAgent
 
 	(IGameAction, ActionContext) IGameAgent.GetNextAction(GameState state)
 	{
-		var actions = state.GetUntargetedActions(_player).ToList();
+		var actions = state.GetValidActions(_player).ToList();
 
 		// Step 1: select the action
 		(IGameAction, ActionContext) selectedAction = SelectFromList(

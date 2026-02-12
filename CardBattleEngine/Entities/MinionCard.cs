@@ -113,8 +113,9 @@ public class MinionCard : Card
 			Description = Description,
 			CastRestriction = CastRestriction,
 			ValidTargetSelector = ValidTargetSelector,
-			TriggeredEffects = TriggeredEffects,
-			MinionTriggeredEffects = MinionTriggeredEffects,
+			TriggeredEffects = TriggeredEffects.ToList(),
+			MinionTriggeredEffects = MinionTriggeredEffects.ToList(),
+			VariableSet = new VariableSet(VariableSet),
 		};
 	}
 

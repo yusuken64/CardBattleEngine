@@ -109,8 +109,9 @@ public class Weapon : ITriggerSource, IGameEntity
 			Attack = Attack,
 			Durability = Durability,
 			Owner = Owner,
-			TriggeredEffects = TriggeredEffects,
+			TriggeredEffects = TriggeredEffects.ToList(),
 			OriginalCard = OriginalCard,
+			VariableSet = new VariableSet(VariableSet),
 		};
 	}
 }

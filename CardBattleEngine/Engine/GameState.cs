@@ -38,6 +38,19 @@ public class GameState
 			.AsReadOnly();
 	}
 
+	private Dictionary<Guid, IGameEntity> _entityMap;
+
+	public void RebuildEntityMap()
+	{
+		_entityMap = new Dictionary<Guid, IGameEntity>();
+		foreach (var player in Players)
+		{
+			_entityMap[player.Id] = player;
+			foreach (var minion in player.Board) _entityMap[minion.Id] = minion;
+			foreach (var card in player.Hand) _entityMap[card.Id] = card;
+		}
+	}
+
 	public Player OpponentOf(Player player)
 	{
 		return player == Players[0] ? Players[1] : Players[0];
@@ -61,6 +74,7 @@ public class GameState
 			ActionContext actionContext = new()
 			{
 				SourcePlayer = player,
+				Source = player,
 				SourceCard = card,
 			};
 
@@ -73,6 +87,7 @@ public class GameState
 					actionContext = new CardBattleEngine.ActionContext()
 					{
 						SourcePlayer = actionContext.SourcePlayer,
+						Source = player,
 						Target = actionContext.SourcePlayer
 					};
 					actions.Add((playCardAction, actionContext));
@@ -158,63 +173,6 @@ public class GameState
 		return actions;
 	}
 
-	public List<(IGameAction, ActionContext)> GetUntargetedActions(Player player)
-	{
-		var actions = new List<(IGameAction, ActionContext)>();
-
-		if (PendingChoice != null)
-		{
-			actions.AddRange(PendingChoice.GetActions(this));
-			return actions;
-		}
-
-		// Playable cards
-		foreach (var card in player.Hand)
-		{
-			if (card.ManaCost <= player.Mana)
-			{
-				var playCardAction = new PlayCardAction() { Card = card };
-
-				ActionContext actionContext = new()
-				{
-					SourcePlayer = player,
-					SourceCard = card,
-				};
-
-				if (playCardAction.IsValid(this, actionContext, out string _))
-				{
-					actions.Add((playCardAction, null));
-				}
-			}
-		}
-
-		List<IGameEntity> attackers = [player, .. player.Board];
-
-		foreach (var attacker in attackers)
-		{
-			if (!attacker.CanAttack())
-			{
-				continue;
-			}
-
-			var attackHeroAction = new AttackAction();
-			actions.Add((attackHeroAction, new ActionContext()
-			{
-				Source = attacker
-			}));
-		}
-
-		// Always can end turn
-		actions.Add((
-			new EndTurnAction(),
-			new()
-			{
-				SourcePlayer = player,
-			}));
-
-		return actions;
-	}
-
 	public bool IsGameOver()
 	{
 		foreach (var player in Players)
@@ -245,7 +203,7 @@ public class GameState
 		var p2 = Players[1].Clone();
 
 		// Create a new game state using the cloned players
-		var clone = new GameState(p1, p2, this.rNG.Clone(), this.CardDB)
+		var clone = new GameState(p1, p2, this.rNG?.Clone(), this.CardDB)
 		{
 			MaxBoardSize = this.MaxBoardSize,
 			maxTurns = this.maxTurns,
@@ -260,38 +218,79 @@ public class GameState
 		return clone;
 	}
 
+	public GameState LightClone()
+	{
+		// Clone both players first
+		var p1 = Players[0].LightClone();
+		var p2 = Players[1].LightClone();
+
+		// Create a new game state using the cloned players
+		var clone = new GameState(p1, p2, this.rNG?.Clone(), [])
+		{
+			MaxBoardSize = this.MaxBoardSize,
+			maxTurns = this.maxTurns,
+			turn = this.turn,
+			Winner = this.Winner == Players[0] ? p1 :
+					 this.Winner == Players[1] ? p2 : null
+		};
+
+		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
+		clone.PendingChoice = this.PendingChoice;
+
+		RebuildEntityMap();
+
+		return clone;
+	}
+
 	public IEnumerable<IGameEntity> GetAllEntities()
 	{
-		var all = new List<IGameEntity>();
-
 		foreach (var player in Players)
 		{
-			all.Add(player);
-			all.AddRange(player.Board);
-			all.AddRange(player.Hand);
-		}
+			yield return player;
 
-		return all;
+			foreach (var minion in player.Board)
+			{
+				yield return minion;
+			}
+
+			foreach (var card in player.Hand)
+			{
+				yield return card;
+			}
+		}
 	}
 
 	public IGameEntity GetEntityById(Guid id)
 	{
+		if (_entityMap != null &&
+			_entityMap.TryGetValue(id, out var entity))
+		{
+			return entity;
+		}
 		return GetAllEntities().FirstOrDefault(x => x.Id == id);
 	}
 
 	public IEnumerable<ITriggerSource> GetAllTriggerSources()
 	{
-		var all = new List<ITriggerSource>();
-
 		foreach (var player in Players)
 		{
-			all.Add(player);
-			all.AddRange(player.Secrets);
-			all.AddRange(player.Board);
-			all.AddRange(player.Hand);
-		}
+			yield return player;
 
-		return all;
+			foreach (var secret in player.Secrets)
+			{
+				yield return secret;
+			}
+
+			foreach (var minion in player.Board)
+			{
+				yield return minion;
+			}
+
+			foreach (var card in player.Hand)
+			{
+				yield return card;
+			}
+		}
 	}
 
 	public IEnumerable<Minion> GetAllMinions()
