@@ -163,5 +163,55 @@ namespace CardBattleEngine.Test
 			}
 
 		}
+
+		[TestMethod]
+		public void CloneHeroAttack()
+		{
+			var gameState = GameFactory.CreateTestGame();
+			var engine = new GameEngine();
+			var current = gameState.Players[0];
+			var oppoenent = gameState.Players[1];
+
+			WeaponCard weapon = new WeaponCard("test", 1, 1, 1);
+			weapon.Owner = current;
+			current.Hand.Add(weapon);
+
+			engine.Resolve(gameState,
+				new ActionContext()
+				{
+					Source = current,
+					SourcePlayer = current,
+					SourceCard = weapon,
+					Target = current,
+				},
+				new PlayCardAction() { Card = weapon });
+
+			AttackAction attackAction = new AttackAction();
+			ActionContext attackContext = new() { Source = current, Target = oppoenent };
+			var attackIsValid = attackAction.IsValid(gameState,
+				attackContext,
+				out _);
+
+			Assert.IsTrue(attackIsValid);
+			var simState = gameState.Clone();
+
+			ActionContext cloneContext = new ActionContext()
+			{
+				SourcePlayer = attackContext.SourcePlayer == null ? null :
+				(CardBattleEngine.Player)simState.GetEntityById(attackContext.SourcePlayer.Id),
+
+				SourceCard = attackContext.SourceCard == null ? null :
+				(CardBattleEngine.Card)simState.GetEntityById(attackContext.SourceCard.Id),
+
+				Source = attackContext.Source == null ? null :
+				simState.GetEntityById(attackContext.Source.Id),
+
+				Target = attackContext.Target == null ? null :
+				simState.GetEntityById(attackContext.Target.Id),
+			};
+			var cloneAttackIsValid = attackAction.IsValid(simState, cloneContext, out _);
+
+			Assert.IsTrue(cloneAttackIsValid);
+		}
 	}
 }

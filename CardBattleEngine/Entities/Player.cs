@@ -101,6 +101,7 @@ public class Player : IGameEntity, ITriggerSource
 			clone.Graveyard.Add(clonedMinion);
 			clonedMinion.Owner = clone;
 		}
+		clone.RecalculateStats();
 
 		return clone;
 	}
@@ -154,6 +155,7 @@ public class Player : IGameEntity, ITriggerSource
 		//	clonedMinion.Owner = clone;
 		//}
 
+		clone.RecalculateStats();
 		return clone;
 	}
 
