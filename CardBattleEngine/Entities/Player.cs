@@ -17,7 +17,7 @@ public class Player : IGameEntity, ITriggerSource
 	public int Mana { get; set; }
 	public bool CanAttack()
 	{
-		return Attack > 0 && !HasAttackedThisTurn;
+		return _attackBehavior.CanInitiateAttack(this, out _);
 	}
 
 	private IAttackBehavior _attackBehavior;

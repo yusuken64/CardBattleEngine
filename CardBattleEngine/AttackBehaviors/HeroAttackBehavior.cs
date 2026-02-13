@@ -7,11 +7,23 @@ public class HeroAttackBehavior : IAttackBehavior
 		return 1;
 	}
 
-	public bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state, out string reason)
+	public bool CanInitiateAttack(IGameEntity attacker, out string reason)
 	{
-		if (attacker is not Player hero || !hero.CanAttack()) // weapon, cooldown, etc.
+		if (attacker is not Player hero)
 		{
 			reason = null;
+			return false;
+		}
+
+		if (hero.HasAttackedThisTurn) //TODO change to attack count like minion
+		{
+			reason = "Already Attacked";
+			return false;
+		}
+
+		if (hero.Attack <= 0)
+		{
+			reason = "";
 			return false;
 		}
 
@@ -21,6 +33,12 @@ public class HeroAttackBehavior : IAttackBehavior
 			return false;
 		}
 
+		reason = "";
+		return true;
+	}
+
+	public bool IsValidAttackTarget(IGameEntity attacker, IGameEntity target, GameState state, out string reason)
+	{
 		if (target == null || !target.IsAlive)
 		{
 			reason = null;
@@ -35,6 +53,14 @@ public class HeroAttackBehavior : IAttackBehavior
 
 		reason = null;
 		return true;
+	}
+
+	public bool CanAttack(IGameEntity attacker, IGameEntity target, GameState state, out string reason)
+	{
+		if (!CanInitiateAttack(attacker, out reason))
+			return false;
+
+		return IsValidAttackTarget(attacker, target, state, out reason);
 	}
 
 	public IEnumerable<(IGameAction, ActionContext)> GenerateDamageActions(

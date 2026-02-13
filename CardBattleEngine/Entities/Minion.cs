@@ -105,8 +105,7 @@ public class Minion : IGameEntity, ITriggerSource
 	{
 		if (CannotAttack) { return false; }
 
-		var maxAttacks = _attackBehavior.MaxAttacks(this);
-		return (HasCharge || HasRush || !HasSummoningSickness) && (AttacksPerformedThisTurn < maxAttacks);
+		return _attackBehavior.CanInitiateAttack(this, out _);
 	}
 
 	internal Minion Clone()
