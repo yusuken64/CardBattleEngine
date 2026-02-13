@@ -74,7 +74,7 @@ public class GameState
 			ActionContext actionContext = new()
 			{
 				SourcePlayer = player,
-				Source = player,
+				Source = card,
 				SourceCard = card,
 			};
 
@@ -87,7 +87,7 @@ public class GameState
 					actionContext = new CardBattleEngine.ActionContext()
 					{
 						SourcePlayer = actionContext.SourcePlayer,
-						Source = player,
+						Source = card,
 						Target = actionContext.SourcePlayer
 					};
 					actions.Add((playCardAction, actionContext));
@@ -103,6 +103,7 @@ public class GameState
 						{
 							SourcePlayer = player,
 							SourceCard = card,
+							Source = card,
 							Target = target,
 						};
 						actions.Add((playCardAction, actionContextTarget));
@@ -113,6 +114,7 @@ public class GameState
 					ActionContext actionContextNoTarget = new()
 					{
 						SourcePlayer = player,
+						Source = card,
 						SourceCard = card,
 					};
 					actions.Add((playCardAction, actionContextNoTarget));
