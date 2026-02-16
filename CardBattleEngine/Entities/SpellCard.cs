@@ -35,6 +35,7 @@ public class SpellCard : Card
 			SpellCastEffects = SpellCastEffects.ToList(),
 			TriggeredEffects = TriggeredEffects.ToList(),
 			VariableSet = new VariableSet(VariableSet),
+			NumericId = NumericId,
 		};
 
 		return spellCard;

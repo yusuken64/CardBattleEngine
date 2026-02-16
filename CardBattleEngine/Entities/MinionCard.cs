@@ -26,7 +26,6 @@ public class MinionCard : Card
 	public List<TriggeredEffect> MinionTriggeredEffects { get; set; } = new();//triggered effects on summoned minion
 	public override IAttackBehavior AttackBehavior => null;
 
-
 	public MinionCard(string name, int cost, int attack, int health)
 	{
 		Name = name;
@@ -116,6 +115,7 @@ public class MinionCard : Card
 			TriggeredEffects = TriggeredEffects.ToList(),
 			MinionTriggeredEffects = MinionTriggeredEffects.ToList(),
 			VariableSet = new VariableSet(VariableSet),
+			NumericId = NumericId,
 		};
 	}
 

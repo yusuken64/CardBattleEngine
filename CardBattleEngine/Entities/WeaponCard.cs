@@ -39,6 +39,7 @@ public class WeaponCard : Card
 			ValidTargetSelector = ValidTargetSelector,
 			TriggeredEffects = TriggeredEffects.ToList(),
 			VariableSet = new VariableSet(VariableSet),
+			NumericId = NumericId,
 		};
 	}
 

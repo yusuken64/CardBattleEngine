@@ -48,23 +48,24 @@ public class Minion : IGameEntity, ITriggerSource
 	private List<StatModifier> _auraModifiers = new();
 
 	public bool IsAlive{ get; set; }
-	public bool IsFrozen { get; internal set; }
-	public bool MissedAttackFromFrozen { get; internal set; }
-	public bool IsStealth { get; internal set; }
-	public bool HasCharge { get; internal set; }
-	public bool HasDivineShield { get; internal set; }
-	public bool HasPoisonous { get; internal set; }
+	public bool IsFrozen { get; set; }
+	public bool MissedAttackFromFrozen { get; set; }
+	public bool IsStealth { get; set; }
+	public bool HasCharge { get; set; }
+	public bool HasDivineShield { get; set; }
+	public bool HasPoisonous { get; set; }
 	public bool HasRush { get; set; }
 	public bool HasWindfury { get; set; }
 	public bool HasLifeSteal { get; set; }
 	public bool HasReborn { get; set; }
-	public int AttacksPerformedThisTurn { get; internal set; }
+	public int AttacksPerformedThisTurn { get; set; }
 
 	public IGameEntity Entity => this;
 
 	public bool CannotAttack { get; set; } //this is an override to normal attack behavior, for special case minion which can never attack
 
 	public VariableSet VariableSet { get; set; } = new();
+	public ushort CardNumericId => OriginalCard.NumericId;
 
 	public Minion(MinionCard card, Player owner)
 	{

@@ -65,7 +65,7 @@ public class MonteCarloModel
 
 	private string HashState(GameState s)
 	{
-		return GameStateHasher.Hash(s);
+		throw new NotImplementedException();
 	}
 
 	public record StatRecord
