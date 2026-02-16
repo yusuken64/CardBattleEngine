@@ -127,7 +127,7 @@ public class Player : IGameEntity, ITriggerSource
 		clone.EquippedWeapon = EquippedWeapon?.Clone();
 
 		// Deep copy the collections
-		foreach (var card in Deck.Take(1))
+		foreach (var card in Deck.Take(5))
 		{
 			Card clonedCard = card.Clone();
 			clone.Deck.Add(clonedCard);
