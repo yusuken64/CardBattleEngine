@@ -91,8 +91,8 @@ public class ActionContext
 		this.IsAttack = IsAttack;
 	}
 
-	public IGameAction OriginalAction { get; internal set; }
-	public Minion SummonedMinion { get; internal set; }
+	public IGameAction OriginalAction { get; set; }
+	public Minion SummonedMinion { get; set; }
 	public int PlayIndex { get; set; } = -1;
 	public HeroPower SourceHeroPower { get; set; }
 	public bool IsReborn { get; set; } = false;
