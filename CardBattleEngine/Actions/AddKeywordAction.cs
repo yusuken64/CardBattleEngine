@@ -79,4 +79,5 @@ public enum Keyword
 	LifeSteal = 1 << 6,
 	Reborn = 1 << 7,
 	Taunt = 1 << 8,
+	Elusive = 1 << 9,
 }

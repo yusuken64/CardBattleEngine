@@ -45,6 +45,20 @@ public class HeroAttackBehavior : IAttackBehavior
 			return false;
 		}
 
+		// Cannot attack friendly units
+		if (attacker.Owner == target.Owner)
+		{
+			reason = null;
+			return false;
+		}
+
+		// Cannot attack stealth minions
+		if (target is Minion tminion && tminion.IsStealth)
+		{
+			reason = "Target is Stealthed";
+			return false;
+		}
+
 		if (!AttackRules.MustAttackTaunt(attacker, target, state))
 		{
 			reason = "Must Attack Minion with Taunt";

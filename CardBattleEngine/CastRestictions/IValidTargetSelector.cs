@@ -2,7 +2,7 @@
 
 public interface IValidTargetSelector
 {
-	List<IGameEntity> Select(GameState gameState, Player player, Card castingCard);
+	IEnumerable<IGameEntity> Select(GameState gameState, Player player, Card castingCard);
 }
 
 [Flags]

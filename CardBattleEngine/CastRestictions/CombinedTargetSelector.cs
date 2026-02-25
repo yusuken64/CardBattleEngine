@@ -6,7 +6,7 @@ public class CombinedTargetSelector : IValidTargetSelector
 	public CombinationOperation Operation { get; set; }
 	public IValidTargetSelector Right { get; set; }
 
-	public List<IGameEntity> Select(GameState gameState, Player player, Card castingCard)
+	public IEnumerable<IGameEntity> Select(GameState gameState, Player player, Card castingCard)
 	{
 		var leftResults = Left.Select(gameState, player, castingCard);
 		var rightResults = Right.Select(gameState, player, castingCard);
@@ -15,18 +15,15 @@ public class CombinedTargetSelector : IValidTargetSelector
 		{
 			case CombinationOperation.And:
 				return leftResults
-					.Intersect(rightResults)
-					.ToList();
+					.Intersect(rightResults);
 
 			case CombinationOperation.Or:
 				return leftResults
-					.Union(rightResults)
-					.ToList();
+					.Union(rightResults);
 
 			case CombinationOperation.Except:
 				return leftResults
-					.Except(rightResults)
-					.ToList();
+					.Except(rightResults);
 
 			default:
 				throw new ArgumentOutOfRangeException(nameof(Operation), Operation, null);

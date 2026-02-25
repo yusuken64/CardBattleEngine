@@ -22,6 +22,14 @@ public class PlayCardAction : GameActionBase
 			return false;
 		}
 
+		if (actionContext.Target != null &&
+			actionContext.Target is Minion minion &&
+			(minion.IsStealth || minion.Elusive))
+		{
+			reason = "Minion can't be targeted";
+			return false;
+		}
+
 		reason = null;
 		return true;
 	}

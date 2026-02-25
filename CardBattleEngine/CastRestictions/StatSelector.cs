@@ -6,7 +6,7 @@ public class StatSelector : IValidTargetSelector
 	public Comparison Comparison { get; set; }
 	public int Value { get; set; }
 
-	public List<IGameEntity> Select(
+	public IEnumerable<IGameEntity> Select(
 		GameState gameState,
 		Player player,
 		Card castingCard)
@@ -14,8 +14,7 @@ public class StatSelector : IValidTargetSelector
 		return gameState.GetAllEntities()
 			.Where(entity =>
 				TryGetEntityValue(entity, Stat, out int entityValue) &&
-				Compare(entityValue, Value, Comparison))
-			.ToList();
+				Compare(entityValue, Value, Comparison));
 	}
 
 	private bool TryGetEntityValue(IGameEntity entity, Stat stat, out int value)

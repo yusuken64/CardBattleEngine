@@ -5,11 +5,10 @@ public class EntityTypeSelector : IValidTargetSelector
 	public EntityType EntityTypes { get; set; }  // note plural
 	public TeamRelationship TeamRelationship { get; set; }
 
-	public List<IGameEntity> Select(GameState gameState, Player player, Card castingCard)
+	public IEnumerable<IGameEntity> Select(GameState gameState, Player player, Card castingCard)
 	{
 		return gameState.GetAllEntities()
-			.Where(entity => MatchesType(entity) && MatchesTeam(entity, gameState, player))
-			.ToList();
+			.Where(entity => MatchesType(entity) && MatchesTeam(entity, gameState, player));
 	}
 
 	private bool MatchesType(IGameEntity entity)

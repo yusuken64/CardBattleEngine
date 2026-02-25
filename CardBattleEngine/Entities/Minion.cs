@@ -51,6 +51,7 @@ public class Minion : IGameEntity, ITriggerSource
 	public bool IsFrozen { get; set; }
 	public bool MissedAttackFromFrozen { get; set; }
 	public bool IsStealth { get; set; }
+	public bool Elusive { get; set; }
 	public bool HasCharge { get; set; }
 	public bool HasDivineShield { get; set; }
 	public bool HasPoisonous { get; set; }
@@ -82,6 +83,7 @@ public class Minion : IGameEntity, ITriggerSource
 		AttacksPerformedThisTurn = 0;
 		HasSummoningSickness = true;
 		IsStealth = card.IsStealth;
+		Elusive = card.Elusive;
 		HasCharge = card.HasCharge;
 		HasDivineShield = card.HasDivineShield;
 		HasPoisonous = card.HasPoisonous;
@@ -123,6 +125,7 @@ public class Minion : IGameEntity, ITriggerSource
 			HasSummoningSickness = this.HasSummoningSickness,
 			AttacksPerformedThisTurn = this.AttacksPerformedThisTurn,
 			IsStealth = this.IsStealth,
+			Elusive = this.Elusive,
 			HasCharge = this.HasCharge,
 			HasDivineShield = this.HasDivineShield,
 			HasPoisonous = this.HasPoisonous,
@@ -221,6 +224,10 @@ public class Minion : IGameEntity, ITriggerSource
 
 	public bool Matches(Keyword keyword, bool hasKeyword)
 	{
+		if (keyword.HasFlag(Keyword.Elusive) &&
+			Elusive != hasKeyword)
+			return false;
+
 		// Stealth
 		if (keyword.HasFlag(Keyword.Stealth) &&
 			IsStealth != hasKeyword)

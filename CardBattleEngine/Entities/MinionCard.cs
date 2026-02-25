@@ -14,6 +14,7 @@ public class MinionCard : Card
 	public override bool IsAlive { get; set; } = true;
 	public List<MinionTribe> MinionTribes { get; set; } = new();
 	public bool IsStealth { get; set; }
+	public bool Elusive { get; set; }
 	public bool HasCharge { get; set; }
 	public bool HasDivineShield { get; set; }
 	public bool HasPoisonous { get; set; }
@@ -97,6 +98,7 @@ public class MinionCard : Card
 			Id = Id,
 			Owner = Owner,
 			IsStealth = IsStealth,
+			Elusive = Elusive,
 			HasCharge = HasCharge,
 			HasDivineShield = HasDivineShield,
 			HasPoisonous = HasPoisonous,
