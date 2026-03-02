@@ -24,7 +24,8 @@ public class PlayCardAction : GameActionBase
 
 		if (actionContext.Target != null &&
 			actionContext.Target is Minion minion &&
-			(minion.IsStealth || minion.Elusive))
+			(minion.IsStealth || minion.Elusive) &&
+			minion.Owner != actionContext.SourcePlayer)
 		{
 			reason = "Minion can't be targeted";
 			return false;

@@ -12,6 +12,15 @@ public class HeroPowerAction : GameActionBase
 			return false;
 		}
 
+		if (context.Target != null &&
+			context.Target is Minion minion &&
+			(minion.IsStealth || minion.Elusive) &&
+			minion.Owner != context.SourcePlayer)
+		{
+			reason = "Minion can't be targeted";
+			return false;
+		}
+
 		reason = null;
 		return !context.SourcePlayer.HeroPower.UsedThisTurn &&
 			context.SourcePlayer.Mana >= context.SourcePlayer.HeroPower.ManaCost;
