@@ -106,7 +106,7 @@ public class GameState
 							Source = card,
 							Target = target,
 						};
-						if (playCardAction.IsValid(this, actionContext, out _))
+						if (playCardAction.IsValid(this, actionContextTarget, out _))
 						{
 							actions.Add((playCardAction, actionContextTarget));
 						}
