@@ -95,7 +95,8 @@ public class GameState
 				}
 
 				var validTargets = playCardAction.Card.ValidTargetSelector?.Select(this, player, playCardAction.Card);
-				if (validTargets != null)
+				if (validTargets != null &&
+					validTargets.Any())
 				{
 					foreach(var target in validTargets)
 					{

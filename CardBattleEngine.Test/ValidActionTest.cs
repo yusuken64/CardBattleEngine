@@ -44,4 +44,40 @@ public class ValidActionTest
 
 		Assert.AreEqual(2, actions.Count());
 	}
+
+	[TestMethod]
+	public void ValidActionTestNoTarget()
+	{
+
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		var opponent = state.Players[1];
+
+		MinionCard archerCard = new MinionCard("sergeant", 1, 1, 1);
+		archerCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			AffectedEntitySelector = new ContextSelector
+			{
+				IncludeTarget = true,
+			},
+			EffectTrigger = EffectTrigger.Battlecry,
+			GameActions = [new DamageAction() {
+				Damage = (Value)1
+			}]
+		});
+		archerCard.ValidTargetSelector = new EntityTypeSelector()
+		{
+			EntityTypes = EntityType.Minion,
+			TeamRelationship = TeamRelationship.Friendly,
+		};
+
+		archerCard.Owner = opponent;
+		opponent.Hand.Add(archerCard);
+
+		var actions = state.GetValidActions(opponent);
+
+		Assert.AreEqual(2, actions.Count());
+	}
 }
