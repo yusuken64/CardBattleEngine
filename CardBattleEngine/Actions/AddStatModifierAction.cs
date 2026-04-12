@@ -1,4 +1,5 @@
-﻿namespace CardBattleEngine;
+﻿
+namespace CardBattleEngine;
 
 public class AddStatModifierAction : GameActionBase
 {
@@ -98,6 +99,18 @@ public class StatModifier
 		{
 			stat = change.Value;
 		}
+	}
+
+	internal StatModifier Clone()
+	{
+		return new StatModifier()
+		{
+			AttackChange = AttackChange,
+			HealthChange = HealthChange,
+			CostChange = CostChange,
+			StatModifierType = StatModifierType,
+			ExpirationTrigger = ExpirationTrigger,
+		};
 	}
 }
 

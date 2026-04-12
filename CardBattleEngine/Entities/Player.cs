@@ -101,6 +101,8 @@ public class Player : IGameEntity, ITriggerSource
 			clone.Graveyard.Add(clonedMinion);
 			clonedMinion.Owner = clone;
 		}
+
+		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
 		clone.RecalculateStats();
 
 		return clone;
@@ -172,10 +174,9 @@ public class Player : IGameEntity, ITriggerSource
 		RecalculateStats();
 	}
 
-	internal void RecalculateStats()
+	public void RecalculateStats()
 	{
-		var attack = EquippedWeapon?.Attack ?? 0;
-		//Health = card.Health;
+		var attack = (EquippedWeapon?.Attack ?? 0);
 
 		foreach (var mod in _modifiers.Concat(_auraModifiers))
 		{
@@ -183,7 +184,6 @@ public class Player : IGameEntity, ITriggerSource
 		}
 
 		Attack = Math.Max(0, attack);
-		//Health = Math.Max(0, Health);
 	}
 
 	internal List<StatModifier> _modifiers = new();
