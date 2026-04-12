@@ -8,10 +8,12 @@ public class EntityTypeSelector : IValidTargetSelector
 	public IEnumerable<IGameEntity> Select(GameState gameState, Player player, Card castingCard)
 	{
 		return gameState.GetAllEntities()
-			.Where(entity => MatchesType(entity) && MatchesTeam(entity, gameState, player));
+			.Where(entity =>
+			MatchesType(entity, EntityTypes) &&
+			MatchesTeam(entity, gameState, player, TeamRelationship));
 	}
 
-	private bool MatchesType(IGameEntity entity)
+	public static bool MatchesType(IGameEntity entity, EntityType entityTypes)
 	{
 		return (entity switch
 		{
@@ -20,12 +22,12 @@ public class EntityTypeSelector : IValidTargetSelector
 			Card => EntityType.Card,
 			Weapon => EntityType.Weapon,
 			_ => EntityType.None
-		} & EntityTypes) != 0;
+		} & entityTypes) != 0;
 	}
 
-	private bool MatchesTeam(IGameEntity entity, GameState gameState, Player player)
+	public static bool MatchesTeam(IGameEntity entity, GameState gameState, Player player, TeamRelationship teamRelationship)
 	{
-		return TeamRelationship switch
+		return teamRelationship switch
 		{
 			TeamRelationship.Friendly => entity.Owner == player,
 			TeamRelationship.Enemy => entity.Owner == gameState.OpponentOf(player),
