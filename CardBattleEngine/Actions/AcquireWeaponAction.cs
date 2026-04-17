@@ -24,6 +24,11 @@ public class AcquireWeaponAction : GameActionBase
 		}
 
 		yield return (new EquipWeaponAction { Weapon = Weapon },
-			new ActionContext { Source = context.Source, Target = player });
+			new ActionContext
+			{
+				SourcePlayer = context.Target.Owner,
+				Source = context.Source,
+				Target = player
+			});
 	}
 }

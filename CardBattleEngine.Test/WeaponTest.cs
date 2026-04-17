@@ -212,4 +212,46 @@ public class WeaponTest
 
 		Assert.AreEqual(3, current.Attack);
 	}
+
+	[TestMethod]
+	public void WeaponBattleCryTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var attacker = state.CurrentPlayer;
+		var defender = state.OpponentOf(attacker);
+
+		MinionCard testCard = new MinionCard("test minion", 1, 1, 1);
+		var weapon = new Weapon("test", 1, 2)
+		{
+			Attack = 1,
+			Durability = 2,
+			TriggeredEffects = new List<TriggeredEffect>()
+			{
+				new TriggeredEffect()
+				{
+					EffectTrigger = EffectTrigger.Battlecry,
+					GameActions = [new SummonMinionAction() {
+						Card = testCard
+					}]
+				}
+			}
+		};
+		var current = state.CurrentPlayer;
+
+		engine.Resolve(
+			state,
+			new ActionContext()
+			{
+				SourcePlayer = current,
+				Target = current
+			},
+			new AcquireWeaponAction()
+		{
+			Weapon = weapon
+		});
+
+		Assert.AreEqual(1, current.Board.Count);
+	}
 }
