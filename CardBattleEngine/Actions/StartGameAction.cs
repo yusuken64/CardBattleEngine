@@ -1,6 +1,6 @@
 ﻿namespace CardBattleEngine;
 
-internal class StartGameAction : GameActionBase
+public class StartGameAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.GameStart;
 

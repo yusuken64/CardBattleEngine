@@ -124,8 +124,16 @@ public class GameEngine
 		var p1 = gameState.Players[0];
 		var p2 = gameState.Players[1];
 
-		Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new StartGameAction());
-		Resolve(gameState, new ActionContext() { SourcePlayer = p2 }, new StartGameAction());
+		Resolve(gameState, new ActionContext() 
+		{
+			SourcePlayer = p1,
+			Source = p1,
+		}, new StartGameAction());
+		Resolve(gameState, new ActionContext()
+		{
+			SourcePlayer = p2,
+			Source = p2,
+		}, new StartGameAction());
 
 		if (!gameState.SkipMulligan)
 		{
