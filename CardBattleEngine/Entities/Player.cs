@@ -159,6 +159,7 @@ public class Player : IGameEntity, ITriggerSource
 		//	clonedMinion.Owner = clone;
 		//}
 
+		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
 		clone.RecalculateStats();
 		return clone;
 	}

@@ -352,4 +352,57 @@ public class AuraTest
 
 		Assert.AreEqual(0, murloc.Health);
 	}
+
+	[TestMethod]
+	public void AuraDebuffKillsMinionTest()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+		current.Mana = 10;
+
+		var victimCard = new MinionCard("Victim", cost: 0, attack: 1, health: 1);
+		victimCard.Owner = current;
+
+		var auraCard = new MinionCard("DebuffAura", cost: 0, attack: 1, health: 1);
+		auraCard.Owner = current;
+		auraCard.MinionTriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Aura,
+			EffectTiming = EffectTiming.Persistant,
+			GameActions = new List<IGameAction>()
+			{
+				new AddStatModifierAction()
+				{
+					HealthChange = (Value)(-5)
+				}
+			},
+			AffectedEntitySelector = new TargetOperationSelector()
+			{
+				Operations = new List<ITargetOperation>()
+				{
+					new SelectBoardEntitiesOperation() {
+						Group = TargetGroup.Minions,
+						Side = TeamRelationship.Friendly,
+						ExcludeSelf = true,
+					},
+				}
+			}
+		});
+
+		current.Hand.Add(victimCard);
+		current.Hand.Add(auraCard);
+
+		ActionContext actionContext = new() { SourcePlayer = current };
+		engine.Resolve(state, actionContext, new PlayCardAction() { Card = victimCard });
+
+		Assert.AreEqual(1, current.Board.Count);
+
+		// Playing the aura minion re-evaluates persistent effects, which should
+		// debuff the victim's health to 0 and kill it via the aura path alone.
+		engine.Resolve(state, actionContext, new PlayCardAction() { Card = auraCard });
+
+		Assert.IsFalse(current.Board.Any(m => m.Name == "Victim"), "Victim should have died from the aura debuff");
+	}
 }

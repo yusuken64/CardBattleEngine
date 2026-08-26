@@ -272,5 +272,54 @@ namespace CardBattleEngine.Test
 			Assert.AreEqual(1, cloneAttack);
 
 		}
+
+		[TestMethod]
+		public void CloneWeaponPreservesIdAndModifiers()
+		{
+			var gameState = GameFactory.CreateTestGame();
+			var engine = new GameEngine();
+			var current = gameState.Players[0];
+
+			WeaponCard weaponCard = new WeaponCard("TestWeapon", cost: 1, attack: 1, durabilty: 2);
+			weaponCard.Owner = current;
+			current.Hand.Add(weaponCard);
+
+			engine.Resolve(gameState,
+				new ActionContext()
+				{
+					Source = current,
+					SourcePlayer = current,
+					SourceCard = weaponCard,
+					Target = current,
+				},
+				new PlayCardAction() { Card = weaponCard });
+
+			var weapon = current.EquippedWeapon;
+			Assert.IsNotNull(weapon);
+			var originalId = weapon.Id;
+
+			engine.Resolve(gameState,
+				new ActionContext() { Source = current, SourcePlayer = current, Target = weapon },
+				new AddStatModifierAction()
+				{
+					AttackChange = (Value)3,
+					StatModifierType = StatModifierType.Additive
+				});
+
+			Assert.AreEqual(4, weapon.Attack);
+
+			var clonedState = gameState.Clone();
+			var clonedPlayer = clonedState.Players[0];
+			var clonedWeapon = clonedPlayer.EquippedWeapon;
+
+			Assert.IsNotNull(clonedWeapon);
+			Assert.AreEqual(originalId, clonedWeapon.Id, "Weapon Id should be preserved across clone");
+			Assert.AreEqual(4, clonedWeapon.Attack, "Weapon buff should survive clone");
+
+			clonedWeapon.RecalculateStats();
+			Assert.AreEqual(4, clonedWeapon.Attack, "Buff should persist after recalculating stats on the clone");
+
+			Assert.AreSame(clonedWeapon, clonedState.GetEntityById(originalId), "Cloned weapon should be resolvable via GetEntityById");
+		}
 	}
 }

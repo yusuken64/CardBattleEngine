@@ -94,7 +94,8 @@ public class GameEngine
 		var ret =  current.action.Resolve(gameState, current.context).ToList();
 		if (!IsSimulation)
 		{
-			_eventBus.EvaluatePersistentEffects(gameState);
+			var auraSideEffects = _eventBus.EvaluatePersistentEffects(gameState);
+			ret.AddRange(auraSideEffects);
 			ActionPlaybackCallback?.Invoke(gameState, current);
 		}
 		return ret;

@@ -113,7 +113,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 	internal Minion Clone()
 	{
-		return new Minion(this.OriginalCard, Owner)
+		var clone = new Minion(this.OriginalCard, Owner)
 		{
 			Id = this.Id,
 			TemplateName = this.TemplateName,
@@ -135,10 +135,15 @@ public class Minion : IGameEntity, ITriggerSource
 			HasReborn = this.HasReborn,
 			CannotAttack = this.CannotAttack,
 			IsFrozen = this.IsFrozen,
-			TriggeredEffects = this.TriggeredEffects.ToList(),
+			TriggeredEffects = this.TriggeredEffects.Select(e => e.Clone()).ToList(),
 
 			IsAlive = IsAlive,
 		};
+
+		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
+		clone._auraModifiers = _auraModifiers.Select(x => x.Clone()).ToList();
+
+		return clone;
 	}
 
 	public void AddModifier(StatModifier modifier)
@@ -150,7 +155,7 @@ public class Minion : IGameEntity, ITriggerSource
 	public void AddAuraModifier(StatModifier auraStatModifier)
 	{
 		_auraModifiers.Add(auraStatModifier);
-		//RecalculateStats();
+		RecalculateStats();
 	}
 
 	public void RemoveModifier(StatModifier modifier)

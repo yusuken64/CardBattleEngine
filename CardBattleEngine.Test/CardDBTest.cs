@@ -65,6 +65,36 @@ public class CardDBTest
 	}
 
 	[TestMethod]
+	public void CreateMinionDefinitionTest_MultipleActionsRoundTrip()
+	{
+		var testGame = GameFactory.CreateTestGame();
+		var current = testGame.Players[0];
+
+		var card = new MinionCard("MultiActionBattlecryMinion", cost: 1, attack: 1, health: 1);
+		card.Owner = current;
+		card.TriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Battlecry,
+			EffectTiming = EffectTiming.Post,
+			GameActions = new List<IGameAction>()
+			{
+				new DamageAction() { Damage = (Value)1 },
+				new DrawCardFromDeckAction(),
+			},
+		});
+
+		CardDatabase.CreateFileFromMinionCard(card, ".\\Data\\", "MultiActionBattlecryMinion");
+
+		CardDatabase testDB = new CardDatabase(".\\Data\\");
+		var loadedMinion = testDB.GetMinionCard("MultiActionBattlecryMinion", current);
+
+		Assert.AreEqual(1, loadedMinion.TriggeredEffects.Count());
+		Assert.AreEqual(2, loadedMinion.TriggeredEffects[0].GameActions.Count(), "Both actions should survive the round trip");
+		Assert.IsInstanceOfType(loadedMinion.TriggeredEffects[0].GameActions[0], typeof(DamageAction));
+		Assert.IsInstanceOfType(loadedMinion.TriggeredEffects[0].GameActions[1], typeof(DrawCardFromDeckAction));
+	}
+
+	[TestMethod]
 	public void LoadMurlocTribeTest()
 	{
 		var state = GameFactory.CreateTestGame();

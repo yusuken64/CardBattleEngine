@@ -18,7 +18,7 @@ public class TriggeredEffect : ITriggeredEffect
 			EffectTrigger = this.EffectTrigger,
 			AffectedEntitySelector = AffectedEntitySelector,
 			Condition = Condition,
-			GameActions = GameActions.ToList(), //TODO implement deep clone for effects
+			GameActions = GameActions.Select(a => a.Clone()).ToList(),
 		};
 	}
 }
