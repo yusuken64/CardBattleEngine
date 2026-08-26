@@ -53,6 +53,26 @@ public class MatchHub : Hub<IMatchClient>
 		return Task.FromResult<PlayerGameView?>(view);
 	}
 
+	public Task JoinQueue(DecklistRequest myDeck)
+	{
+		var match = _registry.TryMatchmake(Context.ConnectionId, myDeck);
+		if (match != null)
+		{
+			match.DriverLoopTask = MatchDriver.Run(match, _hubContext, CancellationToken.None);
+
+			_hubContext.Clients.Client(match.ConnectionIdPlayer1!).OnMatchFound(match.Id.Value);
+			_hubContext.Clients.Client(match.ConnectionIdPlayer2!).OnMatchFound(match.Id.Value);
+		}
+
+		return Task.CompletedTask;
+	}
+
+	public Task LeaveQueue()
+	{
+		_registry.LeaveQueue(Context.ConnectionId);
+		return Task.CompletedTask;
+	}
+
 	public Task<ActionResult> SubmitAction(Guid matchId, int actionIndex, int version)
 	{
 		if (!_registry.TryGet(new MatchId(matchId), out var match))
@@ -77,6 +97,15 @@ public class MatchHub : Hub<IMatchClient>
 
 	public override Task OnDisconnectedAsync(Exception? exception)
 	{
+		if (_registry.TryGetByConnection(Context.ConnectionId, out var match))
+		{
+			var seat = match!.SeatOf(Context.ConnectionId);
+			if (seat != null)
+			{
+				match.AgentFor(seat.Value).Abandon();
+			}
+		}
+
 		_registry.RemoveConnection(Context.ConnectionId);
 		return base.OnDisconnectedAsync(exception);
 	}

@@ -13,6 +13,7 @@ public class RemotePlayerAgent : IGameAgent
 	private int _version;
 	private PendingActionSet? _currentOptions;
 	private TaskCompletionSource<(IGameAction, ActionContext)>? _pending;
+	private readonly TaskCompletionSource<bool> _abandoned = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
 	public event Action<PendingActionSet>? OptionsAvailable;
 
@@ -22,6 +23,12 @@ public class RemotePlayerAgent : IGameAgent
 	}
 
 	public PendingActionSet? CurrentOptions => _currentOptions;
+
+	public bool IsAbandoned => _abandoned.Task.IsCompleted;
+
+	// Marks this player's connection as gone. Any GetNextAction call already blocked waiting on this
+	// player - or the next one made for them - throws PlayerAbandonedException instead of hanging.
+	public void Abandon() => _abandoned.TrySetResult(true);
 
 	public (IGameAction, ActionContext) GetNextAction(GameState game)
 	{
@@ -37,11 +44,18 @@ public class RemotePlayerAgent : IGameAgent
 			Version = ++_version,
 		};
 		_currentOptions = pendingSet;
-		_pending = new TaskCompletionSource<(IGameAction, ActionContext)>(TaskCreationOptions.RunContinuationsAsynchronously);
+		var pending = new TaskCompletionSource<(IGameAction, ActionContext)>(TaskCreationOptions.RunContinuationsAsynchronously);
+		_pending = pending;
 
 		OptionsAvailable?.Invoke(pendingSet);
 
-		return _pending.Task.GetAwaiter().GetResult();
+		var completed = Task.WhenAny(pending.Task, _abandoned.Task).GetAwaiter().GetResult();
+		if (completed == _abandoned.Task)
+		{
+			throw new PlayerAbandonedException();
+		}
+
+		return pending.Task.GetAwaiter().GetResult();
 	}
 
 	public bool TrySubmit(int actionIndex, int version, out string? error)

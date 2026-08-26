@@ -15,6 +15,7 @@ public static class RemoteGameClient
 		PlayerGameView? latestView = null;
 		var viewSignal = new SemaphoreSlim(0);
 		var matchEnded = new TaskCompletionSource<Guid?>();
+		var matchFound = new TaskCompletionSource<Guid>();
 
 		connection.On<PlayerGameView>("OnStateUpdated", view =>
 		{
@@ -32,11 +33,12 @@ public static class RemoteGameClient
 			viewSignal.Release();
 		});
 		connection.On<string>("OnActionRejected", reason => Console.WriteLine($"Action rejected: {reason}"));
+		connection.On<Guid>("OnMatchFound", id => matchFound.TrySetResult(id));
 
 		Console.WriteLine($"Connecting to {hubUrl} ...");
 		await connection.StartAsync();
 
-		var matchId = await CreateOrJoinMatch(connection, playerName);
+		var matchId = await CreateOrJoinMatch(connection, playerName, matchFound.Task);
 		if (matchId == null)
 		{
 			await connection.StopAsync();
@@ -72,12 +74,21 @@ public static class RemoteGameClient
 		await connection.StopAsync();
 	}
 
-	private static async Task<Guid?> CreateOrJoinMatch(HubConnection connection, string playerName)
+	private static async Task<Guid?> CreateOrJoinMatch(HubConnection connection, string playerName, Task<Guid> matchFound)
 	{
 		var deck = BuildDefaultDeck(playerName);
 
-		Console.WriteLine("Create a new match (C) or join an existing one (J)?");
+		Console.WriteLine("Quick match (Q), create a new match (C), or join an existing one (J)?");
 		var key = Console.ReadKey(true).KeyChar;
+
+		if (key is 'q' or 'Q')
+		{
+			await connection.InvokeAsync("JoinQueue", deck);
+			Console.WriteLine("Searching for an opponent...");
+			var matchId = await matchFound;
+			Console.WriteLine($"Match found: {matchId}");
+			return matchId;
+		}
 
 		if (key is 'j' or 'J')
 		{

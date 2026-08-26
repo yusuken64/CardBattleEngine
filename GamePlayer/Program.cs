@@ -2,7 +2,8 @@
 
 if (args.Length > 0 && args[0] == "--remote")
 {
-	string serverUrl = args.Length > 1 ? args[1] : "http://localhost:5299";
+	string serverUrl = args.Length > 1 ? args[1]
+		: Environment.GetEnvironmentVariable("GAMESERVER_URL") ?? "http://localhost:5299";
 	Console.Write("Enter your player name: ");
 	string playerName = Console.ReadLine() is { Length: > 0 } name ? name : "Player";
 	await RemoteGameClient.RunAsync(serverUrl, playerName);

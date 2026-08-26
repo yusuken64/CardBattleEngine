@@ -29,6 +29,11 @@ public class Match
 
 	public bool IsFull => ConnectionIdPlayer1 != null && ConnectionIdPlayer2 != null;
 
+	public MatchSeat? AbandonedSeat =>
+		AgentPlayer1.IsAbandoned ? MatchSeat.Player1 :
+		AgentPlayer2.IsAbandoned ? MatchSeat.Player2 :
+		null;
+
 	public MatchSeat? SeatOf(string connectionId)
 	{
 		if (connectionId == ConnectionIdPlayer1) return MatchSeat.Player1;

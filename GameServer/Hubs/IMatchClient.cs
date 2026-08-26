@@ -8,4 +8,5 @@ public interface IMatchClient
 	Task OnStateUpdated(PlayerGameView view);
 	Task OnMatchEnded(Guid? winnerPlayerId);
 	Task OnActionRejected(string reason);
+	Task OnMatchFound(Guid matchId);
 }

@@ -38,11 +38,28 @@ public static class MatchDriver
 		engine.StartGame(state);
 		Broadcast(state);
 
-		while (!state.IsGameOver() && !cancellationToken.IsCancellationRequested)
+		MatchSeat? forfeitedSeat = null;
+
+		while (!state.IsGameOver() && !cancellationToken.IsCancellationRequested && match.AbandonedSeat == null)
 		{
-			var agent = state.CurrentPlayer == state.Players[0] ? match.AgentPlayer1 : match.AgentPlayer2;
-			var (action, context) = agent.GetNextAction(state);
-			engine.Resolve(state, context, action);
+			var seat = state.CurrentPlayer == state.Players[0] ? MatchSeat.Player1 : MatchSeat.Player2;
+			var agent = match.AgentFor(seat);
+
+			try
+			{
+				var (action, context) = agent.GetNextAction(state);
+				engine.Resolve(state, context, action);
+			}
+			catch (PlayerAbandonedException)
+			{
+				forfeitedSeat = seat;
+			}
+		}
+
+		forfeitedSeat ??= match.AbandonedSeat;
+		if (forfeitedSeat != null)
+		{
+			state.Winner = match.PlayerFor(forfeitedSeat == MatchSeat.Player1 ? MatchSeat.Player2 : MatchSeat.Player1);
 		}
 
 		BroadcastEnd(match, hub);
