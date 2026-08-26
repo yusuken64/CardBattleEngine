@@ -57,18 +57,21 @@ public class GameEngine
 			}
 
 			IEnumerable<(IGameAction, ActionContext)> sideEffects = ResolveAction(gameState, current);
+
+			// Post-resolution triggers - enqueue ahead of this action's own side effects so
+			// end-of-event reactions (e.g. OnTurnEnd expirations) run before any follow-up
+			// action (e.g. StartTurnAction) that side effect produces.
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Post))
+			{
+				_actionQueue.Enqueue(trigger);
+			}
+
 			if (sideEffects != null)
 			{
 				foreach (var effect in sideEffects)
 				{
 					_actionQueue.Enqueue((effect.Item1, effect.Item2));
 				}
-			}
-
-			// Post-resolution triggers
-			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Post))
-			{
-				_actionQueue.Enqueue(trigger);
 			}
 		}
 		if (!IsSimulation)
