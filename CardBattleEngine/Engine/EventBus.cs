@@ -47,7 +47,7 @@ public class EventBus
 			}
 		}
 
-		foreach (var entity in gameState.GetAllEntities())
+		foreach (var entity in entities)
 		{
 			entity.RecalculateStats();
 		}

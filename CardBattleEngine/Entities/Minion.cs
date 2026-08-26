@@ -20,8 +20,10 @@ public class Minion : IGameEntity, ITriggerSource
 		get
 		{
 			// Also return a triggered effect for each temporary modifier
-			foreach (var mod in _modifiers.Where(m => m.ExpirationTrigger != null))
-			{				
+			foreach (var mod in _modifiers)
+			{
+				if (mod.ExpirationTrigger == null) continue;
+
 				yield return (new TriggeredEffect
 				{
 					EffectTrigger = mod.ExpirationTrigger.EffectTrigger,
@@ -186,7 +188,12 @@ public class Minion : IGameEntity, ITriggerSource
 		var originalHealth = Health;
 
 		// Apply modifiers
-		foreach (var mod in _modifiers.Concat(_auraModifiers))
+		foreach (var mod in _modifiers)
+		{
+			mod.ApplyValue(ref attack, mod.AttackChange);
+			mod.ApplyValue(ref maxHealth, mod.HealthChange);
+		}
+		foreach (var mod in _auraModifiers)
 		{
 			mod.ApplyValue(ref attack, mod.AttackChange);
 			mod.ApplyValue(ref maxHealth, mod.HealthChange);

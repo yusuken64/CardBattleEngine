@@ -210,7 +210,7 @@ public class GameState
 		var p2 = Players[1].Clone();
 
 		// Create a new game state using the cloned players
-		var clone = new GameState(p1, p2, this.rNG?.Clone(), this.CardDB)
+		var clone = new GameState(p1, p2, this.rNG?.Clone(), [])
 		{
 			MaxBoardSize = this.MaxBoardSize,
 			maxTurns = this.maxTurns,
@@ -218,6 +218,9 @@ public class GameState
 			Winner = this.Winner == Players[0] ? p1 :
 					 this.Winner == Players[1] ? p2 : null
 		};
+
+		// CardDB is already deduplicated on this instance - avoid re-running the dedup pipeline on every clone
+		clone.CardDB = this.CardDB;
 
 		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
 		clone.PendingChoice = this.PendingChoice;

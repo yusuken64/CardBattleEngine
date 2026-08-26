@@ -82,7 +82,12 @@ public class Weapon : ITriggerSource, IGameEntity
 		var attack = OriginalAttack;
 		var maxHealth = OriginalDurability; // start from base max health
 
-		foreach (var mod in _modifiers.Concat(_auraModifiers))
+		foreach (var mod in _modifiers)
+		{
+			mod.ApplyValue(ref attack, mod.AttackChange);
+			mod.ApplyValue(ref maxHealth, mod.HealthChange);
+		}
+		foreach (var mod in _auraModifiers)
 		{
 			mod.ApplyValue(ref attack, mod.AttackChange);
 			mod.ApplyValue(ref maxHealth, mod.HealthChange);
