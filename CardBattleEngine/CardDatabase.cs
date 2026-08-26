@@ -64,6 +64,7 @@ public class CardDatabase
 				{
 					EffectTiming = x.EffectTiming,
 					EffectTrigger = x.EffectTrigger,
+					Scope = x.Scope,
 					TriggerConditionDefintion = cond,
 					ActionDefintions = x.GameActions.Select(ga => new ActionDefinition
 					{
@@ -250,6 +251,7 @@ public class CardDatabase
 			{
 				EffectTiming = triggeredEffectDefinition.EffectTiming,
 				EffectTrigger = triggeredEffectDefinition.EffectTrigger,
+				Scope = triggeredEffectDefinition.Scope,
 				Condition = condition,
 				GameActions = actions,
 				AffectedEntitySelector = CreateAffectedEntitySelectorFromDefinition(
@@ -378,6 +380,7 @@ public class TriggeredEffectDefinition
 {
 	public EffectTiming EffectTiming { get; set; }
 	public EffectTrigger EffectTrigger { get; set; }
+	public TriggerScope Scope { get; set; }
 	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
 	public ActionDefinition ActionDefintion { get; set; } // legacy, single-action shape — kept for backward compat
 	public List<ActionDefinition> ActionDefintions { get; set; }

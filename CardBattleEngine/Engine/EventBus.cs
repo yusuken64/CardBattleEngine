@@ -70,7 +70,8 @@ public class EventBus
 		{
 			foreach (var effect in triggerSource.TriggeredEffects
 				.Where(te => te.EffectTrigger == triggeringAction.EffectTrigger &&
-							 te.EffectTiming == timing))
+							 te.EffectTiming == timing &&
+							 (te.Scope != TriggerScope.Self || triggerSource.Entity == context.Source)))
 			{
 				var effectContext = new ActionContext()
 				{

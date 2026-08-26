@@ -6,6 +6,7 @@ public class TriggeredEffect : ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
+	public TriggerScope Scope { get; set; }
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
@@ -16,6 +17,7 @@ public class TriggeredEffect : ITriggeredEffect
 		{
 			EffectTiming = this.EffectTiming,
 			EffectTrigger = this.EffectTrigger,
+			Scope = this.Scope,
 			AffectedEntitySelector = AffectedEntitySelector,
 			Condition = Condition,
 			GameActions = GameActions.Select(a => a.Clone()).ToList(),
@@ -27,6 +29,7 @@ public class ExpirationTrigger : ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
+	public TriggerScope Scope { get; set; }
 	public ITriggerCondition Condition { get; set; }
 	public int CountDown { get; set; }
 }
@@ -35,7 +38,17 @@ public interface ITriggeredEffect
 {
 	public EffectTrigger EffectTrigger { get; set; }
 	public EffectTiming EffectTiming { get; set; }
+	public TriggerScope Scope { get; set; }
 	public ITriggerCondition Condition { get; set; }
+}
+
+// Self: the trigger only fires when the entity holding it is the one that performed the triggering action
+// (e.g. "when this minion attacks"). Any: fires regardless of which entity performed the action (default).
+[JsonConverter(typeof(StringEnumConverter))]
+public enum TriggerScope
+{
+	Any,
+	Self,
 }
 
 [JsonConverter(typeof(StringEnumConverter))]
