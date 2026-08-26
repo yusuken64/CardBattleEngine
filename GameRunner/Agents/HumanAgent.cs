@@ -57,7 +57,7 @@ public class HumanAgent : IGameAgent
 		return selectedAction;
 	}
 
-	private static T SelectFromList<T>(
+	public static T SelectFromList<T>(
 		List<T> options,
 		string prompt = "",
 		Func<T, string>? display = null)

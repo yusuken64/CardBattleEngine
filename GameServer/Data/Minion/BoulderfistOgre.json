@@ -1,0 +1,10 @@
+{
+  "Attack": 6,
+  "Health": 7,
+  "Tribe": [ "None" ],
+  "TriggeredEffectDefinitions": [],
+  "Type": "Minion",
+  "Id": "BoulderfistOgre",
+  "Name": "Boulderfist Ogre",
+  "Cost": 6
+}

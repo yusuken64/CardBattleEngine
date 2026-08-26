@@ -1,0 +1,10 @@
+{
+  "Attack": 1,
+  "Health": 1,
+  "Tribe": [ "None" ],
+  "TriggeredEffectDefinitions": [],
+  "Type": "Minion",
+  "Id": "Wisp",
+  "Name": "Wisp",
+  "Cost": 1
+}

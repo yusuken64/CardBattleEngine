@@ -1,0 +1,20 @@
+{
+	"SpellCastEffectDefinitions": [
+		{
+			"ActionDefintions": [
+				{
+					"GameActionTypeName": "DrawCardFromDeckAction",
+					"Params": {}
+				},
+				{
+					"GameActionTypeName": "DrawCardFromDeckAction",
+					"Params": {}
+				}
+			]
+		}
+	],
+	"Type": "Spell",
+	"Id": "ArcaneIntellect",
+	"Name": "Arcane Intellect",
+	"Cost": 3
+}
