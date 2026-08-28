@@ -159,6 +159,7 @@ public class Player : IGameEntity, ITriggerSource
 		//	clonedMinion.Owner = clone;
 		//}
 
+		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
 		clone.RecalculateStats();
 		return clone;
 	}
@@ -180,7 +181,11 @@ public class Player : IGameEntity, ITriggerSource
 	{
 		var attack = (EquippedWeapon?.Attack ?? 0);
 
-		foreach (var mod in _modifiers.Concat(_auraModifiers))
+		foreach (var mod in _modifiers)
+		{
+			mod.ApplyValue(ref attack, mod.AttackChange);
+		}
+		foreach (var mod in _auraModifiers)
 		{
 			mod.ApplyValue(ref attack, mod.AttackChange);
 		}

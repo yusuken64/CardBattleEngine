@@ -10,6 +10,7 @@ public interface IGameAction
 	Dictionary<string, object> EmitParams();
 	void ConsumeParams(Dictionary<string, object> actionParam);
 	object CustomSFX { get; set; } //this will be used the client to assosiated SFX To Action when animated
+	IGameAction Clone();
 }
 
 public abstract class GameActionBase : IGameAction
@@ -62,6 +63,13 @@ public abstract class GameActionBase : IGameAction
 		return new();
 	}
 	public object CustomSFX { get; set; }
+
+	public virtual IGameAction Clone()
+	{
+		var clone = (IGameAction)MemberwiseClone();
+		clone.Canceled = false;
+		return clone;
+	}
 }
 
 //TODO make different implementations for context for each action??
@@ -88,7 +96,7 @@ public class ActionContext
 		this.Modifier = context.Modifier;
 		this._variables = new(context._variables);
 		this.AffectedEntities = [.. context.AffectedEntities];
-		this.IsAttack = IsAttack;
+		this.IsAttack = context.IsAttack;
 	}
 
 	public IGameAction OriginalAction { get; set; }
@@ -146,7 +154,7 @@ public class ActionContext
 		newContext.SourceHeroPower = this.SourceHeroPower;
 		newContext.IsAuraEffect = this.IsAuraEffect;
 		newContext.IsReborn = this.IsReborn;
-		newContext.ResolvedStatusChanges = this.ResolvedStatusChanges;
+		newContext.ResolvedStatusChanges = new List<StatusDelta>(this.ResolvedStatusChanges);
 		newContext.PlayIndex = this.PlayIndex;
 		newContext.SummonedMinion = this.SummonedMinion;
 		newContext.OriginalAction = this.OriginalAction;
@@ -154,7 +162,6 @@ public class ActionContext
 		newContext.CardsLeftInDeck = this.CardsLeftInDeck;
 		newContext.IsAttack = this.IsAttack;
 		newContext.CardGained = this.CardGained;
-		newContext._variables = this._variables;
 
 		return newContext;
 	}

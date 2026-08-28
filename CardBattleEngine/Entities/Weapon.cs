@@ -41,7 +41,7 @@ public class Weapon : ITriggerSource, IGameEntity
 	public void AddAuraModifier(StatModifier auraStatModifier)
 	{
 		_auraModifiers.Add(auraStatModifier);
-		//RecalculateStats();
+		RecalculateStats();
 	}
 
 	public void RemoveModifier(StatModifier modifier)
@@ -82,7 +82,12 @@ public class Weapon : ITriggerSource, IGameEntity
 		var attack = OriginalAttack;
 		var maxHealth = OriginalDurability; // start from base max health
 
-		foreach (var mod in _modifiers.Concat(_auraModifiers))
+		foreach (var mod in _modifiers)
+		{
+			mod.ApplyValue(ref attack, mod.AttackChange);
+			mod.ApplyValue(ref maxHealth, mod.HealthChange);
+		}
+		foreach (var mod in _auraModifiers)
 		{
 			mod.ApplyValue(ref attack, mod.AttackChange);
 			mod.ApplyValue(ref maxHealth, mod.HealthChange);
@@ -104,14 +109,20 @@ public class Weapon : ITriggerSource, IGameEntity
 
 	internal Weapon Clone()
 	{
-		return new Weapon(Name, OriginalAttack, OriginalDurability)
+		var clone = new Weapon(Name, OriginalAttack, OriginalDurability)
 		{
+			Id = Id,
 			Attack = Attack,
 			Durability = Durability,
 			Owner = Owner,
-			TriggeredEffects = TriggeredEffects.ToList(),
+			TriggeredEffects = TriggeredEffects.Select(e => e.Clone()).ToList(),
 			OriginalCard = OriginalCard,
 			VariableSet = new VariableSet(VariableSet),
 		};
+
+		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
+		clone._auraModifiers = _auraModifiers.Select(x => x.Clone()).ToList();
+
+		return clone;
 	}
 }

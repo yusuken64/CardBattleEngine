@@ -136,7 +136,7 @@ public class BattleEffectTest
 		{
 			EffectTiming = EffectTiming.Pre,
 			EffectTrigger = EffectTrigger.Attack,
-			Condition = new OriginalSourceCondition(),
+			Scope = TriggerScope.Self,
 			GameActions =
 			[
 				new DeferredResolveAction()
@@ -198,7 +198,7 @@ public class BattleEffectTest
 		{
 			EffectTiming = EffectTiming.Pre,
 			EffectTrigger = EffectTrigger.Attack,
-			Condition = new OriginalSourceCondition(),
+			Scope = TriggerScope.Self,
 			GameActions =
 			[
 				new DeferredResolveAction()

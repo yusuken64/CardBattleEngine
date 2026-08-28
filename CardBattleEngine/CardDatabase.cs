@@ -64,12 +64,13 @@ public class CardDatabase
 				{
 					EffectTiming = x.EffectTiming,
 					EffectTrigger = x.EffectTrigger,
+					Scope = x.Scope,
 					TriggerConditionDefintion = cond,
-					ActionDefintion = new ActionDefinition
+					ActionDefintions = x.GameActions.Select(ga => new ActionDefinition
 					{
-						GameActionTypeName = x.GameActions[0].GetType().Name,
-						Params = x.GameActions[0].EmitParams()
-					},
+						GameActionTypeName = ga.GetType().Name,
+						Params = ga.EmitParams()
+					}).ToList(),
 					AffectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition()
 					{
 						EntitySelectorTypeName = x.AffectedEntitySelector?.GetType().Name,
@@ -232,10 +233,14 @@ public class CardDatabase
 
 		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitions)
 		{
-			ActionDefinition actionDefintion = triggeredEffectDefinition.ActionDefintion;
-			var action = CreateGameActionFromDefinition(
-				actionDefintion.GameActionTypeName,
-				actionDefintion.Params);
+			List<ActionDefinition> actionDefinitions =
+				(triggeredEffectDefinition.ActionDefintions != null && triggeredEffectDefinition.ActionDefintions.Count > 0)
+					? triggeredEffectDefinition.ActionDefintions
+					: new List<ActionDefinition> { triggeredEffectDefinition.ActionDefintion };
+
+			List<IGameAction> actions = actionDefinitions
+				.Select(ad => CreateGameActionFromDefinition(ad.GameActionTypeName, ad.Params))
+				.ToList();
 
 			TriggerConditionDefinition triggerConditionDefintion = triggeredEffectDefinition.TriggerConditionDefintion;
 			var condition = CreateTriggerConditionFromDefinition(
@@ -246,8 +251,9 @@ public class CardDatabase
 			{
 				EffectTiming = triggeredEffectDefinition.EffectTiming,
 				EffectTrigger = triggeredEffectDefinition.EffectTrigger,
+				Scope = triggeredEffectDefinition.Scope,
 				Condition = condition,
-				GameActions = [action],
+				GameActions = actions,
 				AffectedEntitySelector = CreateAffectedEntitySelectorFromDefinition(
 					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.EntitySelectorTypeName,
 					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.Params
@@ -374,8 +380,10 @@ public class TriggeredEffectDefinition
 {
 	public EffectTiming EffectTiming { get; set; }
 	public EffectTrigger EffectTrigger { get; set; }
+	public TriggerScope Scope { get; set; }
 	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
-	public ActionDefinition ActionDefintion { get; set; }
+	public ActionDefinition ActionDefintion { get; set; } // legacy, single-action shape — kept for backward compat
+	public List<ActionDefinition> ActionDefintions { get; set; }
 	public AffectedEntitySelectorDefinition AffectedEntitySelectorDefinition { get; set; }
 }
 

@@ -1,0 +1,10 @@
+{
+  "Attack": 4,
+  "Health": 5,
+  "Tribe": [ "None" ],
+  "TriggeredEffectDefinitions": [],
+  "Type": "Minion",
+  "Id": "ChillwindYeti",
+  "Name": "Chillwind Yeti",
+  "Cost": 4
+}

@@ -50,4 +50,51 @@ public class HistoryTest
 		Assert.AreEqual(1, state.History.Count);
 		Assert.AreEqual(mainAction, state.History[0].Action);
 	}
+
+	[TestMethod]
+	public void OnTurnEndPostTriggers_ResolveBeforeOpponentStartTurn()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+
+		var current = state.CurrentPlayer;
+
+		var minionCard = new MinionCard("Test", 1, 1, 1);
+		minionCard.Owner = current;
+		var minion = new Minion(minionCard, current);
+		current.Board.Add(minion);
+
+		// Arrange: temporary buff that expires on OnTurnEnd/Post, same pattern the
+		// engine uses for "until end of turn" effects (see AbilityTest.BattleCry_BuffMinion)
+		engine.Resolve(state, new ActionContext { Target = minion }, new AddStatModifierAction()
+		{
+			AttackChange = (Value)2,
+			ExpirationTrigger = new ExpirationTrigger()
+			{
+				EffectTrigger = EffectTrigger.OnTurnEnd,
+				EffectTiming = EffectTiming.Post,
+			}
+		});
+		Assert.AreEqual(3, minion.Attack);
+
+		int endingTurn = state.turn;
+
+		// Act
+		engine.Resolve(state, new ActionContext { SourcePlayer = current }, new EndTurnAction());
+
+		// Assert: the buff expired...
+		Assert.AreEqual(1, minion.Attack);
+
+		// ...and it expired as part of the turn that just ended, before the opponent's
+		// StartTurnAction cascade (mana/draw) ran - not after it.
+		int removeModifierIndex = state.History.FindIndex(h => h.Action is RemoveModifierAction);
+		int startTurnIndex = state.History.FindIndex(h => h.Action is StartTurnAction);
+
+		Assert.AreNotEqual(-1, removeModifierIndex, "Expected the modifier expiration to be recorded in history");
+		Assert.AreNotEqual(-1, startTurnIndex, "Expected the opponent's StartTurnAction to be recorded in history");
+		Assert.IsTrue(removeModifierIndex < startTurnIndex,
+			"OnTurnEnd Post-trigger should resolve before the opponent's StartTurnAction");
+		Assert.AreEqual(endingTurn, state.History[removeModifierIndex].Turn,
+			"Modifier expiration should be tagged with the turn that just ended, not the new turn");
+	}
 }

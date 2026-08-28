@@ -2,8 +2,10 @@
 
 public class EventBus
 {
-	internal void EvaluatePersistentEffects(GameState gameState)
+	internal IEnumerable<(IGameAction, ActionContext)> EvaluatePersistentEffects(GameState gameState)
 	{
+		var sideEffects = new List<(IGameAction, ActionContext)>();
+
 		// 1. Clear all aura modifiers that were previously applied
 		List<IGameEntity> entities = gameState.GetAllEntities().ToList();
 		foreach (var entity in entities)
@@ -40,16 +42,17 @@ public class EventBus
 						AffectedEntitySelector = auraEffect.AffectedEntitySelector,
 						IsAuraEffect = true,
 					};
-					//this list needs to materialize to apply the effects.
-					action.Resolve(gameState, context).ToList();
+					sideEffects.AddRange(action.Resolve(gameState, context));
 				}
 			}
 		}
 
-		foreach (var entity in gameState.GetAllEntities())
+		foreach (var entity in entities)
 		{
 			entity.RecalculateStats();
 		}
+
+		return sideEffects;
 	}
 
 	/// <summary>
@@ -67,7 +70,8 @@ public class EventBus
 		{
 			foreach (var effect in triggerSource.TriggeredEffects
 				.Where(te => te.EffectTrigger == triggeringAction.EffectTrigger &&
-							 te.EffectTiming == timing))
+							 te.EffectTiming == timing &&
+							 (te.Scope != TriggerScope.Self || triggerSource.Entity == context.Source)))
 			{
 				var effectContext = new ActionContext()
 				{

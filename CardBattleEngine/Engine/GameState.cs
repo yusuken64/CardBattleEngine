@@ -48,6 +48,7 @@ public class GameState
 			_entityMap[player.Id] = player;
 			foreach (var minion in player.Board) _entityMap[minion.Id] = minion;
 			foreach (var card in player.Hand) _entityMap[card.Id] = card;
+			if (player.EquippedWeapon != null) _entityMap[player.EquippedWeapon.Id] = player.EquippedWeapon;
 		}
 	}
 
@@ -209,7 +210,7 @@ public class GameState
 		var p2 = Players[1].Clone();
 
 		// Create a new game state using the cloned players
-		var clone = new GameState(p1, p2, this.rNG?.Clone(), this.CardDB)
+		var clone = new GameState(p1, p2, this.rNG?.Clone(), [])
 		{
 			MaxBoardSize = this.MaxBoardSize,
 			maxTurns = this.maxTurns,
@@ -218,8 +219,13 @@ public class GameState
 					 this.Winner == Players[1] ? p2 : null
 		};
 
+		// CardDB is already deduplicated on this instance - avoid re-running the dedup pipeline on every clone
+		clone.CardDB = this.CardDB;
+
 		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
 		clone.PendingChoice = this.PendingChoice;
+
+		clone.RebuildEntityMap();
 
 		return clone;
 	}
@@ -243,7 +249,7 @@ public class GameState
 		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
 		clone.PendingChoice = this.PendingChoice;
 
-		RebuildEntityMap();
+		clone.RebuildEntityMap();
 
 		return clone;
 	}
