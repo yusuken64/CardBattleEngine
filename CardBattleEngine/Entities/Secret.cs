@@ -5,6 +5,7 @@ public class Secret : ITriggerSource
 {
 	public TriggeredEffect SecretTrigger { get; set; }
 	public Player Owner { get; set; }
+	public SpellCard SourceCard { get; set; }
 	public IGameEntity Entity => Owner;
 	public List<TriggeredEffect> TriggeredEffects => [SecretTrigger];
 }
