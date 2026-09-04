@@ -95,11 +95,15 @@ public class HeroPowerView
 }
 
 // Only ever populated on a player's own PublicPlayerView.Secrets - a player always knows their own secrets.
-// Secret.cs has no identity/name of its own (see PlayerViewBuilder) - Index is just its position in
-// the owner's Secrets list, stable enough for a client to track locally against what it played.
+// Index is the secret's position in the owner's Secrets list, stable enough for a client to track
+// locally against what it played. Name/CardId come from Secret.SourceCard and are only ever populated
+// for the owner - PlayerViewBuilder.BuildOpponent nulls the whole Secrets list for the opponent, so
+// these two fields can never reach anyone but the secret's own owner.
 public class SecretView
 {
 	public int Index { get; set; }
+	public string Name { get; set; }
+	public Guid? CardId { get; set; }
 }
 
 public class PendingChoiceView

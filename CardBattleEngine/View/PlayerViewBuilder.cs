@@ -49,7 +49,12 @@ public static class PlayerViewBuilder
 	{
 		var view = BuildBase(player);
 		view.Hand = player.Hand.Select(BuildCardView).ToList();
-		view.Secrets = player.Secrets.Select((secret, index) => new SecretView { Index = index }).ToList();
+		view.Secrets = player.Secrets.Select((secret, index) => new SecretView
+		{
+			Index = index,
+			Name = secret.SourceCard?.Name,
+			CardId = secret.SourceCard?.Id
+		}).ToList();
 		return view;
 	}
 

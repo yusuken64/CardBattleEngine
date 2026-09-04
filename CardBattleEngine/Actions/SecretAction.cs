@@ -20,6 +20,7 @@ public class SecretAction : GameActionBase
 		{
 			player.Secrets.Add(Secret);
 			Secret.Owner = player;
+			Secret.SourceCard = context.SourceCard as SpellCard;
 
 			if (Secret.SecretTrigger != null &&
 				!Secret.SecretTrigger.GameActions.OfType<SecretResolvedAction>().Any())
