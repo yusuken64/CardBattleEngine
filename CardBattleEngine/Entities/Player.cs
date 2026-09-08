@@ -33,10 +33,10 @@ public class Player : IGameEntity, ITriggerSource
 
 	public bool IsAlive { get; set; }
 	public List<TriggeredEffect> TriggeredEffects { get; set; }
-	public bool IsFrozen { get; internal set; }
+	public bool IsFrozen { get; set; }
 	public bool HasAttackedThisTurn { get; set; }
 	public bool MissedAttackFromFrozen { get; internal set; }
-	public bool IsStealth { get; internal set; }
+	public bool IsStealth { get; set; }
 	public Weapon? EquippedWeapon { get; set; }
 	public HeroPower HeroPower { get; set; }
 	public IGameEntity Entity => this;

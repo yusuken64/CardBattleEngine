@@ -7,7 +7,7 @@ public abstract class Card : ITriggerSource, IGameEntity
 	public string SpriteID { get; set; }//doesn't affectgameplay
 	public string Description { get; set; }//doesn't affectgameplay
 	public ushort NumericId { get; internal set; }//used for shorthand id of card and effects
-	public int ManaCost { get; protected set; }
+	public int ManaCost { get; set; }
 	public IValidTargetSelector? ValidTargetSelector { get; set; }
 	public ICastRestriction? CastRestriction { get; set; }
 	public abstract CardType Type { get; }
