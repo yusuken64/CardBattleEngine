@@ -1,5 +1,13 @@
 ﻿using CardBattleEngine;
 
+if (args.Length > 0 && args[0] == "--host")
+{
+	string hostUrl = args.Length > 1 ? args[1]
+		: Environment.GetEnvironmentVariable("GAMESERVER_URL") ?? "http://localhost:5299";
+	await LocalMultiplayerHost.RunAsync(hostUrl);
+	return;
+}
+
 if (args.Length > 0 && args[0] == "--remote")
 {
 	string serverUrl = args.Length > 1 ? args[1]
