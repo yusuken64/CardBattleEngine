@@ -194,7 +194,7 @@ public static class PlayerViewBuilder
 				ActionType = action.GetType().Name,
 				SourceEntityId = context.Source?.Id,
 				TargetEntityId = context.Target?.Id,
-				DisplayName = action.ToString(),
+				DisplayName = ActionDisplay.Describe(action, context),
 			});
 		}
 		return result;

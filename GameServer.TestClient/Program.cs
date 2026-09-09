@@ -31,12 +31,24 @@ void CheckRedaction(PlayerGameView view, string who)
 Guid matchId = Guid.Empty;
 bool autoPlayEnabled = false; // held off until the spoofed-action checks below finish, so they race against nothing.
 
+// Every engine Resolve() broadcasts to both players regardless of whether this player's own legal
+// actions changed, so several pushes in a row can carry the same still-unanswered PromptVersion.
+// Without this guard, each redundant push would fire another SubmitAction for a version already
+// submitted, and the server's rejection of the duplicate would trip Fail() below.
+var lastSubmittedVersion = new Dictionary<HubConnection, int?>();
+
 void TrySubmitFirstLegalAction(HubConnection connection, string who, PlayerGameView view)
 {
 	if (!autoPlayEnabled || view.LegalActions.Count == 0 || !view.PromptVersion.HasValue)
 	{
 		return;
 	}
+
+	if (lastSubmittedVersion.TryGetValue(connection, out var last) && last == view.PromptVersion)
+	{
+		return;
+	}
+	lastSubmittedVersion[connection] = view.PromptVersion;
 
 	_ = connection.InvokeAsync<ActionResult>("SubmitAction", matchId, view.LegalActions[0].Index, view.PromptVersion.Value)
 		.ContinueWith(t =>

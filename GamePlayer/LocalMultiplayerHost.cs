@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 public static class LocalMultiplayerHost
 {
-	public static async Task RunAsync(string url)
+	public static async Task RunAsync(string url, bool useListView = false)
 	{
 		var exeName = OperatingSystem.IsWindows() ? "GamePlayer.exe" : "GamePlayer";
 		var exePath = Path.Combine(AppContext.BaseDirectory, exeName);
@@ -33,10 +33,23 @@ public static class LocalMultiplayerHost
 
 		Process? player1 = null;
 		Process? player2 = null;
+
+		// Process.Start(UseShellExecute: true) spawns the player windows as independent OS processes
+		// with no lifetime tie to this one - closing this host window (X button, Ctrl+C, or a crash)
+		// otherwise leaves them running and locking GamePlayer.exe for the next build. Hook every exit
+		// path so they always get cleaned up alongside the host.
+		void KillChildren(object? sender, EventArgs e)
+		{
+			TryKill(player1);
+			TryKill(player2);
+		}
+		AppDomain.CurrentDomain.ProcessExit += KillChildren;
+		Console.CancelKeyPress += (_, _) => KillChildren(null, EventArgs.Empty);
+
 		try
 		{
-			player1 = StartRemoteClient(exePath, url, "Player 1");
-			player2 = StartRemoteClient(exePath, url, "Player 2");
+			player1 = StartRemoteClient(exePath, url, "Player 1", useListView);
+			player2 = StartRemoteClient(exePath, url, "Player 2", useListView);
 
 			Console.WriteLine();
 			Console.WriteLine("Two player windows have been opened.");
@@ -56,6 +69,8 @@ public static class LocalMultiplayerHost
 		}
 		finally
 		{
+			AppDomain.CurrentDomain.ProcessExit -= KillChildren;
+
 			player1?.Dispose();
 			player2?.Dispose();
 
@@ -65,7 +80,7 @@ public static class LocalMultiplayerHost
 		}
 	}
 
-	private static Process StartRemoteClient(string exePath, string url, string label)
+	private static Process StartRemoteClient(string exePath, string url, string label, bool useListView)
 	{
 		var startInfo = new ProcessStartInfo
 		{
@@ -75,6 +90,10 @@ public static class LocalMultiplayerHost
 		};
 		startInfo.ArgumentList.Add("--remote");
 		startInfo.ArgumentList.Add(url);
+		if (useListView)
+		{
+			startInfo.ArgumentList.Add("--list");
+		}
 
 		var process = Process.Start(startInfo);
 		if (process == null)

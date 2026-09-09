@@ -29,8 +29,31 @@ internal class MulliganChoce : IPendingChoice
 	{
 		if (Options != null) { return Options; }
 
-		Options = [(new SubmitMulliganAction(), new ActionContext() { SourcePlayer = SourcePlayer })];
+		// One option per possible subset of the starting hand to replace, matching how every other
+		// choice point in the engine (e.g. AttackAction enumerating one option per attacker/target
+		// pair) hands out a fully-specified action per legal combination rather than needing a
+		// separate multi-select interaction. Mulligan hands are small (3-4 cards), so 2^n options is
+		// cheap.
+		var hand = SourcePlayer.Hand;
+		var options = new List<(IGameAction, ActionContext)>();
 
+		for (int mask = 0; mask < (1 << hand.Count); mask++)
+		{
+			var cardsToReplace = new List<Card>();
+			for (int i = 0; i < hand.Count; i++)
+			{
+				if ((mask & (1 << i)) != 0)
+				{
+					cardsToReplace.Add(hand[i]);
+				}
+			}
+
+			options.Add((
+				new SubmitMulliganAction { CardsToReplace = cardsToReplace },
+				new ActionContext { SourcePlayer = SourcePlayer }));
+		}
+
+		Options = options;
 		return Options;
 	}
 }
@@ -60,5 +83,12 @@ public class SubmitMulliganAction : GameActionBase
 		}
 		state.Shuffle(context.SourcePlayer.Deck);
 		yield return (new StartTurnAction(), context);
+	}
+
+	public override string ToString()
+	{
+		return CardsToReplace.Count == 0
+			? "Keep all"
+			: "Mulligan: " + string.Join(", ", CardsToReplace.Select(c => c.Name));
 	}
 }

@@ -13,49 +13,21 @@ public class HumanAgent : IGameAgent
 	{
 		var actions = state.GetValidActions(_player).ToList();
 
-		// Step 1: select the action
+		// Step 1: select the action. GetValidActions() already produces one fully-populated
+		// ActionContext per distinct action/target combination, so no further target prompt is needed.
 		(IGameAction, ActionContext) selectedAction = SelectFromList(
 			actions,
 			"Select an action:",
-			static (action) => action.Item1.ToString());
+			static (action) => ActionDisplay.Describe(action.Item1, action.Item2));
 
-		var context = new ActionContext();
-
-		// Step 2: if the action requires a target, prompt for one
-		//if (selectedAction.Item1 is PlayCardAction playCardAction &&
-		//	playCardAction.Card.TriggeredEffects.Any(x => x.TargetType != TargetingType.None))
-		//{
-		//	var effect = playCardAction.Card.TriggeredEffects[0];
-		//	var possibleTargets = state.GetValidTargets(_player, effect.TargetType).ToList();
-		//	if (possibleTargets.Count > 0)
-		//	{
-		//		var selectedTarget = SelectFromList(possibleTargets, "Select a target:");
-		//		context.SourcePlayer = _player;
-		//		context.SourceCard = playCardAction.Card;
-		//		context.Target = selectedTarget as IGameEntity;
-		//	}
-		//}
-		//else if (selectedAction.Item1 is AttackAction attackAction)
-		//{
-		//	//var effect = attackAction.Card.TriggeredEffects[0];
-		//	var possibleTargets = state.GetValidTargets(_player, TargetingType.AnyEnemy).ToList();
-		//	if (possibleTargets.Count > 0)
-		//	{
-		//		var selectedTarget = SelectFromList(possibleTargets, "Select a target:");
-		//		context.SourcePlayer = _player;
-		//		context.SourceCard = null;
-		//		context.Source = selectedAction.Item2.Source;
-		//		context.Target = selectedTarget as IGameEntity;
-		//	}
-		//}
-		//else
-		//{
-		//	context .SourcePlayer = _player;
-		//}
-
-		selectedAction.Item2 = context;
 		return selectedAction;
 	}
+
+	// Tracks how many option rows the previous call at this same screen position drew, so a
+	// shorter follow-up menu (e.g. this turn has fewer legal actions than last turn) can clear the
+	// extra leftover rows a caller like RemoteGameClient - which redraws the menu at the same fixed
+	// position every turn rather than ever-growing scrollback - would otherwise leave stale.
+	private static int _lastOptionCount;
 
 	public static T SelectFromList<T>(
 		List<T> options,
@@ -64,14 +36,26 @@ public class HumanAgent : IGameAgent
 	{
 		int selectedIndex = 0;
 
-		int optionStartTop = Math.Max(0, Console.WindowTop + Console.WindowHeight - options.Count - 1);
-
 		if (!string.IsNullOrEmpty(prompt))
 			Console.WriteLine(prompt);
+
+		// Anchor to wherever the cursor actually is after the prompt, not a window-height guess -
+		// callers (e.g. RemoteGameClient) may have already pinned other content above this point,
+		// so "near the bottom of the window" is not necessarily "right after what we just printed".
+		int optionStartTop = Console.CursorTop;
 
 		// Reserve lines
 		for (int i = 0; i < options.Count; i++)
 			Console.WriteLine();
+
+		for (int i = options.Count; i < _lastOptionCount; i++)
+		{
+			int line = optionStartTop + i;
+			if (line >= Console.BufferHeight) break;
+			Console.SetCursorPosition(0, line);
+			Console.Write(new string(' ', Console.BufferWidth));
+		}
+		_lastOptionCount = options.Count;
 
 		while (true)
 		{
