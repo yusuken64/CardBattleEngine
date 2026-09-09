@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using CardBattleEngine.View;
 using GameServer.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -31,6 +33,11 @@ public static class RemoteGameClient
 	// Row where the fixed-size history log starts in live-view mode. Set once, never moved.
 	private static int? _logRow;
 
+	// True when the last view we saw handed us legal actions - tracked separately from
+	// _waitStartUtc (list mode doesn't set that) so both view modes can detect the same
+	// "it just became my turn" edge and steal focus for this window.
+	private static bool _hadLegalActions;
+
 	private const int HistoryLogLines = 8;
 
 	// Oldest first, capped at HistoryLogLines.
@@ -63,6 +70,10 @@ public static class RemoteGameClient
 		});
 		connection.On<Guid?>("OnMatchEnded", winnerId =>
 		{
+			lock (_consoleLock)
+			{
+				ClearPromptArea();
+			}
 			matchEnded.TrySetResult(winnerId);
 			viewSignal.Release();
 		});
@@ -128,9 +139,17 @@ public static class RemoteGameClient
 		}
 
 		var winnerId = await matchEnded.Task;
-		Console.WriteLine(winnerId.HasValue ? $"Game over. Winner: {winnerId}" : "Game over. Draw.");
+		var resultMessage = winnerId == null
+			? "Game over. Draw."
+			: winnerId == latestView?.ViewerPlayerId
+				? "Game over. You win!"
+				: "Game over. You lose.";
+		Console.WriteLine(resultMessage);
 
 		await connection.StopAsync();
+
+		Console.WriteLine("Press any key to close this window...");
+		Console.ReadKey(true);
 	}
 
 	private static async Task<Guid?> CreateOrJoinMatch(HubConnection connection, string playerName, Task<Guid> matchFound)
@@ -177,6 +196,13 @@ public static class RemoteGameClient
 
 	private static void PrintState(PlayerGameView view)
 	{
+		var hasLegalActions = !view.IsGameOver && view.LegalActions.Count > 0;
+		if (hasLegalActions && !_hadLegalActions)
+		{
+			FocusConsoleWindow();
+		}
+		_hadLegalActions = hasLegalActions;
+
 		if (_useListView)
 		{
 			PrintStateAsList(view);
@@ -185,6 +211,68 @@ public static class RemoteGameClient
 		{
 			PrintStateInPlace(view);
 		}
+	}
+
+	// Steals focus for this process's console window so whichever player's turn it is - the one
+	// with something to act on - is the window in front, instead of leaving that to alt-tab. Windows
+	// blocks background processes from calling SetForegroundWindow directly; attaching to the current
+	// foreground window's input queue first is the standard way around that restriction.
+	private static void FocusConsoleWindow()
+	{
+		if (!OperatingSystem.IsWindows())
+		{
+			return;
+		}
+
+		var hWnd = NativeMethods.GetConsoleWindow();
+		var foregroundWindow = NativeMethods.GetForegroundWindow();
+		if (hWnd == IntPtr.Zero || hWnd == foregroundWindow)
+		{
+			return;
+		}
+
+		var foregroundThreadId = NativeMethods.GetWindowThreadProcessId(foregroundWindow, out _);
+		var currentThreadId = NativeMethods.GetCurrentThreadId();
+
+		NativeMethods.ShowWindow(hWnd, NativeMethods.SW_RESTORE);
+
+		if (foregroundThreadId != 0 && foregroundThreadId != currentThreadId)
+		{
+			NativeMethods.AttachThreadInput(currentThreadId, foregroundThreadId, true);
+			NativeMethods.SetForegroundWindow(hWnd);
+			NativeMethods.AttachThreadInput(currentThreadId, foregroundThreadId, false);
+		}
+		else
+		{
+			NativeMethods.SetForegroundWindow(hWnd);
+		}
+	}
+
+	[SupportedOSPlatform("windows")]
+	private static class NativeMethods
+	{
+		public const int SW_RESTORE = 9;
+
+		[DllImport("kernel32.dll")]
+		public static extern IntPtr GetConsoleWindow();
+
+		[DllImport("kernel32.dll")]
+		public static extern uint GetCurrentThreadId();
+
+		[DllImport("user32.dll")]
+		public static extern IntPtr GetForegroundWindow();
+
+		[DllImport("user32.dll")]
+		public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+		[DllImport("user32.dll")]
+		public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		[DllImport("user32.dll")]
+		public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+		[DllImport("user32.dll")]
+		public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
 	}
 
 	// Debug view: append every broadcast unfiltered, so the full sequence the server actually sent
@@ -248,7 +336,7 @@ public static class RemoteGameClient
 
 		var nextRow = top + StateBlockLineCount;
 
-		if (view.LegalActions.Count == 0 && _lastPromptAreaLines > 0)
+		if ((view.LegalActions.Count == 0 || view.IsGameOver) && _lastPromptAreaLines > 0)
 		{
 			for (int i = 0; i < _lastPromptAreaLines; i++)
 			{
@@ -264,6 +352,24 @@ public static class RemoteGameClient
 		{
 			Console.SetCursorPosition(0, nextRow);
 		}
+	}
+
+	private static void ClearPromptArea()
+	{
+		if (_useListView || _logRow == null || _lastPromptAreaLines == 0)
+		{
+			return;
+		}
+
+		var nextRow = _logRow.Value + HistoryLogLines + StateBlockLineCount;
+		for (int i = 0; i < _lastPromptAreaLines; i++)
+		{
+			int row = nextRow + i;
+			if (row >= Console.BufferHeight) break;
+			Console.SetCursorPosition(0, row);
+			Console.Write(new string(' ', Console.BufferWidth - 1));
+		}
+		_lastPromptAreaLines = 0;
 	}
 
 	private static string BuildWaitingLine()

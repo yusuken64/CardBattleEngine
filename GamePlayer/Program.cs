@@ -8,6 +8,7 @@
 //   dotnet run --project GamePlayer -- --remote [url] --list       same, but with the scrolling debug view (shows every
 //                                                                   broadcast unfiltered, including redundant ones)
 // [url] defaults to $GAMESERVER_URL, or http://localhost:5299 if unset.
+// dotnet run --project GamePlayer -- --host
 
 if (args.Length > 0 && args[0] == "--host")
 {
