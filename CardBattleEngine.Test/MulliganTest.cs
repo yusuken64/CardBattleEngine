@@ -21,7 +21,12 @@ public class MulliganTest
 
 		engine.Resolve(state, submitMullilgan.Item2, submitMullilgan.Item1);
 
-		Assert.IsNull(state.PendingChoice, "PendingChoice should be null after mulligan.");
+		// Player 2 must also mulligan before the game proceeds to turn 1.
+		Assert.IsNotNull(state.PendingChoice, "Player 2 must be prompted to mulligan next.");
+		var submitOpponentMulligan = state.PendingChoice.GetActions(state).First();
+		engine.Resolve(state, submitOpponentMulligan.Item2, submitOpponentMulligan.Item1);
+
+		Assert.IsNull(state.PendingChoice, "PendingChoice should be null after both players have mulliganed.");
 
 		Assert.IsFalse(
 			current.Hand.Contains(originalCard),

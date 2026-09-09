@@ -42,7 +42,8 @@ public static class MatchDriver
 
 		while (!state.IsGameOver() && !cancellationToken.IsCancellationRequested && match.AbandonedSeat == null)
 		{
-			var seat = state.CurrentPlayer == state.Players[0] ? MatchSeat.Player1 : MatchSeat.Player2;
+			var activePlayer = state.PendingChoice?.SourcePlayer ?? state.CurrentPlayer;
+			var seat = activePlayer == state.Players[0] ? MatchSeat.Player1 : MatchSeat.Player2;
 			var agent = match.AgentFor(seat);
 
 			try

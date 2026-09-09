@@ -63,6 +63,7 @@ public class CardView
 	public CardType Type { get; set; }
 	public int? Attack { get; set; }
 	public int? Health { get; set; }
+	public string? CardId { get; set; }
 }
 
 public class MinionView
@@ -77,6 +78,12 @@ public class MinionView
 	public bool IsStealth { get; set; }
 	public bool HasDivineShield { get; set; }
 	public bool CanAttack { get; set; }
+	public string? CardId { get; set; }
+	public bool HasPoisonous { get; set; }
+	public bool HasWindfury { get; set; }
+	public bool HasLifeSteal { get; set; }
+	public bool HasReborn { get; set; }
+	public bool HasSummoningSickness { get; set; }
 }
 
 public class WeaponView

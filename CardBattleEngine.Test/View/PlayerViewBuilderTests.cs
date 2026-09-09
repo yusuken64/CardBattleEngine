@@ -83,6 +83,10 @@ public class PlayerViewBuilderTests
 		var mulligan = state.PendingChoice.GetActions(state).First();
 		engine.Resolve(state, mulligan.Item2, mulligan.Item1);
 
+		// Player 2 must also mulligan before turn 1 begins.
+		var opponentMulligan = state.PendingChoice.GetActions(state).First();
+		engine.Resolve(state, opponentMulligan.Item2, opponentMulligan.Item1);
+
 		var current = state.CurrentPlayer;
 		var other = state.OpponentOf(current);
 

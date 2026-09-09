@@ -102,6 +102,7 @@ public static class PlayerViewBuilder
 			Type = card.Type,
 			Attack = card.Type == CardType.Minion || card.Type == CardType.Weapon ? card.Attack : null,
 			Health = card.Type == CardType.Minion ? card.Health : null,
+			CardId = card.Name,
 		};
 	}
 
@@ -119,6 +120,12 @@ public static class PlayerViewBuilder
 			IsStealth = minion.IsStealth,
 			HasDivineShield = minion.HasDivineShield,
 			CanAttack = minion.CanAttack(),
+			CardId = minion.Name,
+			HasPoisonous = minion.HasPoisonous,
+			HasWindfury = minion.HasWindfury,
+			HasLifeSteal = minion.HasLifeSteal,
+			HasReborn = minion.HasReborn,
+			HasSummoningSickness = minion.HasSummoningSickness,
 		};
 	}
 

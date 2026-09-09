@@ -82,7 +82,15 @@ public class SubmitMulliganAction : GameActionBase
 			yield return (new DrawCardFromDeckAction(), context);
 		}
 		state.Shuffle(context.SourcePlayer.Deck);
-		yield return (new StartTurnAction(), context);
+		if (state.PendingMulligans != null && state.PendingMulligans.Count > 0)
+		{
+			var nextPlayer = state.PendingMulligans.Dequeue();
+			yield return (new PromptMulliganGameAction(), new ActionContext { SourcePlayer = nextPlayer });
+		}
+		else
+		{
+			yield return (new StartTurnAction(), new ActionContext { SourcePlayer = state.Players[0] });
+		}
 	}
 
 	public override string ToString()

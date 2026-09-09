@@ -141,6 +141,7 @@ public class GameEngine
 
 		if (!gameState.SkipMulligan)
 		{
+			gameState.PendingMulligans = new Queue<Player>(new[] { p2 });
 			Resolve(gameState, new ActionContext() { SourcePlayer = p1 }, new PromptMulliganGameAction());
 		}
 		else
