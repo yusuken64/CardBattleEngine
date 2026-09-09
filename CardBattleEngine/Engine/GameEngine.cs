@@ -39,19 +39,31 @@ public class GameEngine
 			if (!current.action.IsValid(gameState, current.context, out string _))
 				continue;
 
-			current.context.OriginalAction = current.action;
+			// Only set if unset - a reaction (e.g. CancelEffectAction) arrives with these already
+			// pointing at the action it's reacting to, and that mustn't get clobbered here.
+			current.context.OriginalAction ??= current.action;
+			current.context.OriginalContext ??= current.context;
 
-			// Pre-resolution triggers
-			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre))
+			// Resolved immediately, not enqueued, so a reaction (e.g. CancelEffectAction) can flip
+			// Canceled before the check below - enqueueing would cancel this action one iteration late.
+			// ToList() first: resolving a trigger can mutate a collection GetTriggers is still iterating.
+			foreach (var trigger in _eventBus.GetTriggers(gameState, current.action, current.context, EffectTiming.Pre).ToList())
 			{
 				var preSideEffects = ResolveAction(gameState, trigger);
 				foreach (var preSideEffect in preSideEffects)
 				{
-					_actionQueue.Enqueue(preSideEffect);
+					var nestedSideEffects = ResolveAction(gameState, preSideEffect);
+					if (nestedSideEffects != null)
+					{
+						foreach (var nested in nestedSideEffects)
+						{
+							_actionQueue.Enqueue(nested);
+						}
+					}
 				}
 			}
 
-			if (current.action.Canceled)
+			if (current.context.Canceled)
 			{
 				continue;
 			}

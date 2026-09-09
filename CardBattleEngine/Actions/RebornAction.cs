@@ -24,6 +24,7 @@ public class RebornAction : GameActionBase
 				SourceCard = context.SourceCard,
 				PlayIndex = context.PlayIndex,
 				OriginalAction = this,
+				OriginalContext = context,
 				IsReborn = true,
 			});
 	}

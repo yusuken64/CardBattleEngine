@@ -8,12 +8,12 @@ public class CancelEffectAction : GameActionBase
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		reason = null;
-		return !context.OriginalAction.Canceled;
+		return !context.OriginalContext.Canceled;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		context.OriginalAction.Canceled = true;
+		context.OriginalContext.Canceled = true;
 
 		return [];
 	}

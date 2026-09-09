@@ -377,6 +377,57 @@ public class CardBattleEngineBenchmark
 
 }
 
+[MemoryDiagnoser]
+public class CloneMicroBenchmarks
+{
+	private Player _player;
+	private const int Clones = 2000;
+
+	[Params(1, 5)]
+	public int EffectCount;
+
+	[GlobalSetup]
+	public void Setup()
+	{
+		_player = new Player("Alice");
+
+		var effects = new List<TriggeredEffect>();
+		for (int i = 0; i < EffectCount; i++)
+		{
+			effects.Add(new TriggeredEffect()
+			{
+				EffectTiming = EffectTiming.Post,
+				EffectTrigger = EffectTrigger.Battlecry,
+				GameActions = [new DamageAction() { Damage = (Value)1 }],
+				AffectedEntitySelector = new TargetOperationSelector()
+				{
+					Operations = [new SelectBoardEntitiesOperation() {
+						Group = TargetGroup.Minions,
+						Side = TeamRelationship.Enemy,
+					}]
+				}
+			});
+		}
+
+		MinionCard card = new MinionCard("Test", 1, 1, 1)
+		{
+			MinionTriggeredEffects = effects
+		};
+		card.Owner = _player;
+		_player.Board.Add(new Minion(card, _player));
+	}
+
+	// Isolates the clone chain from search/engine overhead for a low-noise comparison.
+	[Benchmark]
+	public void PlayerCloneMicro()
+	{
+		for (int i = 0; i < Clones; i++)
+		{
+			_ = _player.Clone();
+		}
+	}
+}
+
 public class Program
 {
 	public static void Main(string[] args)
@@ -388,6 +439,13 @@ public class Program
 				.WithWarmupCount(3)
 				.WithIterationCount(15)
 			);
+
+		if (args.Length > 0 && args[0] == "micro")
+		{
+			BenchmarkRunner.Run<CloneMicroBenchmarks>(config);
+			return;
+		}
+
 		var summary = BenchmarkRunner.Run<CardBattleEngineBenchmark>(config);
 	}
 }

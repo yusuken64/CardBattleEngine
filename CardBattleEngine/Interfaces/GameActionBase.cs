@@ -3,7 +3,6 @@
 // Basic effect/action that can be executed on a GameState
 public interface IGameAction
 {
-	bool Canceled { get; set; }
 	EffectTrigger EffectTrigger { get; }
 	bool IsValid(GameState gameState, ActionContext context, out string reason);
 	IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context);
@@ -15,7 +14,6 @@ public interface IGameAction
 
 public abstract class GameActionBase : IGameAction
 {
-	public bool Canceled { get; set; }
 	public abstract EffectTrigger EffectTrigger { get; }
 
 	public abstract bool IsValid(
@@ -66,9 +64,7 @@ public abstract class GameActionBase : IGameAction
 
 	public virtual IGameAction Clone()
 	{
-		var clone = (IGameAction)MemberwiseClone();
-		clone.Canceled = false;
-		return clone;
+		return (IGameAction)MemberwiseClone();
 	}
 }
 
@@ -102,6 +98,10 @@ public class ActionContext
 	}
 
 	public IGameAction OriginalAction { get; set; }
+	// The context of the pending action OriginalAction refers to - lets CancelEffectAction flip
+	// Canceled there instead of on the action instance, which may be shared across clones.
+	public ActionContext OriginalContext { get; set; }
+	public bool Canceled { get; set; }
 	public bool AuthorizedToEquipWeapon { get; set; }
 	public Minion SummonedMinion { get; set; }
 	public int PlayIndex { get; set; } = -1;
@@ -173,6 +173,8 @@ public class ActionContext
 		newContext.PlayIndex = this.PlayIndex;
 		newContext.SummonedMinion = this.SummonedMinion;
 		newContext.OriginalAction = this.OriginalAction;
+		newContext.OriginalContext = this.OriginalContext;
+		newContext.Canceled = this.Canceled;
 		newContext.OriginalSource = this.OriginalSource;
 		newContext.CardsLeftInDeck = this.CardsLeftInDeck;
 		newContext.IsAttack = this.IsAttack;

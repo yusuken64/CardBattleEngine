@@ -70,7 +70,11 @@ public class Minion : IGameEntity, ITriggerSource
 	public VariableSet VariableSet { get; set; } = new();
 	public ushort CardNumericId => OriginalCard.NumericId;
 
-	public Minion(MinionCard card, Player owner)
+	public Minion(MinionCard card, Player owner) : this(card, owner, cloneEffectsFromCard: true) { }
+
+	// cloneEffectsFromCard is false only for Clone(), which immediately overwrites TriggeredEffects
+	// from the instance's own effects, so building them from the card here would be wasted.
+	private Minion(MinionCard card, Player owner, bool cloneEffectsFromCard)
 	{
 		this.OriginalCard = card;
 		Owner = owner;
@@ -97,11 +101,14 @@ public class Minion : IGameEntity, ITriggerSource
 		CannotAttack = card.CannotAttack;
 
 		IsAlive = true;
-		TriggeredEffects = card.MinionTriggeredEffects.Select(effect =>
+		if (cloneEffectsFromCard)
 		{
-			var instance = effect.Clone();
-			return instance;
-		}).ToList();
+			TriggeredEffects = card.MinionTriggeredEffects.Select(effect =>
+			{
+				var instance = effect.Clone();
+				return instance;
+			}).ToList();
+		}
 
 		VariableSet = new VariableSet(card.VariableSet);
 	}
@@ -115,7 +122,7 @@ public class Minion : IGameEntity, ITriggerSource
 
 	internal Minion Clone()
 	{
-		var clone = new Minion(this.OriginalCard, Owner)
+		var clone = new Minion(this.OriginalCard, Owner, cloneEffectsFromCard: false)
 		{
 			Id = this.Id,
 			TemplateName = this.TemplateName,

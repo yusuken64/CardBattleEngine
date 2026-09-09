@@ -92,5 +92,6 @@ public class SecretTest
 
 		// Assert — spell should be canceled, Counterspell should trigger and disappear
 		Assert.AreEqual(0, player1.Secrets.Count, "CounterSpell should trigger and be consumed.");
+		Assert.AreEqual(30, player1.Health, "Fireball's damage should have been canceled by CounterSpell.");
 	}
 }

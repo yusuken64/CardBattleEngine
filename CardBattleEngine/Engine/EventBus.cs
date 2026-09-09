@@ -82,6 +82,7 @@ public class EventBus
 					PlayIndex = context.PlayIndex,
 					SourceCard = context.SourceCard,
 					OriginalAction = context.OriginalAction,
+					OriginalContext = context.OriginalContext,
 					OriginalSource = context.Source
 				};
 

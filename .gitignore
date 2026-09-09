@@ -2,3 +2,4 @@
 bin/ 
 obj/ 
 /GameRunner/Data
+BenchmarkDotNet.Artifacts/

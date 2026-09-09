@@ -30,6 +30,7 @@ public class TriggerEffectAction : GameActionBase
 				AffectedEntitySelector = TriggeredEffect.AffectedEntitySelector,
 				Target = context.Target,
 				OriginalAction = context.OriginalAction,
+				OriginalContext = context.OriginalContext,
 				OriginalSource = context.Source,
 			});
 		}

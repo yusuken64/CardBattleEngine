@@ -20,7 +20,9 @@ public class TriggeredEffect : ITriggeredEffect
 			Scope = this.Scope,
 			AffectedEntitySelector = AffectedEntitySelector,
 			Condition = Condition,
-			GameActions = GameActions.Select(a => a.Clone()).ToList(),
+			// IGameAction no longer carries per-resolution state (Canceled moved to ActionContext),
+			// so instances are safe to share across clones instead of deep-cloning.
+			GameActions = GameActions,
 		};
 	}
 }
