@@ -217,6 +217,8 @@ public static class PlayerViewBuilder
 			ActionType = entry.Action?.GetType().Name,
 			SourceId = context?.Source?.Id ?? context?.SourceCard?.Id,
 			TargetId = context?.Target?.Id,
+			SourceName = EntityName(context?.Source) ?? context?.SourceCard?.Name,
+			TargetName = EntityName(context?.Target),
 			DamageDealt = context?.DamageDealt,
 			HealedAmount = context?.HealedAmount,
 		};
@@ -240,15 +242,27 @@ public static class PlayerViewBuilder
 			view.ActionType = "SecretPlayed";
 			view.SourceId = null;
 			view.TargetId = null;
+			view.SourceName = null;
+			view.TargetName = null;
 		}
 
 		return view;
 	}
 
-	// A secret's identity (the spell card that cast it) must stay hidden from the opponent between
-	// being cast and actually resolving - Secret.cs carries no "IsRevealed" flag, so the only way to
-	// tell is: is this history entry's card still backing an active (unresolved) Secret owned by
-	// someone other than the viewer?
+	// Card is included because context.Source is the played card itself for PlayCardAction.
+	private static string EntityName(IGameEntity entity)
+	{
+		return entity switch
+		{
+			Player player => player.Name,
+			Minion minion => minion.Name,
+			Card card => card.Name,
+			_ => null,
+		};
+	}
+
+	// A secret's identity must stay hidden until it resolves. Secret.cs has no "IsRevealed" flag,
+	// so check whether this entry's card still backs an active Secret someone else owns.
 	private static bool IsHiddenSecretReveal(HistoryEntry entry, Player viewer)
 	{
 		var card = entry.Context?.SourceCard as SpellCard;

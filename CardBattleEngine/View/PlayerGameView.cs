@@ -138,6 +138,8 @@ public class HistoryEntryView
 	public string ActionType { get; set; }
 	public Guid? SourceId { get; set; }
 	public Guid? TargetId { get; set; }
+	public string SourceName { get; set; }
+	public string TargetName { get; set; }
 	public int? DamageDealt { get; set; }
 	public int? HealedAmount { get; set; }
 	public Guid? SummonedMinionId { get; set; }

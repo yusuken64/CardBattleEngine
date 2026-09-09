@@ -23,10 +23,7 @@ public class HumanAgent : IGameAgent
 		return selectedAction;
 	}
 
-	// Tracks how many option rows the previous call at this same screen position drew, so a
-	// shorter follow-up menu (e.g. this turn has fewer legal actions than last turn) can clear the
-	// extra leftover rows a caller like RemoteGameClient - which redraws the menu at the same fixed
-	// position every turn rather than ever-growing scrollback - would otherwise leave stale.
+	// Previous call's option count, so a shorter menu can clear the extra leftover rows below it.
 	private static int _lastOptionCount;
 
 	public static T SelectFromList<T>(
@@ -37,16 +34,18 @@ public class HumanAgent : IGameAgent
 		int selectedIndex = 0;
 
 		if (!string.IsNullOrEmpty(prompt))
+		{
+			int promptRow = Console.CursorTop;
+			Console.SetCursorPosition(0, promptRow);
+			Console.Write(new string(' ', Console.BufferWidth - 1));
+			Console.SetCursorPosition(0, promptRow);
 			Console.WriteLine(prompt);
+		}
 
-		// Anchor to wherever the cursor actually is after the prompt, not a window-height guess -
-		// callers (e.g. RemoteGameClient) may have already pinned other content above this point,
-		// so "near the bottom of the window" is not necessarily "right after what we just printed".
+		// Anchor to the current cursor, not a window-height guess - callers may already have content
+		// pinned above this point. Rows below use absolute, clamped SetCursorPosition only; a plain
+		// WriteLine "reserve" loop used to live here but risked a real scroll that desynced this row.
 		int optionStartTop = Console.CursorTop;
-
-		// Reserve lines
-		for (int i = 0; i < options.Count; i++)
-			Console.WriteLine();
 
 		for (int i = options.Count; i < _lastOptionCount; i++)
 		{
@@ -89,7 +88,7 @@ public class HumanAgent : IGameAgent
 				break;
 		}
 
-		Console.SetCursorPosition(0, optionStartTop + options.Count);
+		Console.SetCursorPosition(0, Math.Min(optionStartTop + options.Count, Console.BufferHeight - 1));
 		return options[selectedIndex];
 	}
 

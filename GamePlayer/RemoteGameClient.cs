@@ -19,16 +19,22 @@ public static class RemoteGameClient
 	// blocks on this player's response), contention here should be rare in practice.
 	private static readonly object _consoleLock = new();
 
-	// How many rows below the state block the last-drawn prompt ("Select an action:" + its menu
-	// options) occupied. When a later push has no prompt of its own (not this player's turn), the
-	// prompt/menu from the last turn would otherwise just sit there as a stale leftover forever,
-	// since PrintStateInPlace only ever redraws its own fixed 6 rows above it.
+	// Rows the last prompt+menu occupied below the block, so they can be cleared once this
+	// player has no prompt of their own - otherwise they'd sit there as a stale leftover.
 	private static int _lastPromptAreaLines;
 
 	// When set, we have no legal actions of our own (their turn, or their pending choice) - records
 	// when that started so the idle ticker below can show a live "waiting for opponent (Ns)" count.
 	// Null means it's our own turn (or the game is over), so there's nothing to wait on.
 	private static DateTime? _waitStartUtc;
+
+	// Row where the fixed-size history log starts in live-view mode. Set once, never moved.
+	private static int? _logRow;
+
+	private const int HistoryLogLines = 8;
+
+	// Oldest first, capped at HistoryLogLines.
+	private static readonly List<string> _historyLog = new();
 
 	public static async Task RunAsync(string serverUrl, string playerName, bool useListView = false)
 	{
@@ -185,6 +191,8 @@ public static class RemoteGameClient
 	// (including ones that look redundant) is visible in the scrollback.
 	private static void PrintStateAsList(PlayerGameView view)
 	{
+		PrintHistoryLines(view);
+
 		Console.WriteLine();
 		Console.WriteLine($"--- Turn {view.Turn} ---");
 		Console.WriteLine(FormatPlayer("You", view.Self, view.CurrentPlayerId == view.ViewerPlayerId));
@@ -203,15 +211,16 @@ public static class RemoteGameClient
 
 	private const int StateBlockLineCount = 6;
 
-	// Live view (default): redraw a fixed-size block in place instead of appending. Anchored to
-	// Console.WindowTop (re-read fresh each call, not a cached absolute row) - the same reference
-	// point HumanAgent.SelectFromList uses for its menu - so the block stays pinned to the top of
-	// whatever's currently visible even as the console auto-scrolls.
+	// Live view (default): redraw a fixed-size block in place instead of appending.
 	private static void PrintStateInPlace(PlayerGameView view)
 	{
 		_waitStartUtc = (!view.IsGameOver && view.LegalActions.Count == 0)
 			? (_waitStartUtc ?? DateTime.UtcNow)
 			: null;
+
+		_logRow ??= Console.CursorTop;
+
+		PrintHistoryLinesAnchored(view);
 
 		var lines = new[]
 		{
@@ -225,7 +234,7 @@ public static class RemoteGameClient
 			BuildWaitingLine(),
 		};
 
-		var top = Console.WindowTop;
+		var top = _logRow.Value + HistoryLogLines;
 		for (int i = 0; i < lines.Length; i++)
 		{
 			int row = top + i;
@@ -279,12 +288,12 @@ public static class RemoteGameClient
 
 		lock (_consoleLock)
 		{
-			if (_waitStartUtc == null)
+			if (_waitStartUtc == null || _logRow == null)
 			{
 				return;
 			}
 
-			var top = Console.WindowTop;
+			var top = _logRow.Value + HistoryLogLines;
 			int row = top + StateBlockLineCount - 1;
 			if (row >= Console.BufferHeight)
 			{
@@ -297,6 +306,68 @@ public static class RemoteGameClient
 			Console.Write(BuildWaitingLine());
 			Console.SetCursorPosition(0, top + StateBlockLineCount);
 		}
+	}
+
+	private static void PrintHistoryLines(PlayerGameView view)
+	{
+		foreach (var entry in view.NewHistory)
+		{
+			var line = FormatHistoryLine(entry, view);
+			if (line != null)
+			{
+				Console.WriteLine(line);
+			}
+		}
+	}
+
+	private static void PrintHistoryLinesAnchored(PlayerGameView view)
+	{
+		foreach (var entry in view.NewHistory)
+		{
+			var line = FormatHistoryLine(entry, view);
+			if (line == null)
+			{
+				continue;
+			}
+
+			_historyLog.Add(line);
+			if (_historyLog.Count > HistoryLogLines)
+			{
+				_historyLog.RemoveAt(0);
+			}
+		}
+
+		for (int i = 0; i < HistoryLogLines; i++)
+		{
+			int row = _logRow!.Value + i;
+			if (row >= Console.BufferHeight) break;
+
+			Console.SetCursorPosition(0, row);
+			Console.Write(new string(' ', Console.BufferWidth - 1));
+			Console.SetCursorPosition(0, row);
+			if (i < _historyLog.Count)
+			{
+				Console.Write(_historyLog[i]);
+			}
+		}
+	}
+
+	private static string FormatHistoryLine(HistoryEntryView entry, PlayerGameView view)
+	{
+		var who = entry.PlayerId == view.ViewerPlayerId ? "You" : view.Opponent.Name;
+
+		return entry.ActionType switch
+		{
+			"PlayCardAction" => entry.TargetName != null
+				? $"{who} played {entry.SourceName} on {entry.TargetName}"
+				: $"{who} played {entry.SourceName}",
+			"AttackAction" => $"{who} attacked {entry.TargetName} with {entry.SourceName}",
+			"HeroPowerAction" => $"{who} used their Hero Power",
+			"EndTurnAction" => $"{who} ended their turn",
+			"SubmitMulliganAction" => $"{who} finished mulligan",
+			"SecretPlayed" => $"{who} played a Secret",
+			_ => null,
+		};
 	}
 
 	private static string FormatPlayer(string label, PublicPlayerView player, bool isCurrentTurn)
