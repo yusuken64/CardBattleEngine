@@ -1,0 +1,122 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 1 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// ***** Done, took 00:00:00 (0.01 sec)   *****
+// Found 1 benchmarks:
+//   CardBattleEngineBenchmark.EngineIterateActions: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3) [EntityCount=7, MaxDepth=4]
+
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: CardBattleEngineBenchmark.EngineIterateActions: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3) [EntityCount=7, MaxDepth=4]
+// *** Execute ***
+// Launch: 1 / 1
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.15.8
+// Runtime=.NET 8.0.28 (8.0.28, 8.0.2826.26413), X64 RyuJIT x86-64-v3
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE,AVX,SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT,X86Base+SSE+SSE2,AES+PCLMUL,AvxVnni,SERIALIZE VectorSize=256
+// Job: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3)
+
+OverheadJitting  1: 1 op, 93100.00 ns, 93.1000 us/op
+WorkloadJitting  1: 1 op, 694846000.00 ns, 694.8460 ms/op
+
+OverheadJitting  2: 1 op, 800.00 ns, 800.0000 ns/op
+WorkloadJitting  2: 1 op, 352651000.00 ns, 352.6510 ms/op
+
+WorkloadWarmup   1: 1 op, 166290900.00 ns, 166.2909 ms/op
+WorkloadWarmup   2: 1 op, 171699700.00 ns, 171.6997 ms/op
+WorkloadWarmup   3: 1 op, 190769300.00 ns, 190.7693 ms/op
+
+WorkloadActual   1: 1 op, 169605200.00 ns, 169.6052 ms/op
+WorkloadActual   2: 1 op, 202375600.00 ns, 202.3756 ms/op
+WorkloadActual   3: 1 op, 207423700.00 ns, 207.4237 ms/op
+WorkloadActual   4: 1 op, 195125900.00 ns, 195.1259 ms/op
+WorkloadActual   5: 1 op, 181935400.00 ns, 181.9354 ms/op
+WorkloadActual   6: 1 op, 230242300.00 ns, 230.2423 ms/op
+WorkloadActual   7: 1 op, 181887300.00 ns, 181.8873 ms/op
+WorkloadActual   8: 1 op, 209883800.00 ns, 209.8838 ms/op
+WorkloadActual   9: 1 op, 185293600.00 ns, 185.2936 ms/op
+WorkloadActual  10: 1 op, 188540000.00 ns, 188.5400 ms/op
+WorkloadActual  11: 1 op, 221421300.00 ns, 221.4213 ms/op
+WorkloadActual  12: 1 op, 183980700.00 ns, 183.9807 ms/op
+WorkloadActual  13: 1 op, 179916000.00 ns, 179.9160 ms/op
+WorkloadActual  14: 1 op, 182908500.00 ns, 182.9085 ms/op
+WorkloadActual  15: 1 op, 179327200.00 ns, 179.3272 ms/op
+
+WorkloadResult   1: 1 op, 169605200.00 ns, 169.6052 ms/op
+WorkloadResult   2: 1 op, 202375600.00 ns, 202.3756 ms/op
+WorkloadResult   3: 1 op, 207423700.00 ns, 207.4237 ms/op
+WorkloadResult   4: 1 op, 195125900.00 ns, 195.1259 ms/op
+WorkloadResult   5: 1 op, 181935400.00 ns, 181.9354 ms/op
+WorkloadResult   6: 1 op, 230242300.00 ns, 230.2423 ms/op
+WorkloadResult   7: 1 op, 181887300.00 ns, 181.8873 ms/op
+WorkloadResult   8: 1 op, 209883800.00 ns, 209.8838 ms/op
+WorkloadResult   9: 1 op, 185293600.00 ns, 185.2936 ms/op
+WorkloadResult  10: 1 op, 188540000.00 ns, 188.5400 ms/op
+WorkloadResult  11: 1 op, 221421300.00 ns, 221.4213 ms/op
+WorkloadResult  12: 1 op, 183980700.00 ns, 183.9807 ms/op
+WorkloadResult  13: 1 op, 179916000.00 ns, 179.9160 ms/op
+WorkloadResult  14: 1 op, 182908500.00 ns, 182.9085 ms/op
+WorkloadResult  15: 1 op, 179327200.00 ns, 179.3272 ms/op
+
+
+Mean = 193.324 ms, StdErr = 4.468 ms (2.31%), N = 15, StdDev = 17.305 ms
+Min = 169.605 ms, Q1 = 181.911 ms, Median = 185.294 ms, Q3 = 204.900 ms, Max = 230.242 ms
+IQR = 22.988 ms, LowerFence = 147.429 ms, UpperFence = 239.382 ms
+ConfidenceInterval = [174.824 ms; 211.825 ms] (CI 99.9%), Margin = 18.500 ms (9.57% of Mean)
+Skewness = 0.73, Kurtosis = 2.27, MValue = 2
+
+// ** Remained 0 (0.0%) benchmark(s) to run. Estimated finish 2026-09-09 16:44 (0h 0m from now) **
+Successfully reverted power plan (GUID: 381b4222-f694-41f0-9685-ff5bb260df2e FriendlyName: Balanced)
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts\results\MyBenchmarks.CardBattleEngineBenchmark-report.csv
+  BenchmarkDotNet.Artifacts\results\MyBenchmarks.CardBattleEngineBenchmark-report-github.md
+  BenchmarkDotNet.Artifacts\results\MyBenchmarks.CardBattleEngineBenchmark-report.html
+
+// * Detailed results *
+CardBattleEngineBenchmark.EngineIterateActions: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3) [EntityCount=7, MaxDepth=4]
+Runtime = ; GC = 
+Mean = 193.324 ms, StdErr = 4.468 ms (2.31%), N = 15, StdDev = 17.305 ms
+Min = 169.605 ms, Q1 = 181.911 ms, Median = 185.294 ms, Q3 = 204.900 ms, Max = 230.242 ms
+IQR = 22.988 ms, LowerFence = 147.429 ms, UpperFence = 239.382 ms
+ConfidenceInterval = [174.824 ms; 211.825 ms] (CI 99.9%), Margin = 18.500 ms (9.57% of Mean)
+Skewness = 0.73, Kurtosis = 2.27, MValue = 2
+-------------------- Histogram --------------------
+[160.396 ms ; 178.017 ms) | @
+[178.017 ms ; 196.436 ms) | @@@@@@@@@
+[196.436 ms ; 215.339 ms) | @@@
+[215.339 ms ; 235.041 ms) | @@
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet v0.15.8, Windows 11 (10.0.26200.9445/25H2/2025Update/HudsonValley2)
+Intel Core Ultra 7 165H 1.40GHz, 1 CPU, 22 logical and 16 physical cores
+.NET SDK 10.0.301
+  [Host] : .NET 8.0.28 (8.0.28, 8.0.2826.26413), X64 RyuJIT x86-64-v3
+
+Toolchain=InProcessNoEmitToolchain  IterationCount=15  LaunchCount=1  
+WarmupCount=3  
+
+| Method               | EntityCount | MaxDepth | Mean     | Error    | StdDev   |
+|--------------------- |------------ |--------- |---------:|---------:|---------:|
+| EngineIterateActions | 7           | 4        | 193.3 ms | 18.50 ms | 17.31 ms |
+
+// * Legends *
+  EntityCount : Value of the 'EntityCount' parameter
+  MaxDepth    : Value of the 'MaxDepth' parameter
+  Mean        : Arithmetic mean of all measurements
+  Error       : Half of 99.9% confidence interval
+  StdDev      : Standard deviation of all measurements
+  1 ms        : 1 Millisecond (0.001 sec)
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:05 (5.96 sec), executed benchmarks: 1
+
+Global total time: 00:00:07 (7.75 sec), executed benchmarks: 1
+// * Artifacts cleanup *
+Artifacts cleanup is finished

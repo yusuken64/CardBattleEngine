@@ -96,9 +96,9 @@ public class GameState
 					continue;
 				}
 
-				var validTargets = playCardAction.Card.ValidTargetSelector?.Select(this, player, playCardAction.Card);
+				var validTargets = playCardAction.Card.ValidTargetSelector?.Select(this, player, playCardAction.Card).ToList();
 				if (validTargets != null &&
-					validTargets.Any())
+					validTargets.Count > 0)
 				{
 					foreach(var target in validTargets)
 					{
@@ -280,7 +280,17 @@ public class GameState
 		{
 			return entity;
 		}
-		return GetAllEntities().FirstOrDefault(x => x.Id == id);
+
+		// Map is stale (e.g. an entity was summoned/drawn since the last RebuildEntityMap) or
+		// hasn't been built yet. Fall back to a linear scan, then cache the result so repeated
+		// lookups for the same entity don't keep paying for the scan.
+		var found = GetAllEntities().FirstOrDefault(x => x.Id == id);
+		if (found != null)
+		{
+			_entityMap ??= new Dictionary<Guid, IGameEntity>();
+			_entityMap[id] = found;
+		}
+		return found;
 	}
 
 	public IEnumerable<ITriggerSource> GetAllTriggerSources()

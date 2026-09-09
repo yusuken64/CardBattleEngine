@@ -1,0 +1,133 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 1 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// ***** Done, took 00:00:00 (0.01 sec)   *****
+// Found 1 benchmarks:
+//   CardBattleEngineBenchmark.EngineIterateActions: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3) [EntityCount=7, MaxDepth=4]
+
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: CardBattleEngineBenchmark.EngineIterateActions: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3) [EntityCount=7, MaxDepth=4]
+// *** Execute ***
+// Launch: 1 / 1
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.15.8
+// Runtime=.NET 8.0.28 (8.0.28, 8.0.2826.26413), X64 RyuJIT x86-64-v3
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE,AVX,SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT,X86Base+SSE+SSE2,AES+PCLMUL,AvxVnni,SERIALIZE VectorSize=256
+// Job: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3)
+
+OverheadJitting  1: 1 op, 129900.00 ns, 129.9000 us/op
+WorkloadJitting  1: 1 op, 706869100.00 ns, 706.8691 ms/op
+
+OverheadJitting  2: 1 op, 600.00 ns, 600.0000 ns/op
+WorkloadJitting  2: 1 op, 381237800.00 ns, 381.2378 ms/op
+
+WorkloadWarmup   1: 1 op, 190928900.00 ns, 190.9289 ms/op
+WorkloadWarmup   2: 1 op, 215886800.00 ns, 215.8868 ms/op
+WorkloadWarmup   3: 1 op, 215511500.00 ns, 215.5115 ms/op
+
+WorkloadActual   1: 1 op, 195038700.00 ns, 195.0387 ms/op
+WorkloadActual   2: 1 op, 160945600.00 ns, 160.9456 ms/op
+WorkloadActual   3: 1 op, 181877100.00 ns, 181.8771 ms/op
+WorkloadActual   4: 1 op, 195953400.00 ns, 195.9534 ms/op
+WorkloadActual   5: 1 op, 189214700.00 ns, 189.2147 ms/op
+WorkloadActual   6: 1 op, 205408500.00 ns, 205.4085 ms/op
+WorkloadActual   7: 1 op, 162281900.00 ns, 162.2819 ms/op
+WorkloadActual   8: 1 op, 160794600.00 ns, 160.7946 ms/op
+WorkloadActual   9: 1 op, 161570800.00 ns, 161.5708 ms/op
+WorkloadActual  10: 1 op, 192717000.00 ns, 192.7170 ms/op
+WorkloadActual  11: 1 op, 266851900.00 ns, 266.8519 ms/op
+WorkloadActual  12: 1 op, 176902100.00 ns, 176.9021 ms/op
+WorkloadActual  13: 1 op, 163907100.00 ns, 163.9071 ms/op
+WorkloadActual  14: 1 op, 157555300.00 ns, 157.5553 ms/op
+WorkloadActual  15: 1 op, 185949500.00 ns, 185.9495 ms/op
+
+WorkloadResult   1: 1 op, 195038700.00 ns, 195.0387 ms/op
+WorkloadResult   2: 1 op, 160945600.00 ns, 160.9456 ms/op
+WorkloadResult   3: 1 op, 181877100.00 ns, 181.8771 ms/op
+WorkloadResult   4: 1 op, 195953400.00 ns, 195.9534 ms/op
+WorkloadResult   5: 1 op, 189214700.00 ns, 189.2147 ms/op
+WorkloadResult   6: 1 op, 205408500.00 ns, 205.4085 ms/op
+WorkloadResult   7: 1 op, 162281900.00 ns, 162.2819 ms/op
+WorkloadResult   8: 1 op, 160794600.00 ns, 160.7946 ms/op
+WorkloadResult   9: 1 op, 161570800.00 ns, 161.5708 ms/op
+WorkloadResult  10: 1 op, 192717000.00 ns, 192.7170 ms/op
+WorkloadResult  11: 1 op, 176902100.00 ns, 176.9021 ms/op
+WorkloadResult  12: 1 op, 163907100.00 ns, 163.9071 ms/op
+WorkloadResult  13: 1 op, 157555300.00 ns, 157.5553 ms/op
+WorkloadResult  14: 1 op, 185949500.00 ns, 185.9495 ms/op
+// GC:  32 13 0 411120528 1
+// Threading:  0 0 1
+
+
+Mean = 177.865 ms, StdErr = 4.389 ms (2.47%), N = 14, StdDev = 16.422 ms
+Min = 157.555 ms, Q1 = 161.749 ms, Median = 179.390 ms, Q3 = 191.841 ms, Max = 205.409 ms
+IQR = 30.093 ms, LowerFence = 116.609 ms, UpperFence = 236.981 ms
+ConfidenceInterval = [159.340 ms; 196.391 ms] (CI 99.9%), Margin = 18.525 ms (10.42% of Mean)
+Skewness = 0.13, Kurtosis = 1.32, MValue = 3.67
+
+// ** Remained 0 (0.0%) benchmark(s) to run. Estimated finish 2026-09-09 16:55 (0h 0m from now) **
+Successfully reverted power plan (GUID: 381b4222-f694-41f0-9685-ff5bb260df2e FriendlyName: Balanced)
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts\results\MyBenchmarks.CardBattleEngineBenchmark-report.csv
+  BenchmarkDotNet.Artifacts\results\MyBenchmarks.CardBattleEngineBenchmark-report-github.md
+  BenchmarkDotNet.Artifacts\results\MyBenchmarks.CardBattleEngineBenchmark-report.html
+
+// * Detailed results *
+CardBattleEngineBenchmark.EngineIterateActions: Job-ERIHKH(Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3) [EntityCount=7, MaxDepth=4]
+Runtime = ; GC = 
+Mean = 177.865 ms, StdErr = 4.389 ms (2.47%), N = 14, StdDev = 16.422 ms
+Min = 157.555 ms, Q1 = 161.749 ms, Median = 179.390 ms, Q3 = 191.841 ms, Max = 205.409 ms
+IQR = 30.093 ms, LowerFence = 116.609 ms, UpperFence = 236.981 ms
+ConfidenceInterval = [159.340 ms; 196.391 ms] (CI 99.9%), Margin = 18.525 ms (10.42% of Mean)
+Skewness = 0.13, Kurtosis = 1.32, MValue = 3.67
+-------------------- Histogram --------------------
+[151.788 ms ; 169.674 ms) | @@@@@@
+[169.674 ms ; 179.972 ms) | @
+[179.972 ms ; 197.858 ms) | @@@@@@
+[197.858 ms ; 214.351 ms) | @
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet v0.15.8, Windows 11 (10.0.26200.9445/25H2/2025Update/HudsonValley2)
+Intel Core Ultra 7 165H 1.40GHz, 1 CPU, 22 logical and 16 physical cores
+.NET SDK 10.0.301
+  [Host] : .NET 8.0.28 (8.0.28, 8.0.2826.26413), X64 RyuJIT x86-64-v3
+
+Toolchain=InProcessNoEmitToolchain  IterationCount=15  LaunchCount=1  
+WarmupCount=3  
+
+| Method               | EntityCount | MaxDepth | Mean     | Error    | StdDev   | Gen0       | Gen1       | Allocated |
+|--------------------- |------------ |--------- |---------:|---------:|---------:|-----------:|-----------:|----------:|
+| EngineIterateActions | 7           | 4        | 177.9 ms | 18.53 ms | 16.42 ms | 32000.0000 | 13000.0000 | 392.08 MB |
+
+// * Hints *
+Outliers
+  CardBattleEngineBenchmark.EngineIterateActions: Toolchain=InProcessNoEmitToolchain, IterationCount=15, LaunchCount=1, WarmupCount=3 -> 1 outlier  was  removed (266.85 ms)
+
+// * Legends *
+  EntityCount : Value of the 'EntityCount' parameter
+  MaxDepth    : Value of the 'MaxDepth' parameter
+  Mean        : Arithmetic mean of all measurements
+  Error       : Half of 99.9% confidence interval
+  StdDev      : Standard deviation of all measurements
+  Gen0        : GC Generation 0 collects per 1000 operations
+  Gen1        : GC Generation 1 collects per 1000 operations
+  Allocated   : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
+  1 ms        : 1 Millisecond (0.001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:06 (6.06 sec), executed benchmarks: 1
+
+Global total time: 00:00:07 (7.92 sec), executed benchmarks: 1
+// * Artifacts cleanup *
+Artifacts cleanup is finished

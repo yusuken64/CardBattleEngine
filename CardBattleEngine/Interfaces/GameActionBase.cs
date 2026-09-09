@@ -83,7 +83,9 @@ public class ActionContext
 
 	public IAffectedEntitySelector AffectedEntitySelector;
 
-	private Dictionary<string, object> _variables = new();
+	// Lazily allocated: most ActionContexts never touch variables, so avoid an
+	// unconditional Dictionary allocation on every one of the many contexts created per action/trigger.
+	private Dictionary<string, object> _variables;
 
 	public ActionContext() { }
 
@@ -94,8 +96,8 @@ public class ActionContext
 		this.Source = context.Source;
 		this.Target = context.Target;
 		this.Modifier = context.Modifier;
-		this._variables = new(context._variables);
-		this.AffectedEntities = [.. context.AffectedEntities];
+		this._variables = context._variables == null ? null : new(context._variables);
+		this._affectedEntities = context._affectedEntities == null ? null : [.. context._affectedEntities];
 		this.IsAttack = context.IsAttack;
 	}
 
@@ -114,9 +116,21 @@ public class ActionContext
 	public int ArmorGained { get; internal set; }
 	public Minion SummonedMinionSnapShot { get; internal set; }
 
-	public List<StatusDelta> ResolvedStatusChanges { get; internal set; } = new();
+	// Lazily allocated: see _variables above, same rationale.
+	private List<StatusDelta> _resolvedStatusChanges;
+	public List<StatusDelta> ResolvedStatusChanges
+	{
+		get => _resolvedStatusChanges ??= new();
+		internal set => _resolvedStatusChanges = value;
+	}
 	public int CardsLeftInDeck { get; internal set; }
-	public List<(IGameEntity, int)> AffectedEntities { get; internal set; } = new();
+
+	private List<(IGameEntity, int)> _affectedEntities;
+	public List<(IGameEntity, int)> AffectedEntities
+	{
+		get => _affectedEntities ??= new();
+		internal set => _affectedEntities = value;
+	}
 	public bool IsAttack { get; internal set; }
 	public Card CardGained { get; internal set; }
 
@@ -130,7 +144,7 @@ public class ActionContext
 			throw new InvalidOperationException(
 				$"Variable '{variableName}' must be an int");
 
-		_variables[variableName] = value;
+		(_variables ??= new())[variableName] = value;
 	}
 
 	public object GetVar(string variableName)
@@ -138,7 +152,7 @@ public class ActionContext
 		if (string.IsNullOrEmpty(variableName))
 			throw new ArgumentException(nameof(variableName));
 
-		return _variables.TryGetValue(variableName, out var value)
+		return _variables != null && _variables.TryGetValue(variableName, out var value)
 			? value
 			: 0; // Missing vars default to 0
 	}
@@ -155,7 +169,7 @@ public class ActionContext
 		newContext.SourceHeroPower = this.SourceHeroPower;
 		newContext.IsAuraEffect = this.IsAuraEffect;
 		newContext.IsReborn = this.IsReborn;
-		newContext.ResolvedStatusChanges = new List<StatusDelta>(this.ResolvedStatusChanges);
+		newContext._resolvedStatusChanges = this._resolvedStatusChanges == null ? null : new List<StatusDelta>(this._resolvedStatusChanges);
 		newContext.PlayIndex = this.PlayIndex;
 		newContext.SummonedMinion = this.SummonedMinion;
 		newContext.OriginalAction = this.OriginalAction;

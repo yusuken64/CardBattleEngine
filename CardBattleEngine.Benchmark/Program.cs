@@ -6,6 +6,8 @@ using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using CardBattleEngine;
 
 namespace MyBenchmarks;
+
+[MemoryDiagnoser]
 public class CardBattleEngineBenchmark
 {
 
@@ -161,7 +163,7 @@ public class CardBattleEngineBenchmark
 	[Benchmark]
 	public void EngineIterateActions()
 	{
-		_random = new Random();
+		_random = new Random(1234);
 		_engine = new GameEngine();
 		Player p1 = new Player("Alice");
 		Player p2 = new Player("Bob");
@@ -383,8 +385,8 @@ public class Program
 			.AddJob(Job.Default
 				.WithToolchain(InProcessNoEmitToolchain.Instance)
 				.WithLaunchCount(1)
-				.WithWarmupCount(1)
-				.WithIterationCount(3)
+				.WithWarmupCount(3)
+				.WithIterationCount(15)
 			);
 		var summary = BenchmarkRunner.Run<CardBattleEngineBenchmark>(config);
 	}

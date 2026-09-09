@@ -33,7 +33,7 @@ public class EventBus
 					continue;
 				}
 
-				foreach (var action in auraEffect.GameActions.ToList())
+				foreach (var action in auraEffect.GameActions)
 				{
 					ActionContext context = new()
 					{
