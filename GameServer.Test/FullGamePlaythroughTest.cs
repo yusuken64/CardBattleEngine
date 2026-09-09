@@ -50,6 +50,9 @@ public class FullGamePlaythroughTest
 			var connectionB = new HubConnectionBuilder().WithUrl(hubUrl).Build();
 
 			var actionTypesSeen = new HashSet<string>();
+			var playerIdsMulliganed = new HashSet<Guid>();
+			var cardIdsSeen = new List<string>();
+			var minionCardIdsSeen = new List<string>();
 			var redactionFailures = new List<string>();
 			var matchEndedA = new TaskCompletionSource<Guid?>();
 			var matchEndedB = new TaskCompletionSource<Guid?>();
@@ -70,6 +73,30 @@ public class FullGamePlaythroughTest
 				foreach (var entry in view.NewHistory)
 				{
 					actionTypesSeen.Add(entry.ActionType);
+					if (entry.ActionType == "SubmitMulliganAction")
+					{
+						playerIdsMulliganed.Add(entry.PlayerId);
+					}
+				}
+
+				// Capture CardIds from cards in hand and minions on board
+				if (view.Self.Hand != null)
+				{
+					foreach (var card in view.Self.Hand)
+					{
+						if (!string.IsNullOrEmpty(card.CardId))
+						{
+							cardIdsSeen.Add(card.CardId);
+						}
+					}
+				}
+
+				foreach (var minion in view.Self.Board)
+				{
+					if (!string.IsNullOrEmpty(minion.CardId))
+					{
+						minionCardIdsSeen.Add(minion.CardId);
+					}
 				}
 
 				if (view.IsGameOver)
@@ -129,6 +156,13 @@ public class FullGamePlaythroughTest
 				Assert.IsTrue(actionTypesSeen.Contains("SubmitMulliganAction"), "Mulligan was never submitted over the wire.");
 				Assert.IsTrue(actionTypesSeen.Contains("EndTurnAction"));
 				Assert.IsTrue(actionTypesSeen.Contains("PlayCardAction"));
+
+				// Verify both players submitted mulligans (regression guard for ENG-002)
+				Assert.IsTrue(playerIdsMulliganed.Count == 2, $"Both players must submit mulligans, but only {playerIdsMulliganed.Count} player(s) did.");
+
+				// Verify CardId is populated on at least one CardView and one MinionView (regression guard for ENG-001)
+				Assert.IsTrue(cardIdsSeen.Count > 0, "No CardView had a non-null CardId during the playthrough.");
+				Assert.IsTrue(minionCardIdsSeen.Count > 0, "No MinionView had a non-null CardId during the playthrough.");
 			}
 			finally
 			{
