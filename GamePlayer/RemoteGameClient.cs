@@ -439,26 +439,16 @@ public static class RemoteGameClient
 
 	private static void PrintHistoryLines(PlayerGameView view)
 	{
-		foreach (var entry in view.NewHistory)
+		foreach (var line in BuildHistoryLines(view.NewHistory, view))
 		{
-			var line = FormatHistoryLine(entry, view);
-			if (line != null)
-			{
-				Console.WriteLine(line);
-			}
+			Console.WriteLine(line);
 		}
 	}
 
 	private static void PrintHistoryLinesAnchored(PlayerGameView view)
 	{
-		foreach (var entry in view.NewHistory)
+		foreach (var line in BuildHistoryLines(view.NewHistory, view))
 		{
-			var line = FormatHistoryLine(entry, view);
-			if (line == null)
-			{
-				continue;
-			}
-
 			_historyLog.Add(line);
 			if (_historyLog.Count > HistoryLogLines)
 			{
@@ -481,6 +471,40 @@ public static class RemoteGameClient
 		}
 	}
 
+	private static List<string> BuildHistoryLines(IReadOnlyList<HistoryEntryView> entries, PlayerGameView view)
+	{
+		var lines = new List<string>();
+
+		for (int i = 0; i < entries.Count; i++)
+		{
+			var entry = entries[i];
+
+			// A basic minion attack resolves as two separate DamageAction entries - the attacker's
+			// hit and the defender's retaliation - back to back in the same batch. Collapse that
+			// pair into one combat line instead of reporting them as two unrelated damage events.
+			if (entry.ActionType == "DamageAction" && i + 1 < entries.Count)
+			{
+				var next = entries[i + 1];
+				if (next.ActionType == "DamageAction" &&
+					entry.SourceId != null && entry.TargetId != null &&
+					entry.SourceId == next.TargetId && entry.TargetId == next.SourceId)
+				{
+					lines.Add($"Combat: {entry.SourceName} ({entry.DamageDealt ?? 0}) vs {next.SourceName} ({next.DamageDealt ?? 0})");
+					i++;
+					continue;
+				}
+			}
+
+			var line = FormatHistoryLine(entry, view);
+			if (line != null)
+			{
+				lines.Add(line);
+			}
+		}
+
+		return lines;
+	}
+
 	private static string FormatHistoryLine(HistoryEntryView entry, PlayerGameView view)
 	{
 		var who = entry.PlayerId == view.ViewerPlayerId ? "You" : view.Opponent.Name;
@@ -495,6 +519,17 @@ public static class RemoteGameClient
 			"EndTurnAction" => $"{who} ended their turn",
 			"SubmitMulliganAction" => $"{who} finished mulligan",
 			"SecretPlayed" => $"{who} played a Secret",
+			// Divine Shield can reduce a real hit to 0 actual damage - skip those, there's nothing to report.
+			"DamageAction" when entry.DamageDealt is > 0 && entry.SourceName != null && entry.TargetName != null =>
+				$"{entry.SourceName} dealt {entry.DamageDealt} damage to {entry.TargetName}",
+			"DeathAction" when entry.TargetName != null => $"{entry.TargetName} died",
+			// A draw is recorded as DrawCardFromDeckAction -> GainCardAction sharing one context - key
+			// off GainCardAction only (it also covers non-deck "add a card to hand" effects) so a draw
+			// doesn't produce two lines. CardGainedName is null for the opponent's draws (redacted
+			// server-side), so fall back to generic wording there.
+			"GainCardAction" => entry.CardGainedName != null
+				? $"{who} drew {entry.CardGainedName}"
+				: $"{who} drew a card",
 			_ => null,
 		};
 	}

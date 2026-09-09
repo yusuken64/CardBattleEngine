@@ -100,6 +100,7 @@ public class ActionContext
 	}
 
 	public IGameAction OriginalAction { get; set; }
+	public bool AuthorizedToEquipWeapon { get; set; }
 	public Minion SummonedMinion { get; set; }
 	public int PlayIndex { get; set; } = -1;
 	public HeroPower SourceHeroPower { get; set; }

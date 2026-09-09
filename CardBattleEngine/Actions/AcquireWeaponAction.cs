@@ -28,7 +28,8 @@ public class AcquireWeaponAction : GameActionBase
 			{
 				SourcePlayer = context.Target.Owner,
 				Source = context.Source,
-				Target = player
+				Target = player,
+				AuthorizedToEquipWeapon = true
 			});
 	}
 }

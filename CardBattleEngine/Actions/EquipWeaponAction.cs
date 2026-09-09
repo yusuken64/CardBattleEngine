@@ -9,6 +9,12 @@ public class EquipWeaponAction : GameActionBase
 
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
+		if (!context.AuthorizedToEquipWeapon)
+		{
+			throw new InvalidOperationException(
+				"EquipWeaponAction must be issued via AcquireWeaponAction, not yielded directly.");
+		}
+
 		reason = null;
 		return true;
 	}
