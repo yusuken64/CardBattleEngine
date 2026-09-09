@@ -91,6 +91,6 @@ public class PlayCardAction : GameActionBase
 			return $"Playcard {Card.Name} ({Card.ManaCost}){minionCard.Attack}/{minionCard.Health}";
 		}
 
-		return base.ToString();
+		return $"Playcard {Card.Name} ({Card.ManaCost})";
 	}
 }

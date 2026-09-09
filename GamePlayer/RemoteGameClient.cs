@@ -122,11 +122,29 @@ public static class RemoteGameClient
 			LegalActionView chosen;
 			lock (_consoleLock)
 			{
-				_lastPromptAreaLines = 1 + view.LegalActions.Count;
-				chosen = HumanAgent.SelectFromList(
-					view.LegalActions,
-					"Select an action:",
-					a => a.DisplayName ?? a.ActionType);
+				if (view.PendingChoice != null)
+				{
+					// Pending-choice options (mulligan toggles, Discover picks, ...) aren't
+					// verified to group safely by (ActionType, Source) - fall back to the flat picker.
+					_lastPromptAreaLines = 1 + view.LegalActions.Count;
+					chosen = HumanAgent.SelectFromList(
+						view.LegalActions,
+						"Select an action:",
+						a => a.DisplayName ?? a.ActionType);
+				}
+				else
+				{
+					chosen = HumanAgent.SelectGrouped(
+						view.LegalActions,
+						keySelector: static (a) => (a.ActionType, a.SourceEntityId),
+						groupLabel: static (key, items) => DescribeActionGroup(key.ActionType, items[0]),
+						// Stage-2 text doesn't vary by target for non-Attack actions (DisplayName is
+						// built without target info) - a pre-existing ambiguity, not introduced here.
+						itemLabel: static (a) => a.DisplayName ?? a.ActionType,
+						stage1Prompt: "Select an action:",
+						stage2Prompt: "Select a target:",
+						rowsDrawn: out _lastPromptAreaLines);
+				}
 			}
 
 			lastHandledVersion = view.PromptVersion;
@@ -370,6 +388,11 @@ public static class RemoteGameClient
 			Console.Write(new string(' ', Console.BufferWidth - 1));
 		}
 		_lastPromptAreaLines = 0;
+
+		if (nextRow < Console.BufferHeight)
+		{
+			Console.SetCursorPosition(0, nextRow);
+		}
 	}
 
 	private static string BuildWaitingLine()
@@ -474,6 +497,32 @@ public static class RemoteGameClient
 			"SecretPlayed" => $"{who} played a Secret",
 			_ => null,
 		};
+	}
+
+	// AttackAction's DisplayName is always exactly "Attack: {source} -> {target}" (ActionDisplay's
+	// fixed format), so splitting on " -> " and rewording the prefix reliably isolates the
+	// attacker's description for every item in the group.
+	private static string DescribeActionGroup(string actionType, LegalActionView representative)
+	{
+		if (actionType == "AttackAction")
+		{
+			var text = representative.DisplayName ?? "";
+			const string prefix = "Attack: ";
+			const string separator = " -> ";
+			var sepIndex = text.IndexOf(separator, StringComparison.Ordinal);
+			if (text.StartsWith(prefix, StringComparison.Ordinal) && sepIndex > prefix.Length)
+			{
+				return "Attack with " + text.Substring(prefix.Length, sepIndex - prefix.Length);
+			}
+			return text;
+		}
+
+		if (actionType == "EndTurnAction")
+		{
+			return "End Turn";
+		}
+
+		return representative.DisplayName ?? representative.ActionType;
 	}
 
 	private static string FormatPlayer(string label, PublicPlayerView player, bool isCurrentTurn)

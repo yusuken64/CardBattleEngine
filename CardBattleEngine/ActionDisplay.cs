@@ -16,6 +16,16 @@ public static class ActionDisplay
 		return action.ToString();
 	}
 
+	public static string DescribeGroup(IGameAction action, ActionContext context)
+	{
+		return action switch
+		{
+			AttackAction => $"Attack with {DescribeEntity(context.Source)}",
+			EndTurnAction => "End Turn",
+			_ => Describe(action, context),
+		};
+	}
+
 	private static string DescribeEntity(IGameEntity entity)
 	{
 		return entity switch
