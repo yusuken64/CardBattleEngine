@@ -43,6 +43,7 @@ public class SummonRelicAction : GameActionBase
 		list.Insert(clampedIndex, relic);
 
 		actionContext.SummonedRelic = relic;
+		actionContext.SetSnapshot("SummonedRelic", relic.Clone());
 
 		return [];
 	}
