@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using CardBattleEngine;
 using CardBattleEngine.View;
 using GameServer.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -672,7 +673,7 @@ public static class RemoteGameClient
 
 	private static DecklistRequest BuildDefaultDeck(string playerName)
 	{
-		return new DecklistRequest
+		var deck = new DecklistRequest
 		{
 			PlayerName = playerName,
 			Minions = new List<CardCount>
@@ -687,5 +688,26 @@ public static class RemoteGameClient
 				new() { CardId = "ArcaneIntellect", Count = 2 },
 			},
 		};
+
+		AddCustomCards(deck);
+		return deck;
+	}
+
+	// GamePlayer authors a couple of cards that live only in this process, not in the server's
+	// on-disk CardDatabase, and sends their definitions alongside the ids that reference them -
+	// the same custom-card path a real content-authoring client would use. MatchRegistry resolves
+	// them purely from what each client provides here, so nothing needs to exist server-side ahead
+	// of time.
+	private static void AddCustomCards(DecklistRequest deck)
+	{
+		var customMinion = new MinionCard("GamePlayerPrototypeGolem", cost: 4, attack: 4, health: 6);
+		deck.Minions.Add(new CardCount { CardId = customMinion.Name, Count = 2 });
+		deck.CustomMinions.Add(CardDatabase.ToDefinitionJson(
+			CardDatabase.ToMinionCardDefinition(customMinion, customMinion.Name)));
+
+		var customSpell = new SpellCard("GamePlayerPrototypeBolt", cost: 1);
+		deck.Spells.Add(new CardCount { CardId = customSpell.Name, Count = 2 });
+		deck.CustomSpells.Add(CardDatabase.ToDefinitionJson(
+			CardDatabase.ToSpellCardDefinition(customSpell, customSpell.Name)));
 	}
 }
