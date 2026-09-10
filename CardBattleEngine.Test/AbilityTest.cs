@@ -282,13 +282,13 @@ public class AbilityTest
 			},
 			new PlayCardAction() { Card = stealthMinionCard });
 
-		var stealthMinion = current.Board[0];
+		var stealthMinion = (Minion)current.Board[0];
 
 		// Assert: minion is on board and has stealth
 		Assert.IsTrue(stealthMinion.IsStealth, "Minion should have stealth after being played");
 
 		// Attempt to attack the stealth minion with opponent minions
-		foreach (var attacker in opponent.Board)
+		foreach (var attacker in opponent.Board.OfType<Minion>())
 		{
 			var attackAction = new AttackAction();
 			var context = new ActionContext
@@ -350,7 +350,7 @@ public class AbilityTest
 			},
 			new PlayCardAction() { Card = chargeMinionCard });
 
-		var chargeMinion = current.Board[0];
+		var chargeMinion = (Minion)current.Board[0];
 
 		// Assert: Charge minion can attack immediately
 		Assert.IsTrue(chargeMinion.CanAttack(), "Charge minion should be able to attack immediately");
@@ -398,7 +398,7 @@ public class AbilityTest
 			},
 			new PlayCardAction() { Card = divineShieldCard });
 
-		var divineMinion = current.Board[0];
+		var divineMinion = (Minion)current.Board[0];
 
 		// Verify it entered with shield
 		Assert.IsTrue(divineMinion.HasDivineShield, "Minion should have Divine Shield initially.");

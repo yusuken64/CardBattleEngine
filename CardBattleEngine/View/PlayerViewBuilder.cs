@@ -84,7 +84,7 @@ public static class PlayerViewBuilder
 			IsStealth = player.IsStealth,
 			HandCount = player.Hand.Count,
 			DeckCount = player.Deck.Count,
-			Board = player.Board.Select(BuildMinionView).ToList(),
+			Board = player.Board.OfType<Minion>().Select(BuildMinionView).ToList(),
 			Graveyard = player.Graveyard.Select(BuildMinionView).ToList(),
 			EquippedWeapon = player.EquippedWeapon == null ? null : BuildWeaponView(player.EquippedWeapon),
 			HeroPower = player.HeroPower == null ? null : BuildHeroPowerView(player.HeroPower),

@@ -94,7 +94,7 @@ public class HashTest
 		{
 			var cloneState = state.Clone();
 			var clonePlayer = cloneState.GetEntityById(me.Id) as Player;
-			var cloneMinion = clonePlayer.Board.First(m => m.Id == minion.Id);
+			var cloneMinion = clonePlayer.Board.OfType<Minion>().First(m => m.Id == minion.Id);
 
 			mutate.Invoke(cloneMinion);
 

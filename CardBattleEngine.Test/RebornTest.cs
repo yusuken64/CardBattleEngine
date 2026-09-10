@@ -37,7 +37,7 @@ public class RebornTest
 		// The minion should now be on the board
 		Assert.AreEqual(1, current.Board.Count);
 
-		var minion = current.Board[0];
+		var minion = (Minion)current.Board[0];
 
 		Assert.IsTrue(minion.HasReborn, "Minion should start with Reborn.");
 
@@ -56,7 +56,7 @@ public class RebornTest
 		// It should have died and been reborn
 		Assert.AreEqual(1, current.Board.Count, "Minion should be resummoned on the same slot.");
 
-		var rebornMinion = current.Board[0];
+		var rebornMinion = (Minion)current.Board[0];
 
 		// Validate reborn state
 		Assert.IsFalse(rebornMinion.HasReborn, "Reborn should be consumed and removed.");

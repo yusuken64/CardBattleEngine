@@ -24,7 +24,7 @@ public static class GameStateHasher
 
 			hash = HashU64(hash, heroFlags);
 
-			foreach (var m in CanonicalBoard(p.Board))
+			foreach (var m in CanonicalBoard(p.Board.OfType<Minion>()))
 			{
 				hash = HashU64(hash, PackMinion(m));
 			}
@@ -130,8 +130,8 @@ public static class GameStateHasher
 		AddHeroFeatures(v, me);
 		AddHeroFeatures(v, enemy);
 
-		AddBoard(v, me.Board);
-		AddBoard(v, enemy.Board);
+		AddBoard(v, me.Board.OfType<Minion>());
+		AddBoard(v, enemy.Board.OfType<Minion>());
 
 		v.Add(s.CurrentPlayer == me ? 1f : 0f);
 

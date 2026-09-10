@@ -25,7 +25,7 @@ public class EndTurnAction : GameActionBase
 			mod.AttackChange = null;
 		}
 
-		foreach (var minion in player.Board)
+		foreach (var minion in player.Board.OfType<Minion>())
 		{
 			if (minion.IsFrozen &&
 				minion.MissedAttackFromFrozen)

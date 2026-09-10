@@ -603,10 +603,10 @@ public class BattleEffectTest
 			});
 
 		Assert.AreEqual(4, player1.Board.Count());
-		Assert.IsTrue(!player1.Board[0].Taunt);
-		Assert.IsTrue(player1.Board[1].Taunt);
-		Assert.IsTrue(!player1.Board[2].Taunt);
-		Assert.IsTrue(player1.Board[3].Taunt);
+		Assert.IsTrue(!((Minion)player1.Board[0]).Taunt);
+		Assert.IsTrue(((Minion)player1.Board[1]).Taunt);
+		Assert.IsTrue(!((Minion)player1.Board[2]).Taunt);
+		Assert.IsTrue(((Minion)player1.Board[3]).Taunt);
 	}
 
 	[TestMethod]
@@ -677,7 +677,7 @@ public class BattleEffectTest
 			});
 
 		Assert.AreEqual(2, player1.Board.Count());
-		Assert.IsTrue(player1.Board[0].Taunt);
-		Assert.IsTrue(!player1.Board[1].Taunt);
+		Assert.IsTrue(((Minion)player1.Board[0]).Taunt);
+		Assert.IsTrue(!((Minion)player1.Board[1]).Taunt);
 	}
 }

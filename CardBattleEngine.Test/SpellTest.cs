@@ -58,8 +58,8 @@ public class SpellTest
 		}, new PlayCardAction { Card = spellCard });
 
 		// Assert
-		Assert.AreEqual(2, opponent.Board[0].Health, "Frostbolt should deal 3 damage.");
-		Assert.IsTrue(opponent.Board[0].IsFrozen, "Frostbolt should freeze the target.");
+		Assert.AreEqual(2, ((Minion)opponent.Board[0]).Health, "Frostbolt should deal 3 damage.");
+		Assert.IsTrue(((Minion)opponent.Board[0]).IsFrozen, "Frostbolt should freeze the target.");
 	}
 
 	[TestMethod]

@@ -355,8 +355,8 @@ public class CardBattleEngineBenchmark
 		score -= enemyReadyAttack * 2.0f;
 
 		// 4) Taunts (board locking is very valuable)
-		var enemyTauntHealth = enemy.Board.Where(m => m.Taunt).Sum(m => m.Health);
-		var myTauntHealth = me.Board.Where(m => m.Taunt).Sum(m => m.Health);
+		var enemyTauntHealth = enemy.Board.OfType<Minion>().Where(m => m.Taunt).Sum(m => m.Health);
+		var myTauntHealth = me.Board.OfType<Minion>().Where(m => m.Taunt).Sum(m => m.Health);
 
 		score -= enemyTauntHealth * 1.5f;
 		score += myTauntHealth * 1.5f;

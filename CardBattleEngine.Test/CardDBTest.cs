@@ -135,7 +135,7 @@ public class CardDBTest
 			SourceCard = firstMurlocCard
 		}, new PlayCardAction { Card = firstMurlocCard });
 
-		var firstMurloc = current.Board[0];
+		var firstMurloc = (Minion)current.Board[0];
 		Assert.IsTrue(TribeUtils.Matches(firstMurloc.Tribes, "Murloc"));
 	}
 

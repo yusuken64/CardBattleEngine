@@ -31,12 +31,12 @@ public class CombatTest
 			},
 			new PlayCardAction() { Card = rushCard });
 
-		var rushMinion = current.Board[0];
+		var rushMinion = (Minion)current.Board[0];
 
 		// ----- Rush CAN attack minions -----
 		var dummyMinionCard = new MinionCard("Dummy", 1, 1, 1);
 		opponent.Board.Add(new Minion(dummyMinionCard, opponent));
-		var dummyMinion = opponent.Board[0];
+		var dummyMinion = (Minion)opponent.Board[0];
 
 		Assert.IsTrue(rushMinion.CanAttack(),
 			"Rush minion should be able to attack minions immediately");
@@ -73,7 +73,7 @@ public class CombatTest
 			},
 			new PlayCardAction() { Card = wfCard });
 
-		var wfMinion = current.Board[0];
+		var wfMinion = (Minion)current.Board[0];
 
 		// Should start with 2 attacks allowed
 		Assert.AreEqual(0, wfMinion.AttacksPerformedThisTurn);
