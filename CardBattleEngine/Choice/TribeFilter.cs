@@ -9,7 +9,7 @@ public class TribeFilter : ICardFilter
 		{
 			if (card is MinionCard minionCard)
 			{
-				return minionCard.MinionTribes.Select(x => x.ToString()).Contains(Tribe);
+				return TribeUtils.Matches(minionCard.MinionTribes, Tribe);
 			}
 			return false;
 		};

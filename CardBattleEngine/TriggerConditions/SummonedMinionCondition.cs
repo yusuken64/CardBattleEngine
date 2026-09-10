@@ -3,7 +3,7 @@
 public class SummonedMinionCondition : TriggerConditionBase
 {
 	public TeamRelationship MinionToMinionRelationship { get; set; }
-	public MinionTribe MinionTribe { get; set; }
+	public string MinionTribe { get; set; }
 	public bool ExcludeSelf { get; set; } = false;
 	public override bool Evaluate(ActionContext context)
 	{
@@ -16,14 +16,10 @@ public class SummonedMinionCondition : TriggerConditionBase
 		if (ExcludeSelf && summoned == effectSource)
 			return false;
 
-		if (MinionTribe != MinionTribe.None &&
-			MinionTribe != MinionTribe.All)
-		{
-			// Check tribe match
-			if (summoned.Tribes == null ||
-				!summoned.Tribes.Contains(MinionTribe))
-				return false;
-		}
+		// An empty tribe filter means "any minion" - no tribe restriction.
+		if (!string.IsNullOrEmpty(MinionTribe) &&
+			!TribeUtils.Matches(summoned.Tribes, MinionTribe))
+			return false;
 
 		// Check relationship
 		switch (MinionToMinionRelationship)

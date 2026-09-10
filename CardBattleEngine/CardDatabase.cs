@@ -206,7 +206,7 @@ public class CardDatabase
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
 		card.CardId = def.Id;
-		card.MinionTribes = def.Tribes == null ? [MinionTribe.None] : def.Tribes.ToList();
+		card.MinionTribes = def.Tribes?.ToList() ?? [];
 		card.CastRestriction = def.CastRestriction;
 		card.ValidTargetSelector = def.ValidTargetSelector;
 		card.TriggeredEffects.AddRange(def.TriggeredEffects.Select(e => e.Clone()));
@@ -274,7 +274,7 @@ public class MinionCardDefinition : CardDefinition
 {
 	public int Attack { get; set; }
 	public int Health { get; set; }
-	public List<MinionTribe> Tribes { get; set; }
+	public List<string> Tribes { get; set; }
 	public List<TriggeredEffect> TriggeredEffects { get; set; } = new();
 }
 

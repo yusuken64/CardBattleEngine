@@ -15,17 +15,17 @@ public class AuraTest
 
 		// Create normal Murloc
 		var card = new MinionCard("Murloc", cost: 0, attack: 1, health: 1);
-		card.MinionTribes = [MinionTribe.Murloc];
+		card.MinionTribes = ["Murloc"];
 		card.Owner = current;
 
 		// Create non-Murloc
 		var card2 = new MinionCard("TestMinion", cost: 0, attack: 1, health: 1);
-		card.MinionTribes = [MinionTribe.None];
+		card.MinionTribes = [];
 		card2.Owner = current;
 
 		// Create aura Murloc
 		var auraCard = new MinionCard("AuraMurloc", cost: 0, attack: 1, health: 1);
-		card.MinionTribes = [MinionTribe.Murloc];
+		card.MinionTribes = ["Murloc"];
 		auraCard.Owner = current;
 		auraCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{
@@ -48,7 +48,7 @@ public class AuraTest
 					},
 					new TribeOperation()
 					{
-						Tribe = MinionTribe.Murloc,
+						Tribe = "Murloc",
 						ExcludeSelf = true
 					}
 				}
@@ -266,12 +266,12 @@ public class AuraTest
 
 		// Create normal Murloc
 		var card = new MinionCard("Murloc", cost: 0, attack: 1, health: 1);
-		card.MinionTribes = [MinionTribe.Murloc];
+		card.MinionTribes = ["Murloc"];
 		card.Owner = current;
 
 		// Create aura Murloc
 		var auraCard = new MinionCard("AuraMurloc", cost: 0, attack: 1, health: 1);
-		card.MinionTribes = [MinionTribe.Murloc];
+		card.MinionTribes = ["Murloc"];
 		auraCard.Owner = current;
 		auraCard.MinionTriggeredEffects.Add(new TriggeredEffect()
 		{

@@ -12,7 +12,7 @@ public class MinionCard : Card
 	public override int MaxHealth { get; set; }
 	public override int Attack { get; set; }
 	public override bool IsAlive { get; set; } = true;
-	public List<MinionTribe> MinionTribes { get; set; } = new();
+	public List<string> MinionTribes { get; set; } = new();
 	public bool IsStealth { get; set; }
 	public bool Elusive { get; set; }
 	public bool HasCharge { get; set; }

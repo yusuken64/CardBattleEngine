@@ -20,6 +20,13 @@ public class GameState
 	private readonly IRNG rNG;
 
 	public IReadOnlyList<Card> CardDB { get; private set; }
+
+	// The distinct tribes actually in play for this match, derived from the submitted decks (both
+	// players' cards, including custom ones) rather than any global tribe list - tribes are free-text
+	// and open-ended, so "every tribe that exists" is only meaningful scoped to one match. Used by
+	// effects that need to enumerate concrete tribes (e.g. a "choose a tribe" discover), not by
+	// tribe matching itself (TribeUtils.Matches handles that directly via the "all" wildcard).
+	public IReadOnlyList<string> KnownTribes { get; private set; }
 	public bool SkipShuffle; // must be called before start game
 	public bool SkipMulligan; // must be called before start game
 	public int InitialCards = 3; // must be called before start game
@@ -35,6 +42,15 @@ public class GameState
 			.Where(c => c != null && !string.IsNullOrEmpty(c.Name))
 			.GroupBy(c => c.Name)
 			.Select(g => g.First())
+			.ToList()
+			.AsReadOnly();
+
+		KnownTribes = CardDB
+			.OfType<MinionCard>()
+			.SelectMany(c => c.MinionTribes ?? [])
+			.Select(TribeUtils.Normalize)
+			.Where(t => t.Length > 0 && t != TribeUtils.All)
+			.Distinct()
 			.ToList()
 			.AsReadOnly();
 	}
@@ -222,6 +238,7 @@ public class GameState
 
 		// CardDB is already deduplicated on this instance - avoid re-running the dedup pipeline on every clone
 		clone.CardDB = this.CardDB;
+		clone.KnownTribes = this.KnownTribes;
 
 		clone.CurrentPlayer = this.CurrentPlayer == Players[0] ? p1 : p2;
 		clone.PendingChoice = this.PendingChoice;

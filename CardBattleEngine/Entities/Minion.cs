@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Converters;
-
-namespace CardBattleEngine;
+﻿namespace CardBattleEngine;
 
 public class Minion : IGameEntity, ITriggerSource
 {
@@ -11,7 +9,7 @@ public class Minion : IGameEntity, ITriggerSource
 	public int Attack { get; set; }
 	public int Health {	get; set; }
 	public int MaxHealth { get; set; }
-	public List<MinionTribe> Tribes { get; set; }
+	public List<string> Tribes { get; set; }
 	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
 	public bool HasSummoningSickness { get; set; }
@@ -83,7 +81,7 @@ public class Minion : IGameEntity, ITriggerSource
 		Attack = card.Attack;
 		MaxHealth = card.Health;
 		Health = card.Health;
-		Tribes = (card.MinionTribes ?? [MinionTribe.None]).ToList();
+		Tribes = (card.MinionTribes ?? []).ToList();
 
 		_attackBehavior = new MinionAttackBehavior();
 		AttacksPerformedThisTurn = 0;
@@ -294,12 +292,4 @@ public class Minion : IGameEntity, ITriggerSource
 
 		return true;
 	}
-}
-
-[JsonConverter(typeof(StringEnumConverter))]
-public enum MinionTribe
-{
-	None,
-	All,
-	Murloc
 }

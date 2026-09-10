@@ -136,7 +136,7 @@ public class CardDBTest
 		}, new PlayCardAction { Card = firstMurlocCard });
 
 		var firstMurloc = current.Board[0];
-		Assert.IsTrue(firstMurloc.Tribes.Contains(MinionTribe.Murloc));
+		Assert.IsTrue(TribeUtils.Matches(firstMurloc.Tribes, "Murloc"));
 	}
 
 	[TestMethod]
@@ -344,7 +344,7 @@ public class CardDBTest
 			Cost = 2,
 			Attack = 3,
 			Health = 4,
-			Tribes = new List<MinionTribe> { MinionTribe.Murloc },
+			Tribes = new List<string> { "Murloc" },
 		};
 
 		var cardDatabase = new CardDatabase(DBPath);
@@ -356,7 +356,7 @@ public class CardDBTest
 		Assert.AreEqual(2, card.ManaCost);
 		Assert.AreEqual(3, card.Attack);
 		Assert.AreEqual(4, card.Health);
-		Assert.IsTrue(card.MinionTribes.Contains(MinionTribe.Murloc));
+		Assert.IsTrue(TribeUtils.Matches(card.MinionTribes, "Murloc"));
 		Assert.AreEqual(owner, card.Owner);
 	}
 
