@@ -13,13 +13,15 @@ public class PlayCardAction : GameActionBase
 			return false;
 		}
 
-		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card);
-		if (validTargets != null &&
-			validTargets.Any() &&
-			!validTargets.Contains(actionContext.Targets?.FirstOrDefault()))
+		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card)?.ToList();
+		if (validTargets != null && validTargets.Any())
 		{
-			reason = "Invalid Target";
-			return false;
+			var chosen = actionContext.Targets ?? new List<IGameEntity>();
+			if (chosen.Count != Card.RequiredTargetCount || chosen.Any(t => !validTargets.Contains(t)))
+			{
+				reason = "Invalid Target";
+				return false;
+			}
 		}
 
 		if (actionContext.Targets is { Count: > 0 } &&

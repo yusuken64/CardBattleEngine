@@ -35,6 +35,20 @@ public class GameEngine
 		{
 			(IGameAction action, ActionContext context) current = _actionQueue.Dequeue();
 
+			if (current.context.PendingTargetRequirement is { } requirement &&
+				(current.context.Targets == null || current.context.Targets.Count < requirement.Count))
+			{
+				gameState.PendingChoice = new TargetSelectionChoice
+				{
+					SourcePlayer = current.context.SourcePlayer,
+					PendingAction = current.action,
+					PendingContext = current.context,
+					Requirement = requirement,
+					PickedSoFar = new List<IGameEntity>(),
+				};
+				return;
+			}
+
 			// Check if action is still valid
 			if (!current.action.IsValid(gameState, current.context, out string _))
 				continue;

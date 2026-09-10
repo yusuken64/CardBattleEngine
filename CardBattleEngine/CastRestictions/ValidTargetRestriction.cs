@@ -20,7 +20,7 @@ public class ValidTargetRestriction : ICastRestriction
 
 		// There must exist at least one valid target
 		var validTargets = selector.Select(gameState, player, castingCard);
-		if (!validTargets.Any())
+		if (validTargets.Count() < castingCard.RequiredTargetCount)
 		{
 			reason = "No valid targets";
 			return false;

@@ -112,6 +112,25 @@ public class GameState
 					continue;
 				}
 
+				if (card.RequiredTargetCount > 1)
+				{
+					actions.Add((
+						new PlayCardAction { Card = card },
+						new ActionContext
+						{
+							SourcePlayer = player,
+							Source = card,
+							SourceCard = card,
+							PendingTargetRequirement = new TargetRequirement
+							{
+								Provider = card.ValidTargetSelector,
+								Count = card.RequiredTargetCount,
+								AllowDuplicateTargets = card.AllowDuplicateTargets,
+							},
+						}));
+					continue;
+				}
+
 				var validTargets = playCardAction.Card.ValidTargetSelector?.Select(this, player, playCardAction.Card).ToList();
 				if (validTargets != null &&
 					validTargets.Count > 0)

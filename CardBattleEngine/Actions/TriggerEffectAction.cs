@@ -14,11 +14,28 @@ public class TriggerEffectAction : GameActionBase
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		reason = null;
-		return TriggeredEffect.AffectedEntitySelector != null;
+		return TriggeredEffect.AffectedEntitySelector != null || TriggeredEffect.TargetRequirement != null;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
+		if (TriggeredEffect.TargetRequirement != null)
+		{
+			foreach (var action in TriggeredEffect.GameActions)
+			{
+				yield return (action, new ActionContext
+				{
+					Source = TriggerSource.Entity,
+					SourcePlayer = TriggerSource.Entity.Owner,
+					SourceCard = TriggerSource.Entity is Minion m ? m.OriginalCard : null,
+					PendingTargetRequirement = TriggeredEffect.TargetRequirement,
+					OriginalAction = context.OriginalAction,
+					OriginalSource = context.Source,
+				});
+			}
+			yield break;
+		}
+
 		if (TriggeredEffect.AffectedEntitySelector == null) yield break;
 
 		foreach (var action in TriggeredEffect.GameActions)
