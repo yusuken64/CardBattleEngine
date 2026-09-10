@@ -91,14 +91,14 @@ public class Player : IGameEntity, ITriggerSource
 
 		foreach (var minion in Board)
 		{
-			Minion clonedMinion = minion.Clone();
+			Minion clonedMinion = (Minion)minion.Clone();
 			clone.Board.Add(clonedMinion);
 			clonedMinion.Owner = clone;
 		}
 
 		foreach (var minion in Graveyard)
 		{
-			Minion clonedMinion = minion.Clone();
+			Minion clonedMinion = (Minion)minion.Clone();
 			clone.Graveyard.Add(clonedMinion);
 			clonedMinion.Owner = clone;
 		}
@@ -147,7 +147,7 @@ public class Player : IGameEntity, ITriggerSource
 
 		foreach (var minion in Board)
 		{
-			Minion clonedMinion = minion.Clone();
+			Minion clonedMinion = (Minion)minion.Clone();
 			clone.Board.Add(clonedMinion);
 			clonedMinion.Owner = clone;
 		}

@@ -1,16 +1,10 @@
-﻿namespace CardBattleEngine;
+namespace CardBattleEngine;
 
-public class Minion : IGameEntity, ITriggerSource
+public class Minion : BoardPermanent
 {
 	public MinionCard OriginalCard { get; private set; }
-	public Guid Id { get; set; } = Guid.NewGuid();
-	public string Name { get; set; }
 	public string TemplateName { get; set; }
-	public int Attack { get; set; }
-	public int Health {	get; set; }
-	public int MaxHealth { get; set; }
 	public List<string> Tribes { get; set; }
-	public Player Owner { get; set; }
 	public bool Taunt { get; set; }
 	public bool HasSummoningSickness { get; set; }
 	public IEnumerable<(TriggeredEffect, StatModifier)> ModifierTriggeredEffects
@@ -34,20 +28,10 @@ public class Minion : IGameEntity, ITriggerSource
 			}
 		}
 	}
-	public List<TriggeredEffect> TriggeredEffects { get; internal set; }
 
 	private IAttackBehavior _attackBehavior;
-	public IAttackBehavior AttackBehavior
-	{
-		get
-		{
-			return _attackBehavior;
-		}
-	}
-	private List<StatModifier> _modifiers = new();
-	private List<StatModifier> _auraModifiers = new();
+	public override IAttackBehavior AttackBehavior => _attackBehavior;
 
-	public bool IsAlive{ get; set; }
 	public bool IsFrozen { get; set; }
 	public bool MissedAttackFromFrozen { get; set; }
 	public bool IsStealth { get; set; }
@@ -61,11 +45,8 @@ public class Minion : IGameEntity, ITriggerSource
 	public bool HasReborn { get; set; }
 	public int AttacksPerformedThisTurn { get; set; }
 
-	public IGameEntity Entity => this;
-
 	public bool CannotAttack { get; set; } //this is an override to normal attack behavior, for special case minion which can never attack
 
-	public VariableSet VariableSet { get; set; } = new();
 	public ushort CardNumericId => OriginalCard.NumericId;
 
 	public Minion(MinionCard card, Player owner) : this(card, owner, cloneEffectsFromCard: true) { }
@@ -111,14 +92,14 @@ public class Minion : IGameEntity, ITriggerSource
 		VariableSet = new VariableSet(card.VariableSet);
 	}
 
-	public bool CanAttack()
+	public override bool CanAttack()
 	{
 		if (CannotAttack) { return false; }
 
 		return _attackBehavior.CanInitiateAttack(this, out _);
 	}
 
-	internal Minion Clone()
+	internal override BoardPermanent Clone()
 	{
 		var clone = new Minion(this.OriginalCard, Owner, cloneEffectsFromCard: false)
 		{
@@ -153,24 +134,6 @@ public class Minion : IGameEntity, ITriggerSource
 		return clone;
 	}
 
-	public void AddModifier(StatModifier modifier)
-	{
-		_modifiers.Add(modifier);
-		RecalculateStats();
-	}
-
-	public void AddAuraModifier(StatModifier auraStatModifier)
-	{
-		_auraModifiers.Add(auraStatModifier);
-		RecalculateStats();
-	}
-
-	public void RemoveModifier(StatModifier modifier)
-	{
-		_modifiers.Remove(modifier);
-		RecalculateStats();
-	}
-
 	public void ClearModifiers()
 	{
 		var originalHealth = Health;
@@ -179,7 +142,7 @@ public class Minion : IGameEntity, ITriggerSource
 		Health = Utils.Clamp(originalHealth, 0, MaxHealth);
 	}
 
-	public void RecalculateStats()
+	public override void RecalculateStats()
 	{
 		// Before recalculating, compute how much damage the unit has taken.
 		// (damageTaken = MaxHealth_before - Health_before)
@@ -217,21 +180,6 @@ public class Minion : IGameEntity, ITriggerSource
 
 		// Clamp health to valid range
 		Health = Utils.Clamp(newHealth, 0, MaxHealth);
-	}
-
-	public bool HasModifier(StatModifier modifier)
-	{
-		return _modifiers.Contains(modifier);
-	}
-
-	public void ClearAuras(bool skipRecalculate)
-	{
-		_auraModifiers.Clear();
-
-		if (!skipRecalculate)
-		{
-			RecalculateStats();
-		}
 	}
 
 	public override string ToString()

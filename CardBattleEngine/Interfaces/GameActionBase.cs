@@ -94,6 +94,7 @@ public class ActionContext
 	public bool Canceled { get; set; }
 	public bool AuthorizedToEquipWeapon { get; set; }
 	public Minion SummonedMinion { get; set; }
+	public Relic SummonedRelic { get; set; }
 	public int PlayIndex { get; set; } = -1;
 	public HeroPower SourceHeroPower { get; set; }
 	public bool IsReborn { get; set; } = false;
@@ -162,6 +163,7 @@ public class ActionContext
 		newContext._resolvedStatusChanges = this._resolvedStatusChanges == null ? null : new List<StatusDelta>(this._resolvedStatusChanges);
 		newContext.PlayIndex = this.PlayIndex;
 		newContext.SummonedMinion = this.SummonedMinion;
+		newContext.SummonedRelic = this.SummonedRelic;
 		newContext.OriginalAction = this.OriginalAction;
 		newContext.OriginalContext = this.OriginalContext;
 		newContext.Canceled = this.Canceled;

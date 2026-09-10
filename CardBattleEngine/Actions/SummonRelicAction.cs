@@ -1,14 +1,13 @@
-﻿namespace CardBattleEngine;
+namespace CardBattleEngine;
 
-public class SummonMinionAction : GameActionBase
+public class SummonRelicAction : GameActionBase
 {
-	public MinionCard Card { get; set; }
+	public RelicCard Card { get; set; }
 	public int IndexOffset { get; set; }
-	public override EffectTrigger EffectTrigger => EffectTrigger.SummonMinion;
+	public override EffectTrigger EffectTrigger => EffectTrigger.None;
 
 	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
-		// Board not full
 		if (actionContext.SourcePlayer.Board.Count >= state.MaxBoardSize)
 		{
 			reason = null;
@@ -24,9 +23,8 @@ public class SummonMinionAction : GameActionBase
 		if (!IsValid(state, actionContext, out var _))
 			return [];
 
-		// Create minion entity
-		var minion = actionContext.SummonedMinion
-			?? new Minion(Card, actionContext.SourcePlayer);
+		var relic = actionContext.SummonedRelic
+			?? new Relic(Card, actionContext.SourcePlayer);
 
 		var list = actionContext.SourcePlayer.Board;
 		int playIndex = actionContext.PlayIndex;
@@ -42,18 +40,9 @@ public class SummonMinionAction : GameActionBase
 				? list.Count
 				: offsetIndex;
 
-		list.Insert(clampedIndex, minion);
+		list.Insert(clampedIndex, relic);
 
-		actionContext.PlayIndex = list.IndexOf(minion);
-
-		if (actionContext.IsReborn)
-		{
-			minion.HasReborn = false;
-			minion.Health = 1;
-		}
-
-		actionContext.SummonedMinion = minion;
-		actionContext.SummonedMinionSnapShot = (Minion)minion.Clone();
+		actionContext.SummonedRelic = relic;
 
 		return [];
 	}
