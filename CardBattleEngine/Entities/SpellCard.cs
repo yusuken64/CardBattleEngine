@@ -27,6 +27,7 @@ public class SpellCard : Card
 		var spellCard = new SpellCard(Name, ManaCost)
 		{
 			Id = Id,
+			CardId = CardId,
 			Owner = Owner,
 			SpriteID = SpriteID,
 			Description = Description,

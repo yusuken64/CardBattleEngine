@@ -171,4 +171,147 @@ public class PlayerViewBuilderTests
 			viewForOpponentAfterResolve.NewHistory.Any(h => h.SourceId == secretCard.Id),
 			"Once a secret has resolved, the opponent should be able to see what it actually was.");
 	}
+
+	// Regression guard: CardId view fields must carry the CardDatabase/custom-dictionary lookup key
+	// (CardDefinition.Id), not the card's display Name - these can legitimately differ for a
+	// client-submitted custom card, and a client requesting art by CardId needs the real key.
+	[TestMethod]
+	public void MinionView_CardId_UsesDefinitionId_NotDisplayName()
+	{
+		var cardDb = new CardDatabase(CardDBTest.DBPath);
+		var state = GameFactory.CreateTestGame();
+		var player = state.Players[0];
+
+		var minionDef = new MinionCardDefinition
+		{
+			Type = CardType.Minion,
+			Id = "custom-minion-id",
+			Name = "Custom Minion Display Name",
+			Cost = 1,
+			Attack = 1,
+			Health = 1,
+		};
+		var minionCard = cardDb.BuildMinionCard(minionDef, player);
+		var minion = new Minion(minionCard, player);
+		player.Board.Add(minion);
+
+		var view = PlayerViewBuilder.Build(state, player);
+		var minionView = view.Self.Board.Single(m => m.Id == minion.Id);
+
+		Assert.AreEqual("custom-minion-id", minionView.CardId);
+		Assert.AreEqual("Custom Minion Display Name", minionView.Name);
+	}
+
+	[TestMethod]
+	public void WeaponView_CardId_UsesDefinitionId_NotDisplayName()
+	{
+		var cardDb = new CardDatabase(CardDBTest.DBPath);
+		var state = GameFactory.CreateTestGame();
+		var player = state.Players[0];
+
+		var weaponDef = new WeaponCardDefinition
+		{
+			Type = CardType.Weapon,
+			Id = "custom-weapon-id",
+			Name = "Custom Weapon Display Name",
+			Cost = 1,
+			Attack = 2,
+			Durability = 3,
+		};
+		var weaponCard = cardDb.BuildWeaponCard(weaponDef, player);
+		player.EquipWeapon(weaponCard.CreateWeapon());
+
+		var view = PlayerViewBuilder.Build(state, player);
+
+		Assert.IsNotNull(view.Self.EquippedWeapon);
+		Assert.AreEqual("custom-weapon-id", view.Self.EquippedWeapon.CardId);
+		Assert.AreEqual("Custom Weapon Display Name", view.Self.EquippedWeapon.Name);
+	}
+
+	[TestMethod]
+	public void HistoryEntry_SourceCardId_UsesDefinitionId_ForPlayedSpell()
+	{
+		var cardDb = new CardDatabase(CardDBTest.DBPath);
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		var spellDef = new SpellCardDefinition
+		{
+			Type = CardType.Spell,
+			Id = "custom-spell-id",
+			Name = "Custom Spell Display Name",
+			Cost = 0,
+		};
+		var spellCard = cardDb.BuildSpellCard(spellDef, player1);
+		player1.Hand.Add(spellCard);
+
+		int historyBefore = state.History.Count;
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = player1,
+			Source = spellCard,
+			SourceCard = spellCard,
+			Target = player1,
+		}, new PlayCardAction { Card = spellCard });
+
+		var newEntries = state.History.Skip(historyBefore).ToList();
+		var view = PlayerViewBuilder.Build(state, player2, newEntries);
+
+		var castEntry = view.NewHistory.FirstOrDefault(h => h.ActionType == "CastSpellAction");
+		Assert.IsNotNull(castEntry, "Expected a CastSpellAction history entry for the played spell.");
+		Assert.AreEqual("custom-spell-id", castEntry.SourceCardId);
+		Assert.AreEqual("Custom Spell Display Name", castEntry.SourceName);
+	}
+
+	[TestMethod]
+	public void HistoryEntry_SourceCardId_IsRedacted_ForHiddenSecretReveal()
+	{
+		var state = GameFactory.CreateTestGame();
+		var engine = new GameEngine();
+		var player1 = state.Players[0];
+		var player2 = state.Players[1];
+
+		player1.Mana = 1;
+
+		var secretCard = new SpellCard("CounterSpell", 1) { CardId = "custom-secret-id" };
+		secretCard.SpellCastEffects.Add(new SpellCastEffect
+		{
+			GameActions =
+			[
+				new SecretAction
+				{
+					Secret = new Secret
+					{
+						SecretTrigger = new TriggeredEffect
+						{
+							EffectTrigger = EffectTrigger.SpellCast,
+							EffectTiming = EffectTiming.Pre,
+							GameActions = [new CancelEffectAction()],
+							Condition = new SourceOwnerCondition { TeamRelationship = TeamRelationship.Enemy },
+							AffectedEntitySelector = new ContextSelector { IncludeSourcePlayer = true },
+						},
+					},
+				},
+			],
+		});
+		secretCard.Owner = player1;
+		player1.Hand.Add(secretCard);
+
+		int historyBefore = state.History.Count;
+		engine.Resolve(state, new ActionContext
+		{
+			SourcePlayer = player1,
+			SourceCard = secretCard,
+			Target = player1,
+		}, new PlayCardAction { Card = secretCard });
+
+		var castEntries = state.History.Skip(historyBefore).ToList();
+		var viewForOpponent = PlayerViewBuilder.Build(state, player2, castEntries);
+
+		Assert.IsTrue(
+			viewForOpponent.NewHistory.Where(h => h.ActionType == "SecretPlayed").All(h => h.SourceCardId == null),
+			"The opponent must never see the real CardId behind an unresolved secret.");
+	}
 }

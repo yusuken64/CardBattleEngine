@@ -102,7 +102,7 @@ public static class PlayerViewBuilder
 			Type = card.Type,
 			Attack = card.Type == CardType.Minion || card.Type == CardType.Weapon ? card.Attack : null,
 			Health = card.Type == CardType.Minion ? card.Health : null,
-			CardId = card.Name,
+			CardId = card.CardId ?? card.Name,
 		};
 	}
 
@@ -120,7 +120,7 @@ public static class PlayerViewBuilder
 			IsStealth = minion.IsStealth,
 			HasDivineShield = minion.HasDivineShield,
 			CanAttack = minion.CanAttack(),
-			CardId = minion.Name,
+			CardId = minion.OriginalCard?.CardId ?? minion.Name,
 			HasPoisonous = minion.HasPoisonous,
 			HasWindfury = minion.HasWindfury,
 			HasLifeSteal = minion.HasLifeSteal,
@@ -137,6 +137,7 @@ public static class PlayerViewBuilder
 			Name = weapon.Name,
 			Attack = weapon.Attack,
 			Durability = weapon.Durability,
+			CardId = weapon.OriginalCard?.CardId ?? weapon.Name,
 		};
 	}
 
@@ -218,6 +219,7 @@ public static class PlayerViewBuilder
 			SourceId = context?.Source?.Id ?? context?.SourceCard?.Id,
 			TargetId = context?.Target?.Id,
 			SourceName = EntityName(context?.Source) ?? context?.SourceCard?.Name,
+			SourceCardId = EntityCardId(context?.Source) ?? EntityCardId(context?.SourceCard),
 			TargetName = EntityName(context?.Target),
 			DamageDealt = context?.DamageDealt,
 			HealedAmount = context?.HealedAmount,
@@ -243,6 +245,7 @@ public static class PlayerViewBuilder
 			view.SourceId = null;
 			view.TargetId = null;
 			view.SourceName = null;
+			view.SourceCardId = null;
 			view.TargetName = null;
 		}
 
@@ -257,6 +260,19 @@ public static class PlayerViewBuilder
 			Player player => player.Name,
 			Minion minion => minion.Name,
 			Card card => card.Name,
+			_ => null,
+		};
+	}
+
+	// Same CardId convention as MinionView/CardView/WeaponView.CardId (the CardDatabase lookup key,
+	// falling back to Name for cards not built via CardDatabase) - Player has no CardId, unlike
+	// EntityName, so it's omitted here rather than falling through to null.
+	private static string EntityCardId(IGameEntity entity)
+	{
+		return entity switch
+		{
+			Minion minion => minion.OriginalCard?.CardId ?? minion.Name,
+			Card card => card.CardId ?? card.Name,
 			_ => null,
 		};
 	}

@@ -4,6 +4,10 @@ public abstract class Card : ITriggerSource, IGameEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 	public string Name { get; protected set; }
+	// The CardDatabase/custom-dictionary lookup key (CardDefinition.Id) this card was built from -
+	// distinct from Name (display text, can differ for custom cards) and Id (a fresh instance Guid,
+	// not a stable definition key). Null for cards constructed directly rather than via CardDatabase.
+	public string? CardId { get; set; }
 	public string SpriteID { get; set; }//doesn't affectgameplay
 	public string Description { get; set; }//doesn't affectgameplay
 	public ushort NumericId { get; internal set; }//used for shorthand id of card and effects

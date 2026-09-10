@@ -92,6 +92,7 @@ public class WeaponView
 	public string Name { get; set; }
 	public int Attack { get; set; }
 	public int Durability { get; set; }
+	public string? CardId { get; set; }
 }
 
 public class HeroPowerView
@@ -139,6 +140,10 @@ public class HistoryEntryView
 	public Guid? SourceId { get; set; }
 	public Guid? TargetId { get; set; }
 	public string SourceName { get; set; }
+	// The played/acting card's CardId (same convention as MinionView/CardView.CardId - the card's
+	// Name) - lets a client request art for a spell it saw the opponent cast, since spells have no
+	// persistent board entity of their own to carry a CardId the way minions/weapons do.
+	public string? SourceCardId { get; set; }
 	public string TargetName { get; set; }
 	public int? DamageDealt { get; set; }
 	public int? HealedAmount { get; set; }

@@ -587,9 +587,10 @@ public static class RemoteGameClient
 			$"Board:[{string.Join(",", player.Board.Select(m => $"{m.Name} {m.Attack}/{m.Health}"))}]";
 	}
 
-	// Card art for anything the opponent has revealed - a minion currently on their board, or one that
-	// already died - counts as "seen" once requested here; opponent hand contents are never visible
-	// (PlayerViewBuilder nulls Opponent.Hand), so there is nothing else to request art for.
+	// Card art for anything the opponent has revealed - a minion currently on their board, one that
+	// already died, their equipped weapon, or a spell they just cast - counts as "seen" once
+	// requested here; opponent hand contents are never visible (PlayerViewBuilder nulls Opponent.Hand),
+	// so there is nothing else to request art for.
 	private static void RequestArtForUnseenOpponentCards(
 		HubConnection connection, Guid matchId, PlayerGameView view, HashSet<string> requestedCardArtIds)
 	{
@@ -606,6 +607,19 @@ public static class RemoteGameClient
 		foreach (var minion in view.Opponent.Graveyard)
 		{
 			RequestArtIfUnseen(connection, matchId, minion.CardId, requestedCardArtIds);
+		}
+
+		RequestArtIfUnseen(connection, matchId, view.Opponent.EquippedWeapon?.CardId, requestedCardArtIds);
+
+		// A cast spell has no persistent view (unlike a minion's Board entry or a weapon's
+		// EquippedWeapon) - the history entry recording the opponent's own play is the only place
+		// its CardId is ever exposed.
+		foreach (var entry in view.NewHistory)
+		{
+			if (entry.ActionType == "CastSpellAction" && entry.PlayerId != view.ViewerPlayerId)
+			{
+				RequestArtIfUnseen(connection, matchId, entry.SourceCardId, requestedCardArtIds);
+			}
 		}
 	}
 

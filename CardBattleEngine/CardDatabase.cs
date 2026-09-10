@@ -205,6 +205,7 @@ public class CardDatabase
 	{
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
+		card.CardId = def.Id;
 		card.MinionTribes = def.Tribes == null ? [MinionTribe.None] : def.Tribes.ToList();
 		card.CastRestriction = def.CastRestriction;
 		card.ValidTargetSelector = def.ValidTargetSelector;
@@ -225,6 +226,7 @@ public class CardDatabase
 	{
 		var card = new WeaponCard(def.Name, def.Cost, def.Attack, def.Durability);
 		card.Owner = owner;
+		card.CardId = def.Id;
 		card.CastRestriction = def.CastRestriction;
 		card.ValidTargetSelector = def.ValidTargetSelector;
 		card.TriggeredEffects.AddRange(def.TriggeredEffects.Select(e => e.Clone()));
@@ -244,6 +246,7 @@ public class CardDatabase
 	{
 		var card = new SpellCard(def.Name, def.Cost);
 		card.Owner = owner;
+		card.CardId = def.Id;
 		card.CastRestriction = def.CastRestriction;
 		card.ValidTargetSelector = def.ValidTargetSelector;
 		card.SpellCastEffects.AddRange(def.SpellCastEffects);
