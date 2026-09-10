@@ -21,9 +21,30 @@ public class TriggerEffectAction : GameActionBase
 	{
 		if (TriggeredEffect.TargetRequirement != null)
 		{
-			foreach (var action in TriggeredEffect.GameActions)
+			if (TriggeredEffect.GameActions.Count > 0)
 			{
-				yield return (action, new ActionContext
+				foreach (var action in TriggeredEffect.GameActions)
+				{
+					yield return (action, new ActionContext
+					{
+						Source = TriggerSource.Entity,
+						SourcePlayer = TriggerSource.Entity.Owner,
+						SourceCard = TriggerSource.Entity is Minion m ? m.OriginalCard : null,
+						PendingTargetRequirement = TriggeredEffect.TargetRequirement,
+						OriginalAction = context.OriginalAction,
+						OriginalSource = context.Source,
+					});
+				}
+			}
+			else
+			{
+				// If TargetRequirement is set but GameActions is empty, yield a no-op action
+				// to allow the target selection flow to proceed
+				yield return (new DebugLambaAction
+				{
+					IsValidFunc = (s, c) => true,
+					ResolveFunc = (s, c) => Enumerable.Empty<(IGameAction, ActionContext)>()
+				}, new ActionContext
 				{
 					Source = TriggerSource.Entity,
 					SourcePlayer = TriggerSource.Entity.Owner,
