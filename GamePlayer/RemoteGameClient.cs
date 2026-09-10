@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
+using System.Text;
 using CardBattleEngine.View;
 using GameServer.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -55,6 +57,12 @@ public static class RemoteGameClient
 		var matchEnded = new TaskCompletionSource<Guid?>();
 		var matchFound = new TaskCompletionSource<Guid>();
 
+		// Set once CreateOrJoinMatch resolves below - the closures here capture this variable (not
+		// its value at registration time), so requests sent from OnStateUpdated before that point are
+		// simply skipped by RequestArtForUnseenOpponentCards's Guid.Empty guard.
+		var activeMatchId = Guid.Empty;
+		var requestedCardArtIds = new HashSet<string>();
+
 		connection.On<PlayerGameView>("OnStateUpdated", view =>
 		{
 			latestView = view;
@@ -66,6 +74,7 @@ public static class RemoteGameClient
 			{
 				matchEnded.TrySetResult(view.WinnerPlayerId);
 			}
+			RequestArtForUnseenOpponentCards(connection, activeMatchId, view, requestedCardArtIds);
 			viewSignal.Release();
 		});
 		connection.On<Guid?>("OnMatchEnded", winnerId =>
@@ -80,6 +89,14 @@ public static class RemoteGameClient
 		connection.On<string>("OnActionRejected", reason => Console.WriteLine($"Action rejected: {reason}"));
 		connection.On<Guid>("OnMatchFound", id => matchFound.TrySetResult(id));
 
+		// GamePlayer has no real card art to show - it exercises the same request/relay round trip a
+		// visual client would, but responds with a deterministic hash of the cardId instead of image
+		// bytes, so the requester can verify the exact bytes it gets back came from this cardId.
+		connection.On<Guid, string>("OnCardArtRequested", (requestMatchId, cardId) =>
+			RespondToCardArtRequest(connection, requestMatchId, cardId));
+		connection.On<string, byte[]>("OnCardArtReceived", (cardId, imageBytes) =>
+			VerifyReceivedCardArt(cardId, imageBytes));
+
 		Console.WriteLine($"Connecting to {hubUrl} ...");
 		await connection.StartAsync();
 
@@ -89,6 +106,8 @@ public static class RemoteGameClient
 			await connection.StopAsync();
 			return;
 		}
+
+		activeMatchId = matchId.Value;
 
 		// Redraws just the idle-wait line once a second so it live-counts up between server pushes,
 		// rather than only ever updating when a broadcast happens to arrive.
@@ -567,6 +586,75 @@ public static class RemoteGameClient
 			$"Hand:{player.HandCount} Deck:{player.DeckCount} Secrets:{player.SecretCount} " +
 			$"Board:[{string.Join(",", player.Board.Select(m => $"{m.Name} {m.Attack}/{m.Health}"))}]";
 	}
+
+	// Card art for anything the opponent has revealed - a minion currently on their board, or one that
+	// already died - counts as "seen" once requested here; opponent hand contents are never visible
+	// (PlayerViewBuilder nulls Opponent.Hand), so there is nothing else to request art for.
+	private static void RequestArtForUnseenOpponentCards(
+		HubConnection connection, Guid matchId, PlayerGameView view, HashSet<string> requestedCardArtIds)
+	{
+		if (matchId == Guid.Empty)
+		{
+			return;
+		}
+
+		foreach (var minion in view.Opponent.Board)
+		{
+			RequestArtIfUnseen(connection, matchId, minion.CardId, requestedCardArtIds);
+		}
+
+		foreach (var minion in view.Opponent.Graveyard)
+		{
+			RequestArtIfUnseen(connection, matchId, minion.CardId, requestedCardArtIds);
+		}
+	}
+
+	private static async void RequestArtIfUnseen(
+		HubConnection connection, Guid matchId, string? cardId, HashSet<string> requestedCardArtIds)
+	{
+		if (string.IsNullOrEmpty(cardId) || !requestedCardArtIds.Add(cardId))
+		{
+			return;
+		}
+
+		try
+		{
+			await connection.InvokeAsync("RequestCardArt", matchId, cardId);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"RequestCardArt failed for '{cardId}': {ex.Message}");
+		}
+	}
+
+	// The other client is asking us for art for cardId. GamePlayer has no real art to send, so it
+	// replies with a hash of cardId instead - a "verifiable blob" the requester can independently
+	// recompute from the cardId it asked for, proving the relay round trip delivered the right bytes
+	// for the right card rather than actually rendering anything.
+	private static async void RespondToCardArtRequest(HubConnection connection, Guid matchId, string cardId)
+	{
+		byte[] blob = ComputeVerifiableArtBlob(cardId);
+
+		try
+		{
+			await connection.InvokeAsync("SubmitCardArt", matchId, cardId, blob);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"SubmitCardArt failed for '{cardId}': {ex.Message}");
+		}
+	}
+
+	private static void VerifyReceivedCardArt(string cardId, byte[] imageBytes)
+	{
+		var expected = ComputeVerifiableArtBlob(cardId);
+		var verified = imageBytes != null && imageBytes.AsSpan().SequenceEqual(expected);
+		Console.WriteLine(verified
+			? $"Card art round trip verified for '{cardId}'."
+			: $"Card art round trip FAILED for '{cardId}' (received {imageBytes?.Length ?? 0} bytes).");
+	}
+
+	private static byte[] ComputeVerifiableArtBlob(string cardId) => SHA256.HashData(Encoding.UTF8.GetBytes(cardId));
 
 	private static DecklistRequest BuildDefaultDeck(string playerName)
 	{

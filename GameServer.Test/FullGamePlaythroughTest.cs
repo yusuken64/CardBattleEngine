@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using CardBattleEngine.View;
 using GameServer;
 using GameServer.Contracts;
@@ -139,6 +141,75 @@ public class FullGamePlaythroughTest
 
 				Assert.IsFalse(joinResult.Success, "Expected JoinMatch to fail when both decks submit conflicting custom cards under the same id.");
 				Assert.IsTrue(joinResult.Error != null && joinResult.Error.Contains("ConflictingCard"), $"Expected the error to mention the conflicting id. Actual: {joinResult.Error}");
+			}
+			finally
+			{
+				await connectionA.StopAsync();
+				await connectionB.StopAsync();
+			}
+		}
+		finally
+		{
+			await app.StopAsync();
+			await app.DisposeAsync();
+		}
+	}
+
+	[TestMethod]
+	public async Task CardArtRelay_RequestAndSubmit_DeliversVerifiableBlobToRequester()
+	{
+		var builder = WebApplication.CreateBuilder();
+		builder.WebHost.UseUrls("http://127.0.0.1:0");
+		builder.Logging.ClearProviders();
+		var app = ServerHost.Build(builder);
+		await app.StartAsync();
+
+		try
+		{
+			var addressesFeature = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>();
+			var baseUrl = addressesFeature!.Addresses.First();
+			var hubUrl = $"{baseUrl}/hubs/match";
+
+			var connectionA = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+			var connectionB = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+
+			connectionA.On<PlayerGameView>("OnStateUpdated", _ => { });
+			connectionB.On<PlayerGameView>("OnStateUpdated", _ => { });
+
+			// Mirrors GamePlayer's actual behavior: it has no real art, so it replies to a request with
+			// a hash of the requested cardId as a "verifiable blob" - the requester can independently
+			// recompute that same hash and check it byte-for-byte, proving the relay delivered the
+			// right bytes for the right card without needing a real image on either side.
+			const string cardId = "CardArtRelayTestCard";
+			var receivedArt = new TaskCompletionSource<(string CardId, byte[] ImageBytes)>();
+
+			connectionB.On<Guid, string>("OnCardArtRequested", async (requestedMatchId, requestedCardId) =>
+			{
+				var blob = SHA256.HashData(Encoding.UTF8.GetBytes(requestedCardId));
+				await connectionB.InvokeAsync("SubmitCardArt", requestedMatchId, requestedCardId, blob);
+			});
+			connectionA.On<string, byte[]>("OnCardArtReceived", (receivedCardId, imageBytes) =>
+				receivedArt.TrySetResult((receivedCardId, imageBytes)));
+
+			await connectionA.StartAsync();
+			await connectionB.StartAsync();
+
+			try
+			{
+				var matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", BuildDeck("Alice"));
+				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob"));
+				Assert.IsTrue(joinResult.Success, $"JoinMatch failed: {joinResult.Error}");
+
+				await connectionA.InvokeAsync("RequestCardArt", matchId, cardId);
+
+				await Task.WhenAny(receivedArt.Task, Task.Delay(TimeSpan.FromSeconds(10)));
+				Assert.IsTrue(receivedArt.Task.IsCompleted, "OnCardArtReceived was never delivered back to the requester within 10 seconds.");
+
+				var (deliveredCardId, deliveredBytes) = receivedArt.Task.Result;
+				Assert.AreEqual(cardId, deliveredCardId);
+
+				var expectedBlob = SHA256.HashData(Encoding.UTF8.GetBytes(cardId));
+				CollectionAssert.AreEqual(expectedBlob, deliveredBytes, "Delivered art bytes did not match the expected hash of the requested cardId.");
 			}
 			finally
 			{
