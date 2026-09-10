@@ -23,8 +23,21 @@ public class CastSpellAction : GameActionBase
 		{
 			var selector = spellCastEffect.AffectedEntitySelector;
 
-			if (selector == null ||
-				selector.ResolutionTiming == TargetResolutionTiming.Once)
+			if (selector == null)
+			{
+				var spellActionContext = new ActionContext
+				{
+					SourcePlayer = context.SourcePlayer,
+					Source = context.Source,
+					SourceCard = context.SourceCard,
+					Targets = context.Targets,
+				};
+				foreach (var action in spellCastEffect.GameActions)
+					yield return (action, spellActionContext);
+				continue;
+			}
+
+			if (selector.ResolutionTiming == TargetResolutionTiming.Once)
 			{
 				context.AffectedEntitySelector = selector;
 				var targets = ResolveTargets(state, context);
@@ -44,7 +57,7 @@ public class CastSpellAction : GameActionBase
 						yield return (action, spellActionContext);
 				}
 			}
-			else
+			else if (selector.ResolutionTiming == TargetResolutionTiming.PerAction)
 			{
 				var spellActionContext = new ActionContext
 				{

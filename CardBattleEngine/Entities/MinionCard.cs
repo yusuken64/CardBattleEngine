@@ -119,6 +119,8 @@ public class MinionCard : Card
 			MinionTriggeredEffects = MinionTriggeredEffects.ToList(),
 			VariableSet = new VariableSet(VariableSet),
 			NumericId = NumericId,
+			RequiredTargetCount = RequiredTargetCount,
+			AllowDuplicateTargets = AllowDuplicateTargets,
 		};
 	}
 

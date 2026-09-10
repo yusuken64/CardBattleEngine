@@ -41,6 +41,8 @@ public class WeaponCard : Card
 			TriggeredEffects = TriggeredEffects.ToList(),
 			VariableSet = new VariableSet(VariableSet),
 			NumericId = NumericId,
+			RequiredTargetCount = RequiredTargetCount,
+			AllowDuplicateTargets = AllowDuplicateTargets,
 		};
 	}
 

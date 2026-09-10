@@ -10,6 +10,7 @@ public class TriggeredEffect : ITriggeredEffect
 	public List<IGameAction> GameActions { get; set; } = new();
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
+	public TargetRequirement TargetRequirement { get; set; }
 	public ExpirationTrigger ExpirationTrigger { get; set; }
 	public EffectFrequency Frequency { get; set; } = EffectFrequency.Unlimited;
 	public bool UsedThisTurn { get; set; } = false;
@@ -21,6 +22,7 @@ public class TriggeredEffect : ITriggeredEffect
 			EffectTrigger = this.EffectTrigger,
 			Scope = this.Scope,
 			AffectedEntitySelector = AffectedEntitySelector,
+			TargetRequirement = TargetRequirement,
 			Condition = Condition,
 			// IGameAction no longer carries per-resolution state (Canceled moved to ActionContext),
 			// so instances are safe to share across clones instead of deep-cloning.

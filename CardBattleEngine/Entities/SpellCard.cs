@@ -37,6 +37,8 @@ public class SpellCard : Card
 			TriggeredEffects = TriggeredEffects.ToList(),
 			VariableSet = new VariableSet(VariableSet),
 			NumericId = NumericId,
+			RequiredTargetCount = RequiredTargetCount,
+			AllowDuplicateTargets = AllowDuplicateTargets,
 		};
 
 		return spellCard;

@@ -14,6 +14,8 @@ public abstract class Card : ITriggerSource, IGameEntity
 	public int ManaCost { get; set; }
 	public IValidTargetSelector? ValidTargetSelector { get; set; }
 	public ICastRestriction? CastRestriction { get; set; }
+	public int RequiredTargetCount { get; set; } = 1;
+	public bool AllowDuplicateTargets { get; set; } = false;
 	public abstract CardType Type { get; }
 	public Player Owner { get; set; }
 	internal abstract IEnumerable<(IGameAction, ActionContext)> GetPlayEffects(GameState state, ActionContext actionContext);
