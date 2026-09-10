@@ -7,6 +7,7 @@ public class CardDatabase
 {
 	private readonly Dictionary<string, MinionCardDefinition> _minions = new();
 	private readonly Dictionary<string, SpellCardDefinition> _spells = new();
+	private readonly Dictionary<string, WeaponCardDefinition> _weapons = new();
 
 	private readonly Dictionary<string, Type> _actions = new();
 	private readonly Dictionary<string, Type> _triggerConditions = new();
@@ -166,6 +167,10 @@ public class CardDatabase
 					Console.WriteLine($"loaded spell {spell.Id}");
 					_spells[spell.Id] = spell;
 					break;
+				case WeaponCardDefinition weapon:
+					Console.WriteLine($"loaded weapon {weapon.Id}");
+					_weapons[weapon.Id] = weapon;
+					break;
 			}
 		}
 	}
@@ -203,6 +208,7 @@ public class CardDatabase
 			{
 				CardType.Minion => JsonConvert.DeserializeObject<MinionCardDefinition>(json, JsonSettings),
 				CardType.Spell => JsonConvert.DeserializeObject<SpellCardDefinition>(json, JsonSettings),
+				CardType.Weapon => JsonConvert.DeserializeObject<WeaponCardDefinition>(json, JsonSettings),
 				_ => null
 			};
 		}
@@ -230,8 +236,28 @@ public class CardDatabase
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
 		card.MinionTribes = def.Tribes == null ?[MinionTribe.None] : def.Tribes.ToList();
+		card.TriggeredEffects.AddRange(BuildTriggeredEffects(def.TriggeredEffectDefinitions));
 
-		foreach (var triggeredEffectDefinition in def.TriggeredEffectDefinitions)
+		return card;
+	}
+
+	public WeaponCard GetWeaponCard(string id, Player owner)
+	{
+		if (!_weapons.TryGetValue(id, out var def))
+			throw new KeyNotFoundException($"Unknown weapon id '{id}'");
+
+		var card = new WeaponCard(def.Name, def.Cost, def.Attack, def.Durability);
+		card.Owner = owner;
+		card.TriggeredEffects.AddRange(BuildTriggeredEffects(def.TriggeredEffectDefinitions));
+
+		return card;
+	}
+
+	private List<TriggeredEffect> BuildTriggeredEffects(List<TriggeredEffectDefinition> triggeredEffectDefinitions)
+	{
+		var effects = new List<TriggeredEffect>();
+
+		foreach (var triggeredEffectDefinition in triggeredEffectDefinitions)
 		{
 			List<ActionDefinition> actionDefinitions =
 				(triggeredEffectDefinition.ActionDefintions != null && triggeredEffectDefinition.ActionDefintions.Count > 0)
@@ -247,7 +273,7 @@ public class CardDatabase
 				triggerConditionDefintion?.ConditionTypeName,
 				triggerConditionDefintion?.Params);
 
-			TriggeredEffect effect = new()
+			effects.Add(new TriggeredEffect
 			{
 				EffectTiming = triggeredEffectDefinition.EffectTiming,
 				EffectTrigger = triggeredEffectDefinition.EffectTrigger,
@@ -258,12 +284,12 @@ public class CardDatabase
 					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.EntitySelectorTypeName,
 					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.Params
 					)
-			};
-			card.TriggeredEffects.Add(effect);
+			});
 		}
 
-		return card;
+		return effects;
 	}
+
 	public SpellCard GetSpellCard(string id, Player owner)
 	{
 		if (!_spells.TryGetValue(id, out var def))
@@ -373,6 +399,13 @@ public class MinionCardDefinition : CardDefinition
 	public int Attack { get; set; }
 	public int Health { get; set; }
 	public List<MinionTribe> Tribes { get; set; }
+	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
+}
+
+public class WeaponCardDefinition : CardDefinition
+{
+	public int Attack { get; set; }
+	public int Durability { get; set; }
 	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
 }
 

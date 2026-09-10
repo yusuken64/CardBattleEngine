@@ -19,6 +19,20 @@ public class CardDBTest
 	}
 
 	[TestMethod]
+	public void LoadWeaponDBTest()
+	{
+		CardDatabase cardDatabase = new(DBPath);
+
+		Player owner = new Player("Test");
+		WeaponCard weapon = cardDatabase.GetWeaponCard("TestWeapon", owner);
+
+		Assert.IsNotNull(weapon);
+		Assert.AreEqual(3, weapon.Attack);
+		Assert.AreEqual(2, weapon.Durability);
+		Assert.AreEqual(2, weapon.ManaCost);
+	}
+
+	[TestMethod]
 	public void CreateMinionDefinitionTest()
 	{
 		MinionCard card = new MinionCard("SaveTest", 2, 2, 2);

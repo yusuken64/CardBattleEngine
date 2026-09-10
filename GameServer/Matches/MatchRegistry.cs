@@ -112,9 +112,11 @@ public class MatchRegistry
 			player1,
 			deck1.Minions.Select(c => (c.CardId, c.Count)),
 			deck1.Spells.Select(c => (c.CardId, c.Count)),
+			deck1.Weapons.Select(c => (c.CardId, c.Count)),
 			player2,
 			deck2.Minions.Select(c => (c.CardId, c.Count)),
 			deck2.Spells.Select(c => (c.CardId, c.Count)),
+			deck2.Weapons.Select(c => (c.CardId, c.Count)),
 			rngSeed);
 
 		var match = new Match(id, gameState, new GameEngine())
