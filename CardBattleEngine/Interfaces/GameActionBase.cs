@@ -74,6 +74,9 @@ public class ActionContext
 	// unconditional Dictionary allocation on every one of the many contexts created per action/trigger.
 	private Dictionary<string, object> _variables;
 
+	// Lazily allocated: see _variables above, same rationale.
+	private Dictionary<string, IGameEntity> _snapshots;
+
 	public ActionContext() { }
 
 	public ActionContext(ActionContext context)
@@ -85,6 +88,7 @@ public class ActionContext
 		this.PendingTargetRequirement = context.PendingTargetRequirement;
 		this.Modifier = context.Modifier;
 		this._variables = context._variables == null ? null : new(context._variables);
+		this._snapshots = context._snapshots == null ? null : new(context._snapshots);
 		this._affectedEntities = context._affectedEntities == null ? null : [.. context._affectedEntities];
 		this.IsAttack = context.IsAttack;
 	}
@@ -107,7 +111,7 @@ public class ActionContext
 	public int HealthDamageDealt { get; internal set; }
 	public int ArmorDamageDealt { get; internal set; }
 	public int ArmorGained { get; internal set; }
-	public Minion SummonedMinionSnapShot { get; internal set; }
+	public Minion SummonedMinionSnapShot => GetSnapshot("SummonedMinion") as Minion;
 
 	// Lazily allocated: see _variables above, same rationale.
 	private List<StatusDelta> _resolvedStatusChanges;
@@ -150,10 +154,27 @@ public class ActionContext
 			: 0; // Missing vars default to 0
 	}
 
+	public void SetSnapshot(string name, IGameEntity entityClone)
+	{
+		if (string.IsNullOrEmpty(name))
+			throw new ArgumentException(nameof(name));
+
+		(_snapshots ??= new())[name] = entityClone;
+	}
+
+	public IGameEntity GetSnapshot(string name)
+	{
+		if (string.IsNullOrEmpty(name))
+			throw new ArgumentException(nameof(name));
+
+		return _snapshots != null && _snapshots.TryGetValue(name, out var value)
+			? value
+			: null;
+	}
+
 	public ActionContext ShallowCopy()
 	{
 		var newContext = new ActionContext(this);
-		newContext.SummonedMinionSnapShot = this.SummonedMinionSnapShot;
 		newContext.ArmorGained = this.ArmorGained;
 		newContext.ArmorDamageDealt = this.ArmorDamageDealt;
 		newContext.HealthDamageDealt = this.HealthDamageDealt;

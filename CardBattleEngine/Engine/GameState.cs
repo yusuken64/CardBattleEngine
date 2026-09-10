@@ -306,6 +306,11 @@ public class GameState
 			{
 				yield return card;
 			}
+
+			if (player.EquippedWeapon != null)
+			{
+				yield return player.EquippedWeapon;
+			}
 		}
 	}
 
