@@ -73,6 +73,34 @@ public class MatchHub : Hub<IMatchClient>
 		return Task.CompletedTask;
 	}
 
+	public Task RequestCardArt(Guid matchId, string cardId)
+	{
+		if (_registry.TryGet(new MatchId(matchId), out var match))
+		{
+			var other = match!.OtherConnectionId(Context.ConnectionId);
+			if (other != null)
+			{
+				return _hubContext.Clients.Client(other).OnCardArtRequested(matchId, cardId);
+			}
+		}
+
+		return Task.CompletedTask;
+	}
+
+	public Task SubmitCardArt(Guid matchId, string cardId, byte[] imageBytes)
+	{
+		if (_registry.TryGet(new MatchId(matchId), out var match))
+		{
+			var other = match!.OtherConnectionId(Context.ConnectionId);
+			if (other != null)
+			{
+				return _hubContext.Clients.Client(other).OnCardArtReceived(cardId, imageBytes);
+			}
+		}
+
+		return Task.CompletedTask;
+	}
+
 	public Task<ActionResult> SubmitAction(Guid matchId, int actionIndex, int version)
 	{
 		if (!_registry.TryGet(new MatchId(matchId), out var match))

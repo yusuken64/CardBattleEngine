@@ -1,3 +1,4 @@
+using CardBattleEngine;
 using CardBattleEngine.View;
 using GameServer.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -85,7 +86,7 @@ WireHandlers(connectionB, "PlayerB", matchEndedB);
 await connectionA.StartAsync();
 await connectionB.StartAsync();
 
-var deckA = BuildDeck("Alice");
+var deckA = BuildDeckWithCustomMinion("Alice");
 var deckB = BuildDeck("Bob");
 
 matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", deckA);
@@ -166,4 +167,17 @@ static DecklistRequest BuildDeck(string name)
 			new() { CardId = "ArcaneIntellect", Count = 2 },
 		},
 	};
+}
+
+static DecklistRequest BuildDeckWithCustomMinion(string name)
+{
+	var deck = BuildDeck(name);
+
+	var customCard = new MinionCard("SmokeTestCustomMinion", cost: 2, attack: 7, health: 7);
+	var json = CardDatabase.ToDefinitionJson(CardDatabase.ToMinionCardDefinition(customCard, "SmokeTestCustomMinion"));
+
+	deck.Minions.Add(new CardCount { CardId = "SmokeTestCustomMinion", Count = 1 });
+	deck.CustomMinions.Add(json);
+
+	return deck;
 }
