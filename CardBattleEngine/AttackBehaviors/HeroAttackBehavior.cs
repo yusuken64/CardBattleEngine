@@ -45,6 +45,13 @@ public class HeroAttackBehavior : IAttackBehavior
 			return false;
 		}
 
+		// Relics can't be attacked
+		if (target is Relic)
+		{
+			reason = "Relic can't be attacked";
+			return false;
+		}
+
 		// Cannot attack friendly units
 		if (attacker.Owner == target.Owner)
 		{

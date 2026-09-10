@@ -8,6 +8,7 @@ public class CardDatabase
 	private readonly Dictionary<string, MinionCardDefinition> _minions = new();
 	private readonly Dictionary<string, SpellCardDefinition> _spells = new();
 	private readonly Dictionary<string, WeaponCardDefinition> _weapons = new();
+	private readonly Dictionary<string, RelicCardDefinition> _relics = new();
 
 	public CardDatabase(string path)
 	{
@@ -136,6 +137,10 @@ public class CardDatabase
 					Console.WriteLine($"loaded weapon {weapon.Id}");
 					_weapons[weapon.Id] = weapon;
 					break;
+				case RelicCardDefinition relic:
+					Console.WriteLine($"loaded relic {relic.Id}");
+					_relics[relic.Id] = relic;
+					break;
 			}
 		}
 	}
@@ -174,6 +179,7 @@ public class CardDatabase
 				CardType.Minion => JsonConvert.DeserializeObject<MinionCardDefinition>(json, JsonSettings),
 				CardType.Spell => JsonConvert.DeserializeObject<SpellCardDefinition>(json, JsonSettings),
 				CardType.Weapon => JsonConvert.DeserializeObject<WeaponCardDefinition>(json, JsonSettings),
+				CardType.Relic => JsonConvert.DeserializeObject<RelicCardDefinition>(json, JsonSettings),
 				_ => null
 			};
 		}
@@ -234,6 +240,27 @@ public class CardDatabase
 		return card;
 	}
 
+	public RelicCard GetRelicCard(string id, Player owner)
+	{
+		if (!_relics.TryGetValue(id, out var def))
+			throw new KeyNotFoundException($"Unknown relic id '{id}'");
+
+		return BuildRelicCard(def, owner);
+	}
+
+	public RelicCard BuildRelicCard(RelicCardDefinition def, Player owner)
+	{
+		var card = new RelicCard(def.Name, def.Cost, def.Health);
+		card.Owner = owner;
+		card.CardId = def.Id;
+		card.Charges = def.Charges;
+		card.CastRestriction = def.CastRestriction;
+		card.ValidTargetSelector = def.ValidTargetSelector;
+		card.RelicTriggeredEffects.AddRange(def.TriggeredEffects.Select(e => e.Clone()));
+
+		return card;
+	}
+
 	public SpellCard GetSpellCard(string id, Player owner)
 	{
 		if (!_spells.TryGetValue(id, out var def))
@@ -282,5 +309,12 @@ public class WeaponCardDefinition : CardDefinition
 {
 	public int Attack { get; set; }
 	public int Durability { get; set; }
+	public List<TriggeredEffect> TriggeredEffects { get; set; } = new();
+}
+
+public class RelicCardDefinition : CardDefinition
+{
+	public int Health { get; set; }
+	public int? Charges { get; set; }
 	public List<TriggeredEffect> TriggeredEffects { get; set; } = new();
 }

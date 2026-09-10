@@ -30,8 +30,8 @@ public static class GameStateVectorizer
 				f[i++] = m.Attack / 10f;
 				f[i++] = m.Health / 10f;
 				f[i++] = m.CanAttack() ? 1f : 0f;
-				f[i++] = m.Taunt ? 1f : 0f;
-				f[i++] = m.HasDivineShield ? 1f : 0f;
+				f[i++] = m is Minion friendlyMinion && friendlyMinion.Taunt ? 1f : 0f;
+				f[i++] = m is Minion friendlyMinionDs && friendlyMinionDs.HasDivineShield ? 1f : 0f;
 			}
 			else
 			{
@@ -50,8 +50,8 @@ public static class GameStateVectorizer
 				f[i++] = m.Attack / 10f;
 				f[i++] = m.Health / 10f;
 				f[i++] = m.CanAttack() ? 1f : 0f;
-				f[i++] = m.Taunt ? 1f : 0f;
-				f[i++] = m.HasDivineShield ? 1f : 0f;
+				f[i++] = m is Minion enemyMinion && enemyMinion.Taunt ? 1f : 0f;
+				f[i++] = m is Minion enemyMinionDs && enemyMinionDs.HasDivineShield ? 1f : 0f;
 			}
 			else
 			{

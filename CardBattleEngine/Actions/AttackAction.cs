@@ -34,7 +34,7 @@ public static class AttackRules
 	{
 		// Find opponent's taunt minions
 		var opponent = state.OpponentOf(attacker.Owner);
-		var taunts = opponent.Board.Where(m => m.Taunt && m.IsAlive && !m.IsStealth);
+		var taunts = opponent.Board.OfType<Minion>().Where(m => m.Taunt && m.IsAlive && !m.IsStealth);
 
 		// If there are taunts, you must target one
 		return !taunts.Any() || (target is Minion t && t.Taunt);

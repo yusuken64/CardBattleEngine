@@ -74,5 +74,9 @@ public class DeathAction : GameActionBase
 					});
 			}
 		}
+		if (actionContext.Target is Relic relic)
+		{
+			relic.Owner.Board.Remove(relic);
+		}
 	}
 }

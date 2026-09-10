@@ -21,6 +21,7 @@ public class EntityTypeSelector : IValidTargetSelector
 			Minion => EntityType.Minion,
 			Card => EntityType.Card,
 			Weapon => EntityType.Weapon,
+			Relic => EntityType.Relic,
 			_ => EntityType.None
 		} & entityTypes) != 0;
 	}

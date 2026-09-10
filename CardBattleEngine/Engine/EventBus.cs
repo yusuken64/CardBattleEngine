@@ -71,7 +71,8 @@ public class EventBus
 			foreach (var effect in triggerSource.TriggeredEffects
 				.Where(te => te.EffectTrigger == triggeringAction.EffectTrigger &&
 							 te.EffectTiming == timing &&
-							 (te.Scope != TriggerScope.Self || triggerSource.Entity == context.Source)))
+							 (te.Scope != TriggerScope.Self || triggerSource.Entity == context.Source) &&
+							 (te.Frequency != EffectFrequency.OncePerTurn || !te.UsedThisTurn)))
 			{
 				var effectContext = new ActionContext()
 				{

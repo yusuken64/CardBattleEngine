@@ -34,5 +34,24 @@ public class TriggerEffectAction : GameActionBase
 				OriginalSource = context.Source,
 			});
 		}
+
+		if (TriggeredEffect.Frequency == EffectFrequency.OncePerTurn)
+		{
+			TriggeredEffect.UsedThisTurn = true;
+		}
+
+		if (TriggerSource is Relic relic && relic.Charges.HasValue)
+		{
+			relic.Charges--;
+			if (relic.Charges <= 0)
+			{
+				yield return (new DeathAction(), new ActionContext
+				{
+					SourcePlayer = relic.Owner,
+					Source = relic,
+					Target = relic,
+				});
+			}
+		}
 	}
 }

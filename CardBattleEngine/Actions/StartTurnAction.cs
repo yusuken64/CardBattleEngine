@@ -20,6 +20,26 @@ public class StartTurnAction : GameActionBase
 		{
 			player.HeroPower.UsedThisTurn = false;
 		}
+
+		foreach (var relic in player.Board.OfType<Relic>())
+		{
+			if (relic.Ability != null)
+			{
+				relic.Ability.UsedThisTurn = false;
+			}
+		}
+
+		foreach (var source in state.GetAllTriggerSources().Where(s => s.Entity.Owner == player))
+		{
+			foreach (var effect in source.TriggeredEffects)
+			{
+				if (effect.Frequency == EffectFrequency.OncePerTurn)
+				{
+					effect.UsedThisTurn = false;
+				}
+			}
+		}
+
 		player.HasAttackedThisTurn = false;
 		if (player.IsFrozen &&
 			player.MissedAttackFromFrozen)
@@ -36,7 +56,7 @@ public class StartTurnAction : GameActionBase
 		}
 
 		// Reset attack flags
-		foreach (var minion in actionContext.SourcePlayer.Board)
+		foreach (var minion in actionContext.SourcePlayer.Board.OfType<Minion>())
 		{
 			minion.AttacksPerformedThisTurn = 0;
 			minion.HasSummoningSickness = false;

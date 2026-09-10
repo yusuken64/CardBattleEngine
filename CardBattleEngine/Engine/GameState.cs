@@ -321,6 +321,11 @@ public class GameState
 				yield return secret;
 			}
 
+			foreach (var sigil in player.Sigils)
+			{
+				yield return sigil;
+			}
+
 			foreach (var minion in player.Board)
 			{
 				yield return minion;
@@ -339,7 +344,7 @@ public class GameState
 
 		foreach (var player in Players)
 		{
-			all.AddRange(player.Board);
+			all.AddRange(player.Board.OfType<Minion>());
 		}
 
 		return all;

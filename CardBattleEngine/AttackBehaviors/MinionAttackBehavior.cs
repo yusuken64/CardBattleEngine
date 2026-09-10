@@ -63,6 +63,13 @@ public class MinionAttackBehavior : IAttackBehavior
 			return false;
 		}
 
+		// Relics can't be attacked
+		if (target is Relic)
+		{
+			reason = "Relic can't be attacked";
+			return false;
+		}
+
 		// Cannot attack friendly units
 		if (minion.Owner == target.Owner)
 		{

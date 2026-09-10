@@ -66,6 +66,12 @@ public class PlayCardAction : GameActionBase
 			return false;
 		}
 
+		if (Card is RelicCard relicCard && player.Board.Count >= state.MaxBoardSize)
+		{
+			reason = "Board is Full";
+			return false;
+		}
+
 		reason = null;
 		return true;
 	}

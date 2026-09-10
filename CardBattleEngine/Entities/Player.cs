@@ -6,9 +6,10 @@ public class Player : IGameEntity, ITriggerSource
 	public string Name { get; set; }
 	public List<Card> Deck { get; } = new List<Card>();
 	public List<Card> Hand { get; } = new List<Card>();
-	public List<Minion> Board { get; } = new List<Minion>();
+	public List<BoardPermanent> Board { get; } = new List<BoardPermanent>();
 	public List<Minion> Graveyard { get; } = new List<Minion>();
 	public List<Secret> Secrets { get; set; } = new List<Secret>();//TODO expand to hero auras
+	public List<Sigil> Sigils { get; set; } = new List<Sigil>();
 	public int MaxMana { get; set; }
 	public int Attack { get; set; }
 	public int Health { get; set; } = 30;
@@ -89,11 +90,11 @@ public class Player : IGameEntity, ITriggerSource
 			clonedCard.Owner = clone;
 		}
 
-		foreach (var minion in Board)
+		foreach (var entity in Board)
 		{
-			Minion clonedMinion = (Minion)minion.Clone();
-			clone.Board.Add(clonedMinion);
-			clonedMinion.Owner = clone;
+			BoardPermanent clonedEntity = entity.Clone();
+			clone.Board.Add(clonedEntity);
+			clonedEntity.Owner = clone;
 		}
 
 		foreach (var minion in Graveyard)
@@ -101,6 +102,13 @@ public class Player : IGameEntity, ITriggerSource
 			Minion clonedMinion = (Minion)minion.Clone();
 			clone.Graveyard.Add(clonedMinion);
 			clonedMinion.Owner = clone;
+		}
+
+		foreach (var sigil in Sigils)
+		{
+			Sigil clonedSigil = sigil.Clone();
+			clone.Sigils.Add(clonedSigil);
+			clonedSigil.Owner = clone;
 		}
 
 		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
@@ -145,11 +153,11 @@ public class Player : IGameEntity, ITriggerSource
 			clonedCard.Owner = clone;
 		}
 
-		foreach (var minion in Board)
+		foreach (var entity in Board)
 		{
-			Minion clonedMinion = (Minion)minion.Clone();
-			clone.Board.Add(clonedMinion);
-			clonedMinion.Owner = clone;
+			BoardPermanent clonedEntity = entity.Clone();
+			clone.Board.Add(clonedEntity);
+			clonedEntity.Owner = clone;
 		}
 
 		//foreach (var minion in Graveyard)
@@ -158,6 +166,13 @@ public class Player : IGameEntity, ITriggerSource
 		//	clone.Graveyard.Add(clonedMinion);
 		//	clonedMinion.Owner = clone;
 		//}
+
+		foreach (var sigil in Sigils)
+		{
+			Sigil clonedSigil = sigil.Clone();
+			clone.Sigils.Add(clonedSigil);
+			clonedSigil.Owner = clone;
+		}
 
 		clone._modifiers = _modifiers.Select(x => x.Clone()).ToList();
 		clone.RecalculateStats();
