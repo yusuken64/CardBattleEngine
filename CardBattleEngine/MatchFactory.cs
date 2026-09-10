@@ -18,10 +18,13 @@ public static class MatchFactory
 		IEnumerable<(string CardId, int Count)> minionDeck2,
 		IEnumerable<(string CardId, int Count)> spellDeck2,
 		IEnumerable<(string CardId, int Count)> weaponDeck2,
-		ulong rngSeed)
+		ulong rngSeed,
+		IReadOnlyDictionary<string, MinionCardDefinition> customMinions = null,
+		IReadOnlyDictionary<string, SpellCardDefinition> customSpells = null,
+		IReadOnlyDictionary<string, WeaponCardDefinition> customWeapons = null)
 	{
-		AddToDeck(cardDb, player1, minionDeck1, spellDeck1, weaponDeck1);
-		AddToDeck(cardDb, player2, minionDeck2, spellDeck2, weaponDeck2);
+		AddToDeck(cardDb, player1, minionDeck1, spellDeck1, weaponDeck1, customMinions, customSpells, customWeapons);
+		AddToDeck(cardDb, player2, minionDeck2, spellDeck2, weaponDeck2, customMinions, customSpells, customWeapons);
 
 		var cardPool = player1.Deck.Concat(player2.Deck);
 
@@ -33,13 +36,19 @@ public static class MatchFactory
 		Player player,
 		IEnumerable<(string CardId, int Count)> minionDeck,
 		IEnumerable<(string CardId, int Count)> spellDeck,
-		IEnumerable<(string CardId, int Count)> weaponDeck)
+		IEnumerable<(string CardId, int Count)> weaponDeck,
+		IReadOnlyDictionary<string, MinionCardDefinition> customMinions = null,
+		IReadOnlyDictionary<string, SpellCardDefinition> customSpells = null,
+		IReadOnlyDictionary<string, WeaponCardDefinition> customWeapons = null)
 	{
 		foreach (var (cardId, count) in minionDeck)
 		{
 			for (int i = 0; i < count; i++)
 			{
-				player.Deck.Add(cardDb.GetMinionCard(cardId, player));
+				var card = customMinions != null && customMinions.TryGetValue(cardId, out var minionDef)
+					? cardDb.BuildMinionCard(minionDef, player)
+					: cardDb.GetMinionCard(cardId, player);
+				player.Deck.Add(card);
 			}
 		}
 
@@ -47,7 +56,10 @@ public static class MatchFactory
 		{
 			for (int i = 0; i < count; i++)
 			{
-				player.Deck.Add(cardDb.GetSpellCard(cardId, player));
+				var card = customSpells != null && customSpells.TryGetValue(cardId, out var spellDef)
+					? cardDb.BuildSpellCard(spellDef, player)
+					: cardDb.GetSpellCard(cardId, player);
+				player.Deck.Add(card);
 			}
 		}
 
@@ -55,7 +67,10 @@ public static class MatchFactory
 		{
 			for (int i = 0; i < count; i++)
 			{
-				player.Deck.Add(cardDb.GetWeaponCard(cardId, player));
+				var card = customWeapons != null && customWeapons.TryGetValue(cardId, out var weaponDef)
+					? cardDb.BuildWeaponCard(weaponDef, player)
+					: cardDb.GetWeaponCard(cardId, player);
+				player.Deck.Add(card);
 			}
 		}
 	}

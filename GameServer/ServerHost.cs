@@ -8,7 +8,10 @@ public static class ServerHost
 {
 	public static WebApplication Build(WebApplicationBuilder builder)
 	{
-		builder.Services.AddSignalR();
+		builder.Services.AddSignalR(options =>
+		{
+			options.MaximumReceiveMessageSize = 1 * 1024 * 1024;
+		});
 		builder.Services.AddSingleton(new CardDatabase(Path.Combine(AppContext.BaseDirectory, "Data")));
 		builder.Services.AddSingleton<MatchRegistry>();
 

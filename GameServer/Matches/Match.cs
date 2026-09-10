@@ -49,4 +49,9 @@ public class Match
 
 	public string? ConnectionFor(MatchSeat seat) =>
 		seat == MatchSeat.Player1 ? ConnectionIdPlayer1 : ConnectionIdPlayer2;
+
+	public string? OtherConnectionId(string connectionId) =>
+		connectionId == ConnectionIdPlayer1 ? ConnectionIdPlayer2 :
+		connectionId == ConnectionIdPlayer2 ? ConnectionIdPlayer1 :
+		null;
 }
