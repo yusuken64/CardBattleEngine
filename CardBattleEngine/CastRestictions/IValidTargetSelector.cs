@@ -12,7 +12,8 @@ public enum EntityType
 	Player = 1 << 0,
 	Minion = 1 << 1,
 	Card = 1 << 2,
-	Weapon = 1 << 3
+	Weapon = 1 << 3,
+	Relic = 1 << 4
 }
 
 public enum Comparison

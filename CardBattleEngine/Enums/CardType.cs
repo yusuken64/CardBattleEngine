@@ -3,4 +3,4 @@
 namespace CardBattleEngine;
 
 [JsonConverter(typeof(StringEnumConverter))]
-public enum CardType { Minion, Spell, Weapon, Hero }
+public enum CardType { Minion, Spell, Weapon, Hero, Relic }

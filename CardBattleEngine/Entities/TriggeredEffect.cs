@@ -11,6 +11,8 @@ public class TriggeredEffect : ITriggeredEffect
 	public ITriggerCondition Condition { get; set; }
 	public IAffectedEntitySelector AffectedEntitySelector { get; set; }
 	public ExpirationTrigger ExpirationTrigger { get; set; }
+	public EffectFrequency Frequency { get; set; } = EffectFrequency.Unlimited;
+	public bool UsedThisTurn { get; set; } = false;
 	internal TriggeredEffect Clone()
 	{
 		return new TriggeredEffect()
@@ -23,6 +25,8 @@ public class TriggeredEffect : ITriggeredEffect
 			// IGameAction no longer carries per-resolution state (Canceled moved to ActionContext),
 			// so instances are safe to share across clones instead of deep-cloning.
 			GameActions = GameActions,
+			Frequency = this.Frequency,
+			UsedThisTurn = this.UsedThisTurn,
 		};
 	}
 }
@@ -42,6 +46,13 @@ public interface ITriggeredEffect
 	public EffectTiming EffectTiming { get; set; }
 	public TriggerScope Scope { get; set; }
 	public ITriggerCondition Condition { get; set; }
+}
+
+[JsonConverter(typeof(StringEnumConverter))]
+public enum EffectFrequency
+{
+	Unlimited,
+	OncePerTurn,
 }
 
 // Self: the trigger only fires when the entity holding it is the one that performed the triggering action
@@ -79,6 +90,7 @@ public enum EffectTrigger
 	OnHealed,
 	Reborn,
 	GameEnd,
+	OnRelicAbility,
 } //TODO standardize naming
 
 [JsonConverter(typeof(StringEnumConverter))]
