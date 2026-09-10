@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 
 namespace CardBattleEngine;
@@ -9,79 +9,68 @@ public class CardDatabase
 	private readonly Dictionary<string, SpellCardDefinition> _spells = new();
 	private readonly Dictionary<string, WeaponCardDefinition> _weapons = new();
 
-	private readonly Dictionary<string, Type> _actions = new();
-	private readonly Dictionary<string, Type> _triggerConditions = new();
-	private readonly Dictionary<string, Type> _affectedEntitySelectors = new();
-	private readonly Dictionary<string, Type> _targetOperations = new();
-
 	public CardDatabase(string path)
 	{
 		LoadAll(path);
-		RegisterTypes<IGameAction>(_actions);
-		RegisterTypes<ITriggerCondition>(_triggerConditions);
-		RegisterTypes<IAffectedEntitySelector>(_affectedEntitySelectors);
-		RegisterTypes<ITargetOperation>(_targetOperations);
 	}
 
-	private void RegisterTypes<T>(Dictionary<string, Type> targetDictionary)
+	public static MinionCardDefinition ToMinionCardDefinition(MinionCard card, string id)
 	{
-		var assembly = typeof(T).Assembly;
-
-		foreach (var type in assembly.GetTypes())
+		return new MinionCardDefinition
 		{
-			if (typeof(T).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-			{
-				targetDictionary[type.Name] = type;
-			}
-		}
+			Type = CardType.Minion,
+			Id = id,
+			Name = card.Name,
+			Cost = card.ManaCost,
+			Attack = card.Attack,
+			Health = card.Health,
+			Tribes = card.MinionTribes?.ToList(),
+			CastRestriction = card.CastRestriction,
+			ValidTargetSelector = card.ValidTargetSelector,
+			TriggeredEffects = card.TriggeredEffects.ToList()
+		};
+	}
+
+	public static SpellCardDefinition ToSpellCardDefinition(SpellCard card, string id)
+	{
+		return new SpellCardDefinition
+		{
+			Type = CardType.Spell,
+			Id = id,
+			Name = card.Name,
+			Cost = card.ManaCost,
+			CastRestriction = card.CastRestriction,
+			ValidTargetSelector = card.ValidTargetSelector,
+			SpellCastEffects = card.SpellCastEffects.ToList()
+		};
+	}
+
+	public static WeaponCardDefinition ToWeaponCardDefinition(WeaponCard card, string id)
+	{
+		return new WeaponCardDefinition
+		{
+			Type = CardType.Weapon,
+			Id = id,
+			Name = card.Name,
+			Cost = card.ManaCost,
+			Attack = card.Attack,
+			Durability = card.Durability,
+			CastRestriction = card.CastRestriction,
+			ValidTargetSelector = card.ValidTargetSelector,
+			TriggeredEffects = card.TriggeredEffects.ToList()
+		};
+	}
+
+	public static string ToDefinitionJson(CardDefinition def)
+	{
+		return JsonConvert.SerializeObject(def, JsonSettings);
 	}
 
 	public static string CreateFileFromMinionCard(MinionCard card, string directory, string cardName)
 	{
 		Directory.CreateDirectory(directory);
 
-		var def = new MinionCardDefinition
-		{
-			Id = cardName,
-			Name = card.Name,
-			Cost = card.ManaCost,
-			Attack = card.Attack,
-			Health = card.Health,
-			Tribes = card.MinionTribes?.ToList(),
-			TriggeredEffectDefinitions = card.TriggeredEffects.Select(x =>
-			{
-				TriggerConditionDefinition cond = null;
-
-				if (x.Condition != null)
-				{
-					cond = new TriggerConditionDefinition
-					{
-						ConditionTypeName = x.Condition.GetType().Name,
-						Params = x.Condition.EmitParams()
-					};
-				}
-
-				return new TriggeredEffectDefinition
-				{
-					EffectTiming = x.EffectTiming,
-					EffectTrigger = x.EffectTrigger,
-					Scope = x.Scope,
-					TriggerConditionDefintion = cond,
-					ActionDefintions = x.GameActions.Select(ga => new ActionDefinition
-					{
-						GameActionTypeName = ga.GetType().Name,
-						Params = ga.EmitParams()
-					}).ToList(),
-					AffectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition()
-					{
-						EntitySelectorTypeName = x.AffectedEntitySelector?.GetType().Name,
-						Params = x.AffectedEntitySelector?.EmitParams()
-					}
-				};
-			}).ToList()
-		};
-
-		string json = JsonConvert.SerializeObject(def, JsonSettings);
+		string json = ToDefinitionJson(ToMinionCardDefinition(card, cardName));
 		File.WriteAllText(Path.Combine(directory, $"{cardName}.json"), json);
 
 		return json;
@@ -92,39 +81,15 @@ public class CardDatabase
 		if (card == null) throw new ArgumentNullException(nameof(card));
 		if (string.IsNullOrWhiteSpace(cardName)) throw new ArgumentNullException(nameof(cardName));
 
-		var def = new SpellCardDefinition
-		{
-			Id = cardName,
-			Name = card.Name,
-			Cost = card.ManaCost,
-			Type = card.Type,
-			SpellCastEffectDefinitions = card.SpellCastEffects.Select(x =>
-			{
-				AffectedEntitySelectorDefinition? affectedEntitySelectorDefinition = null;
-				if (x.AffectedEntitySelector != null)
-				{
-					affectedEntitySelectorDefinition = new AffectedEntitySelectorDefinition
-					{
-						EntitySelectorTypeName = x.AffectedEntitySelector.GetType().Name,
-						Params = x.AffectedEntitySelector.EmitParams(),
-					};
-				}
+		return ToDefinitionJson(ToSpellCardDefinition(card, cardName));
+	}
 
-				return new SpellCastEffectDefinition
-				{
-					AffectedEntitySelectorDefinition = affectedEntitySelectorDefinition,
-					ActionDefintions = x.GameActions.Select(ga => new ActionDefinition
-					{
-						GameActionTypeName = ga.GetType().Name,
-						Params = ga.EmitParams()
-					}).ToList(),
-				};
-			}).ToList()
-		};
+	public static string CreateJsonFromWeaponCard(WeaponCard card, string cardName)
+	{
+		if (card == null) throw new ArgumentNullException(nameof(card));
+		if (string.IsNullOrWhiteSpace(cardName)) throw new ArgumentNullException(nameof(cardName));
 
-		string json = JsonConvert.SerializeObject(def, JsonSettings);
-
-		return json;
+		return ToDefinitionJson(ToWeaponCardDefinition(card, cardName));
 	}
 
 	public static void WriteJsonToFile(string json, string directory, string cardName)
@@ -233,10 +198,17 @@ public class CardDatabase
 		if (!_minions.TryGetValue(id, out var def))
 			throw new KeyNotFoundException($"Unknown minion id '{id}'");
 
+		return BuildMinionCard(def, owner);
+	}
+
+	public MinionCard BuildMinionCard(MinionCardDefinition def, Player owner)
+	{
 		var card = new MinionCard(def.Name, def.Cost, def.Attack, def.Health);
 		card.Owner = owner;
-		card.MinionTribes = def.Tribes == null ?[MinionTribe.None] : def.Tribes.ToList();
-		card.TriggeredEffects.AddRange(BuildTriggeredEffects(def.TriggeredEffectDefinitions));
+		card.MinionTribes = def.Tribes == null ? [MinionTribe.None] : def.Tribes.ToList();
+		card.CastRestriction = def.CastRestriction;
+		card.ValidTargetSelector = def.ValidTargetSelector;
+		card.TriggeredEffects.AddRange(def.TriggeredEffects.Select(e => e.Clone()));
 
 		return card;
 	}
@@ -246,48 +218,18 @@ public class CardDatabase
 		if (!_weapons.TryGetValue(id, out var def))
 			throw new KeyNotFoundException($"Unknown weapon id '{id}'");
 
-		var card = new WeaponCard(def.Name, def.Cost, def.Attack, def.Durability);
-		card.Owner = owner;
-		card.TriggeredEffects.AddRange(BuildTriggeredEffects(def.TriggeredEffectDefinitions));
-
-		return card;
+		return BuildWeaponCard(def, owner);
 	}
 
-	private List<TriggeredEffect> BuildTriggeredEffects(List<TriggeredEffectDefinition> triggeredEffectDefinitions)
+	public WeaponCard BuildWeaponCard(WeaponCardDefinition def, Player owner)
 	{
-		var effects = new List<TriggeredEffect>();
+		var card = new WeaponCard(def.Name, def.Cost, def.Attack, def.Durability);
+		card.Owner = owner;
+		card.CastRestriction = def.CastRestriction;
+		card.ValidTargetSelector = def.ValidTargetSelector;
+		card.TriggeredEffects.AddRange(def.TriggeredEffects.Select(e => e.Clone()));
 
-		foreach (var triggeredEffectDefinition in triggeredEffectDefinitions)
-		{
-			List<ActionDefinition> actionDefinitions =
-				(triggeredEffectDefinition.ActionDefintions != null && triggeredEffectDefinition.ActionDefintions.Count > 0)
-					? triggeredEffectDefinition.ActionDefintions
-					: new List<ActionDefinition> { triggeredEffectDefinition.ActionDefintion };
-
-			List<IGameAction> actions = actionDefinitions
-				.Select(ad => CreateGameActionFromDefinition(ad.GameActionTypeName, ad.Params))
-				.ToList();
-
-			TriggerConditionDefinition triggerConditionDefintion = triggeredEffectDefinition.TriggerConditionDefintion;
-			var condition = CreateTriggerConditionFromDefinition(
-				triggerConditionDefintion?.ConditionTypeName,
-				triggerConditionDefintion?.Params);
-
-			effects.Add(new TriggeredEffect
-			{
-				EffectTiming = triggeredEffectDefinition.EffectTiming,
-				EffectTrigger = triggeredEffectDefinition.EffectTrigger,
-				Scope = triggeredEffectDefinition.Scope,
-				Condition = condition,
-				GameActions = actions,
-				AffectedEntitySelector = CreateAffectedEntitySelectorFromDefinition(
-					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.EntitySelectorTypeName,
-					triggeredEffectDefinition.AffectedEntitySelectorDefinition?.Params
-					)
-			});
-		}
-
-		return effects;
+		return card;
 	}
 
 	public SpellCard GetSpellCard(string id, Player owner)
@@ -295,83 +237,18 @@ public class CardDatabase
 		if (!_spells.TryGetValue(id, out var def))
 			throw new KeyNotFoundException($"Unknown spell id '{id}'");
 
+		return BuildSpellCard(def, owner);
+	}
+
+	public SpellCard BuildSpellCard(SpellCardDefinition def, Player owner)
+	{
 		var card = new SpellCard(def.Name, def.Cost);
 		card.Owner = owner;
-
-		foreach (var spellCastEffectDefinition in def.SpellCastEffectDefinitions)
-		{
-			IEnumerable<IGameAction> gameActions = 
-				spellCastEffectDefinition.ActionDefintions
-				.Select(x => CreateGameActionFromDefinition(
-						x.GameActionTypeName,
-						x.Params)
-				);
-
-			IAffectedEntitySelector affectedEntitySelector = null;
-			if (spellCastEffectDefinition.AffectedEntitySelectorDefinition != null)
-			{
-				affectedEntitySelector =
-					CreateAffectedEntitySelectorFromDefinintion(
-						spellCastEffectDefinition.AffectedEntitySelectorDefinition.EntitySelectorTypeName,
-						spellCastEffectDefinition.AffectedEntitySelectorDefinition.Params
-					);
-			}
-			SpellCastEffect effect = new()
-			{
-				GameActions = gameActions.ToList(),
-				AffectedEntitySelector = affectedEntitySelector
-			};
-			card.SpellCastEffects.Add(effect);
-		}
+		card.CastRestriction = def.CastRestriction;
+		card.ValidTargetSelector = def.ValidTargetSelector;
+		card.SpellCastEffects.AddRange(def.SpellCastEffects);
 
 		return card;
-	}
-
-	private IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinintion(
-		string entitySelectorTypeName,
-		Dictionary<string, object> paramObj)
-	{
-		if (!_affectedEntitySelectors.TryGetValue(entitySelectorTypeName, out var t))
-			throw new Exception($"Unknown entitySelector: {entitySelectorTypeName}");
-
-		var instance = (IAffectedEntitySelector)Activator.CreateInstance(t)!;
-
-		instance.ConsumeParams(paramObj);
-		return instance;
-	}
-
-	public IGameAction CreateGameActionFromDefinition(string typeName, Dictionary<string, object> paramObj)
-	{
-		if (!_actions.TryGetValue(typeName, out var t))
-			throw new Exception($"Unknown entitySelector: {typeName}");
-
-		var action = (IGameAction)Activator.CreateInstance(t)!;
-		action.ConsumeParams(paramObj);
-		return action;
-	}
-
-	public ITriggerCondition CreateTriggerConditionFromDefinition(string typeName, Dictionary<string, object> paramObj)
-	{
-		if (typeName == null) { return null; }
-
-		if (!_triggerConditions.TryGetValue(typeName, out var t))
-			throw new Exception($"Unknown entitySelector: {typeName}");
-
-		var triggerCondition = (ITriggerCondition)Activator.CreateInstance(t)!;
-		triggerCondition.ConsumeParams(JsonParamHelper.Normalize(paramObj));
-		return triggerCondition;
-	}
-
-	public IAffectedEntitySelector CreateAffectedEntitySelectorFromDefinition(string typeName, Dictionary<string, object> paramObj)
-	{
-		if (typeName == null) { return null; }
-
-		if (!_affectedEntitySelectors.TryGetValue(typeName, out var t))
-			throw new Exception($"Unknown entitySelector: {typeName}");
-
-		var entitySelector = (IAffectedEntitySelector)Activator.CreateInstance(t)!;
-		entitySelector.ConsumeParams(JsonParamHelper.Normalize(paramObj));
-		return entitySelector;
 	}
 }
 
@@ -381,17 +258,13 @@ public abstract class CardDefinition
 	public string Id { get; set; }
 	public string Name { get; set; }
 	public int Cost { get; set; }
+	public ICastRestriction CastRestriction { get; set; }
+	public IValidTargetSelector ValidTargetSelector { get; set; }
 }
 
 public class SpellCardDefinition : CardDefinition
 {
-	public List<SpellCastEffectDefinition> SpellCastEffectDefinitions { get; set; }
-}
-
-public class SpellCastEffectDefinition
-{
-	public List<ActionDefinition> ActionDefintions { get; set; } = new();
-	public AffectedEntitySelectorDefinition AffectedEntitySelectorDefinition { get; set; }
+	public List<SpellCastEffect> SpellCastEffects { get; set; } = new();
 }
 
 public class MinionCardDefinition : CardDefinition
@@ -399,41 +272,12 @@ public class MinionCardDefinition : CardDefinition
 	public int Attack { get; set; }
 	public int Health { get; set; }
 	public List<MinionTribe> Tribes { get; set; }
-	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
+	public List<TriggeredEffect> TriggeredEffects { get; set; } = new();
 }
 
 public class WeaponCardDefinition : CardDefinition
 {
 	public int Attack { get; set; }
 	public int Durability { get; set; }
-	public List<TriggeredEffectDefinition> TriggeredEffectDefinitions { get; set; } = new();
-}
-
-public class TriggeredEffectDefinition
-{
-	public EffectTiming EffectTiming { get; set; }
-	public EffectTrigger EffectTrigger { get; set; }
-	public TriggerScope Scope { get; set; }
-	public TriggerConditionDefinition TriggerConditionDefintion { get; set; }
-	public ActionDefinition ActionDefintion { get; set; } // legacy, single-action shape — kept for backward compat
-	public List<ActionDefinition> ActionDefintions { get; set; }
-	public AffectedEntitySelectorDefinition AffectedEntitySelectorDefinition { get; set; }
-}
-
-public class ActionDefinition
-{
-	public string GameActionTypeName { get; set; }
-	public Dictionary<string, object> Params { get; set; }
-}
-
-public class TriggerConditionDefinition
-{
-	public string ConditionTypeName { get; set; }
-	public Dictionary<string, object> Params { get; set; }
-}
-
-public class AffectedEntitySelectorDefinition
-{
-	public string EntitySelectorTypeName { get; set; }
-	public Dictionary<string, object> Params { get; set; } = new();
+	public List<TriggeredEffect> TriggeredEffects { get; set; } = new();
 }

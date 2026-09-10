@@ -25,24 +25,4 @@ public class ContextSelector : AffectedEntitySelectorBase
 		if (IncludeSummonedMinion && context.SummonedMinion != null)
 			yield return context.SummonedMinion;
 	}
-
-	public override Dictionary<string, object> EmitParams()
-	{
-		var ret = new Dictionary<string, object>();
-
-		ret[nameof(IncludeTarget)] = IncludeTarget;
-		ret[nameof(IncludeSource)] = IncludeSource;
-		ret[nameof(IncludeSourcePlayer)] = IncludeSourcePlayer;
-		ret[nameof(IncludeTargetOwner)] = IncludeTargetOwner;
-
-		return ret;
-	}
-
-	public override void ConsumeParams(Dictionary<string, object> p)
-	{
-		IncludeTarget = p.TryGetValue("IncludeTarget", out var t) && (bool)t;
-		IncludeSource = p.TryGetValue("IncludeSource", out var s) && (bool)s;
-		IncludeSourcePlayer = p.TryGetValue("IncludeSourcePlayer", out var sp) && (bool)sp;
-		IncludeTargetOwner = p.TryGetValue("IncludeTargetOwner", out var to) && (bool)to;
-	}
 }

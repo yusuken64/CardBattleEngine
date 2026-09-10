@@ -1,18 +1,12 @@
-﻿{
-	"SpellCastEffectDefinitions": [
+{
+	"SpellCastEffects": [
 		{
-			"TargetType": 5,
-			"ActionDefintions": [
+			"GameActions": [
 				{
-					"GameActionTypeName": "DamageAction",
-					"Params": {
-						"Damage": 3
-					}
+					"$type": "CardBattleEngine.DamageAction, CardBattleEngine",
+					"Damage": { "$type": "CardBattleEngine.ConstantValue, CardBattleEngine", "Number": 3 }
 				},
-				{
-					"GameActionTypeName": "FreezeAction",
-					"Params": {}
-				}
+				{ "$type": "CardBattleEngine.FreezeAction, CardBattleEngine" }
 			]
 		}
 	],

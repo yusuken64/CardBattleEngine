@@ -41,22 +41,4 @@ public class SummonedMinionCondition : TriggerConditionBase
 				return false;
 		}
 	}
-
-
-	public override void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-		MinionTribe = Utils.GetEnum<MinionTribe>(actionParam, nameof(MinionTribe));
-		MinionToMinionRelationship = Utils.GetEnum<TeamRelationship>(actionParam, nameof(MinionToMinionRelationship));
-		ExcludeSelf = actionParam.TryGetValue(nameof(ExcludeSelf), out var val) && val is bool b && b;
-	}
-
-	public override Dictionary<string, object> EmitParams()
-	{
-		return new Dictionary<string, object>
-		{
-			{ nameof(MinionTribe), MinionTribe.ToString() },
-			{ nameof(MinionToMinionRelationship), MinionToMinionRelationship.ToString() },
-			{ nameof(ExcludeSelf), ExcludeSelf.ToString() }
-		};
-	}
 }

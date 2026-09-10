@@ -1,7 +1,7 @@
 {
   "Attack": 3,
   "Durability": 2,
-  "TriggeredEffectDefinitions": [],
+  "TriggeredEffects": [],
   "Type": "Weapon",
   "Id": "TestWeapon",
   "Name": "TestWeapon",

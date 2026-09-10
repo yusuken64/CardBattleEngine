@@ -6,8 +6,6 @@ public interface IGameAction
 	EffectTrigger EffectTrigger { get; }
 	bool IsValid(GameState gameState, ActionContext context, out string reason);
 	IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context);
-	Dictionary<string, object> EmitParams();
-	void ConsumeParams(Dictionary<string, object> actionParam);
 	object CustomSFX { get; set; } //this will be used the client to assosiated SFX To Action when animated
 	IGameAction Clone();
 }
@@ -51,14 +49,6 @@ public abstract class GameActionBase : IGameAction
 		return targets
 			.Where(t => t != null && t.IsAlive && t.Health > 0)
 			.ToList();
-	}
-	public virtual void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-	}
-
-	public virtual Dictionary<string, object> EmitParams()
-	{
-		return new();
 	}
 	public object CustomSFX { get; set; }
 

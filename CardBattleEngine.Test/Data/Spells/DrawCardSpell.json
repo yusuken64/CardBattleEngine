@@ -1,20 +1,10 @@
-﻿{
-	"SpellCastEffectDefinitions": [
+{
+	"SpellCastEffects": [
 		{
-			"TargetType": 7,
-			"ActionDefintions": [
-				{
-					"GameActionTypeName": "DrawCardFromDeckAction",
-					"Params": {}
-				},
-				{
-					"GameActionTypeName": "DrawCardFromDeckAction",
-					"Params": {}
-				},
-				{
-					"GameActionTypeName": "DrawCardFromDeckAction",
-					"Params": {}
-				}
+			"GameActions": [
+				{ "$type": "CardBattleEngine.DrawCardFromDeckAction, CardBattleEngine" },
+				{ "$type": "CardBattleEngine.DrawCardFromDeckAction, CardBattleEngine" },
+				{ "$type": "CardBattleEngine.DrawCardFromDeckAction, CardBattleEngine" }
 			]
 		}
 	],

@@ -8,13 +8,4 @@ public class RandomOperation : ITargetOperation
 	{
 		return state.ChooseRandom([.. input], Count.GetValue(state, context));
 	}
-
-	public void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-	}
-
-	public Dictionary<string, object> EmitParams()
-	{
-		return null;
-	}
 }

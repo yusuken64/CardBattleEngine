@@ -5,18 +5,16 @@
   "Cost": 1,
   "Attack": 1,
   "Health": 1,
-  "Tribe": null,
-  "TriggeredEffectDefinitions": [
+  "TriggeredEffects": [
     {
-      "EffectTiming": 1,
-      "EffectTrigger": 1,
-      "TargetType": 5,
-      "ActionDefintion": {
-        "GameActionTypeName": "DamageAction",
-        "Params": {
-          "Damage": 1
+      "EffectTiming": "Post",
+      "EffectTrigger": "Battlecry",
+      "GameActions": [
+        {
+          "$type": "CardBattleEngine.DamageAction, CardBattleEngine",
+          "Damage": { "$type": "CardBattleEngine.ConstantValue, CardBattleEngine", "Number": 1 }
         }
-      }
+      ]
     }
   ]
 }
