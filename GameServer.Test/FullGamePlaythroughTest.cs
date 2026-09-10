@@ -32,6 +32,127 @@ public class FullGamePlaythroughTest
 		await RunGame(pickFirst: false);
 	}
 
+	[TestMethod]
+	public async Task CreateMatch_WithCustomMinionDefinition_ResolvesServerSide()
+	{
+		var builder = WebApplication.CreateBuilder();
+		builder.WebHost.UseUrls("http://127.0.0.1:0");
+		builder.Logging.ClearProviders();
+		var app = ServerHost.Build(builder);
+		await app.StartAsync();
+
+		try
+		{
+			var addressesFeature = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>();
+			var baseUrl = addressesFeature!.Addresses.First();
+			var hubUrl = $"{baseUrl}/hubs/match";
+
+			var connectionA = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+			var connectionB = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+
+			connectionA.On<PlayerGameView>("OnStateUpdated", _ => { });
+			connectionB.On<PlayerGameView>("OnStateUpdated", _ => { });
+
+			await connectionA.StartAsync();
+			await connectionB.StartAsync();
+
+			try
+			{
+				var customCard = new CardBattleEngine.MinionCard("IntegrationTestOnlyMinion", cost: 2, attack: 99, health: 99);
+				var json = CardBattleEngine.CardDatabase.ToDefinitionJson(
+					CardBattleEngine.CardDatabase.ToMinionCardDefinition(customCard, "IntegrationTestOnlyMinion"));
+
+				var deckA = BuildDeck("Alice");
+				deckA.Minions.Add(new CardCount { CardId = "IntegrationTestOnlyMinion", Count = 1 });
+				deckA.CustomMinions.Add(json);
+
+				var matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", deckA);
+				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob"));
+				Assert.IsTrue(joinResult.Success, $"JoinMatch failed: {joinResult.Error}");
+
+				var view = await connectionA.InvokeAsync<PlayerGameView?>("GetState", matchId);
+				Assert.IsNotNull(view);
+
+				// deckA has 13 cards total (12 from BuildDeck + 1 custom minion) - if the custom card
+				// failed to resolve, MatchFactory would have thrown and JoinMatch would have failed above,
+				// so reaching here with the exact expected total confirms all 13 cards, including the
+				// custom one, made it into the deck.
+				Assert.AreEqual(13, view!.Self.HandCount + view.Self.DeckCount);
+			}
+			finally
+			{
+				await connectionA.StopAsync();
+				await connectionB.StopAsync();
+			}
+		}
+		finally
+		{
+			await app.StopAsync();
+			await app.DisposeAsync();
+		}
+	}
+
+	[TestMethod]
+	public async Task JoinMatch_WithConflictingCustomCardIds_Fails()
+	{
+		var builder = WebApplication.CreateBuilder();
+		builder.WebHost.UseUrls("http://127.0.0.1:0");
+		builder.Logging.ClearProviders();
+		var app = ServerHost.Build(builder);
+		await app.StartAsync();
+
+		try
+		{
+			var addressesFeature = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>();
+			var baseUrl = addressesFeature!.Addresses.First();
+			var hubUrl = $"{baseUrl}/hubs/match";
+
+			var connectionA = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+			var connectionB = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+
+			connectionA.On<PlayerGameView>("OnStateUpdated", _ => { });
+			connectionB.On<PlayerGameView>("OnStateUpdated", _ => { });
+
+			await connectionA.StartAsync();
+			await connectionB.StartAsync();
+
+			try
+			{
+				var cardA = new CardBattleEngine.MinionCard("ConflictingCard", cost: 1, attack: 1, health: 1);
+				var jsonA = CardBattleEngine.CardDatabase.ToDefinitionJson(
+					CardBattleEngine.CardDatabase.ToMinionCardDefinition(cardA, "ConflictingCard"));
+
+				var cardB = new CardBattleEngine.MinionCard("ConflictingCard", cost: 1, attack: 2, health: 2);
+				var jsonB = CardBattleEngine.CardDatabase.ToDefinitionJson(
+					CardBattleEngine.CardDatabase.ToMinionCardDefinition(cardB, "ConflictingCard"));
+
+				var deckA = BuildDeck("Alice");
+				deckA.Minions.Add(new CardCount { CardId = "ConflictingCard", Count = 1 });
+				deckA.CustomMinions.Add(jsonA);
+
+				var deckB = BuildDeck("Bob");
+				deckB.Minions.Add(new CardCount { CardId = "ConflictingCard", Count = 1 });
+				deckB.CustomMinions.Add(jsonB);
+
+				var matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", deckA);
+				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, deckB);
+
+				Assert.IsFalse(joinResult.Success, "Expected JoinMatch to fail when both decks submit conflicting custom cards under the same id.");
+				Assert.IsTrue(joinResult.Error != null && joinResult.Error.Contains("ConflictingCard"), $"Expected the error to mention the conflicting id. Actual: {joinResult.Error}");
+			}
+			finally
+			{
+				await connectionA.StopAsync();
+				await connectionB.StopAsync();
+			}
+		}
+		finally
+		{
+			await app.StopAsync();
+			await app.DisposeAsync();
+		}
+	}
+
 	private async Task RunGame(bool pickFirst)
 	{
 		var builder = WebApplication.CreateBuilder();
