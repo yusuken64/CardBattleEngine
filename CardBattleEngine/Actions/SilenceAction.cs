@@ -8,7 +8,8 @@ public class SilenceAction : GameActionBase
 	{
 		reason = null;
 		// Valid if the target exists and is alive
-		return context.Target != null && context.Target.IsAlive;
+		var single = context.Targets?.FirstOrDefault();
+		return single is { IsAlive: true };
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
@@ -17,7 +18,7 @@ public class SilenceAction : GameActionBase
 			yield break;
 
 		// Apply freeze
-		if (context.Target is Minion minion)
+		if (context.Targets?.FirstOrDefault() is Minion minion)
 		{
 			minion.IsFrozen = false;
 			minion.IsStealth = false;

@@ -6,7 +6,7 @@ public class TargetOwnerCondition : TriggerConditionBase
 
 	public override bool Evaluate(ActionContext context)
 	{
-		IGameEntity entity = context.Target;
+		IGameEntity entity = context.Targets?.FirstOrDefault();
 
 		switch (TeamRelationship)
 		{

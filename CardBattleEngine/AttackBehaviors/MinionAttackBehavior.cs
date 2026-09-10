@@ -124,7 +124,7 @@ public class MinionAttackBehavior : IAttackBehavior
 		{
 			SourcePlayer = attackingMinion.Owner,
 			Source = attackingMinion,
-			Target = target,
+			Targets = [target],
 			IsAttack = true,
 		});
 
@@ -137,7 +137,7 @@ public class MinionAttackBehavior : IAttackBehavior
 			}, new ActionContext()
 			{
 				SourcePlayer = attackingMinion.Owner,
-				Target = attackingMinion,
+				Targets = [attackingMinion],
 				Source = defendingMinion,
 			});
 		}

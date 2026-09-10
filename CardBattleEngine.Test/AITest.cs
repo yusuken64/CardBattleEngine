@@ -137,7 +137,7 @@ public class AITest
 				Assert.AreEqual(action.Item2.Source, decodedAction.Item2.Source,
 					"Action source mismatch");
 				// 3. Target entity matches (nullable)
-				Assert.AreEqual(action.Item2.Target, decodedAction.Item2.Target,
+				Assert.AreEqual(action.Item2.Targets?.FirstOrDefault(), decodedAction.Item2.Targets?.FirstOrDefault(),
 					"Action target mismatch");
 			}
 

@@ -55,7 +55,7 @@ public class RelicCard : Card
 			}
 			else
 			{
-				targets = [context.Target];
+				targets = context.Targets is { Count: > 0 } ? context.Targets : [null];
 			}
 
 			foreach (var target in targets)
@@ -65,7 +65,7 @@ public class RelicCard : Card
 					SourceCard = null,
 					Source = context.SummonedRelic,
 					SourcePlayer = context.SourcePlayer,
-					Target = target,
+					Targets = [target],
 				};
 
 				foreach (var gameAction in effect.GameActions)

@@ -21,7 +21,7 @@ public class WeaponTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = current
+			Targets = [current]
 		}, new AcquireWeaponAction { Weapon = weapon });
 
 		Assert.AreEqual(weapon, current.EquippedWeapon);
@@ -36,7 +36,7 @@ public class WeaponTest
 			{
 				SourcePlayer = current,
 				Source = current,
-				Target = opponent,
+				Targets = [opponent],
 			},
 			new AttackAction());
 
@@ -68,7 +68,7 @@ public class WeaponTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = current
+			Targets = [current]
 		}, new AcquireWeaponAction { Weapon = weapon });
 
 		Assert.AreSame(weapon, current.EquippedWeapon);
@@ -78,7 +78,7 @@ public class WeaponTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = current
+			Targets = [current]
 		}, new AcquireWeaponAction { Weapon = weapon2 });
 
 		Assert.AreSame(weapon2, current.EquippedWeapon, "The second weapon should now be equipped.");
@@ -125,7 +125,7 @@ public class WeaponTest
 		};
 
 		// Equip the weapon
-		engine.Resolve(state, new ActionContext { Target = attacker }, new AcquireWeaponAction { Weapon = weapon });
+		engine.Resolve(state, new ActionContext { Targets = [attacker] }, new AcquireWeaponAction { Weapon = weapon });
 
 		// Dummy target to attack
 		MinionCard card = new MinionCard("Defender", 1, 2, 5);
@@ -137,7 +137,7 @@ public class WeaponTest
 		engine.Resolve(state, new ActionContext()
 		{
 			Source = attacker,
-			Target = defender,
+			Targets = [defender],
 		}, new AttackAction());
 
 		Assert.AreEqual(1, weapon.Durability, "Weapon durability should reduce to 1 after first attack.");
@@ -149,7 +149,7 @@ public class WeaponTest
 		engine.Resolve(state, new ActionContext()
 		{
 			Source = attacker,
-			Target = defender,
+			Targets = [defender],
 		}, new AttackAction());
 
 		//Assert.AreEqual(0, weapon.Durability, "Weapon durability should reach 0 after second attack.");
@@ -245,7 +245,7 @@ public class WeaponTest
 			new ActionContext()
 			{
 				SourcePlayer = current,
-				Target = current
+				Targets = [current]
 			},
 			new AcquireWeaponAction()
 		{

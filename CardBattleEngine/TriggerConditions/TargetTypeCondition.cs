@@ -6,7 +6,7 @@ public class TargetTypeCondition : TriggerConditionBase
 
 	public override bool Evaluate(ActionContext context)
 	{
-		var target = context.Target;
+		var target = context.Targets?.FirstOrDefault();
 		if (target == null) return false;
 
 		return EntityTypeSelector.MatchesType(target, EntityTypes);

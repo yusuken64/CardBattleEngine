@@ -9,12 +9,12 @@ public class ChangeKeywordAction : GameActionBase
 	public override bool IsValid(GameState state, ActionContext context, out string reason)
 	{
 		reason = null;
-		return context.Target is Minion;
+		return context.Targets?.FirstOrDefault() is Minion;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (context.Target is Minion minion)
+		if (context.Targets?.FirstOrDefault() is Minion minion)
 		{
 			var hasKeyword = ChangeType == ChangeType.Add;
 

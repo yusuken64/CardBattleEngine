@@ -23,7 +23,7 @@ public class BattleEffectTest
 		player2.Board.Add(minion2);
 
 		var freezeMinionAction = new FreezeAction();
-		engine.Resolve(state, new ActionContext { Target = minion2, SourcePlayer = player1 }, freezeMinionAction);
+		engine.Resolve(state, new ActionContext { Targets = [minion2], SourcePlayer = player1 }, freezeMinionAction);
 
 		//enemy minion is frozen and hasn't missed attack yet
 		Assert.IsTrue(minion2.IsFrozen, "Enemy minion should be frozen");
@@ -31,7 +31,7 @@ public class BattleEffectTest
 
 		//Freeze enemy hero
 		var freezeHeroAction = new FreezeAction();
-		engine.Resolve(state, new ActionContext { Target = player2, SourcePlayer = player1 }, freezeHeroAction);
+		engine.Resolve(state, new ActionContext { Targets = [player2], SourcePlayer = player1 }, freezeHeroAction);
 
 		Assert.IsTrue(player2.IsFrozen, "Enemy hero should be frozen");
 
@@ -44,7 +44,7 @@ public class BattleEffectTest
 
 		// Act 3: Attempt attack with frozen minion
 		var attackAction = new AttackAction();
-		var attackContext = new ActionContext { Source = minion2, Target = minion1, SourcePlayer = player2 };
+		var attackContext = new ActionContext { Source = minion2, Targets = [minion1], SourcePlayer = player2 };
 		Assert.IsFalse(attackAction.IsValid(state, attackContext, out string _), "Frozen minion cannot attack");
 
 		// Act 5: End frozen player's turn -> freeze should wear off
@@ -171,7 +171,7 @@ public class BattleEffectTest
 		var actionContext = new ActionContext()
 		{
 			Source = player1.Board[0],
-			Target = player2.Board[2],
+			Targets = [player2.Board[2]],
 		};
 		engine.Resolve(state, actionContext, attackAction);
 
@@ -233,7 +233,7 @@ public class BattleEffectTest
 		var actionContext = new ActionContext()
 		{
 			Source = player1.Board[0],
-			Target = player2.Board[0],
+			Targets = [player2.Board[0]],
 		};
 		engine.Resolve(state, actionContext, attackAction);
 	}
@@ -313,7 +313,7 @@ public class BattleEffectTest
 			{
 				SourcePlayer = player1,
 				Source = player1,
-				Target = testMinion
+				Targets = [testMinion]
 			},
 			new DamageAction() { Damage = (Value)1 });
 
@@ -362,7 +362,7 @@ public class BattleEffectTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = minion
+			Targets = [minion]
 		}, new DeathAction());
 	}
 

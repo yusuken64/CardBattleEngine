@@ -106,7 +106,7 @@ public class GameState
 					{
 						SourcePlayer = actionContext.SourcePlayer,
 						Source = card,
-						Target = actionContext.SourcePlayer
+						Targets = [actionContext.SourcePlayer]
 					};
 					actions.Add((playCardAction, actionContext));
 					continue;
@@ -123,7 +123,7 @@ public class GameState
 							SourcePlayer = player,
 							SourceCard = card,
 							Source = card,
-							Target = target,
+							Targets = [target],
 						};
 						if (playCardAction.IsValid(this, actionContextTarget, out _))
 						{
@@ -159,7 +159,7 @@ public class GameState
 			{
 				Source = attacker,
 				SourcePlayer = player,
-				Target = OpponentOf(player)
+				Targets = [OpponentOf(player)]
 			};
 			if (attackHeroAction.IsValid(this, attackHeroActionContext, out string _))
 			{
@@ -173,7 +173,7 @@ public class GameState
 				{
 					Source = attacker,
 					SourcePlayer = player,
-					Target = defender
+					Targets = [defender]
 				};
 				if (attackAction.IsValid(
 					this,

@@ -14,7 +14,7 @@ public class CleaveOperation : ITargetOperation
 
 	public IEnumerable<IGameEntity> Apply(IEnumerable<IGameEntity> input, GameState state, ActionContext context)
 	{
-		if (context.Target is not Minion target)
+		if (context.Targets?.FirstOrDefault() is not Minion target)
 			yield break;
 
 		var board = target.Owner.Board;

@@ -23,7 +23,7 @@ public class RelicTest
 		{
 			SourcePlayer = player,
 			SourceCard = relicCard,
-			Target = player,
+			Targets = [player],
 		};
 
 		// Act
@@ -190,7 +190,7 @@ public class RelicTest
 		var context = new ActionContext()
 		{
 			SourcePlayer = player,
-			Target = relic,
+			Targets = [relic],
 		};
 
 		// Act
@@ -220,7 +220,7 @@ public class RelicTest
 		var context = new ActionContext()
 		{
 			SourcePlayer = state.CurrentPlayer,
-			Target = relic,
+			Targets = [relic],
 		};
 		engine.Resolve(state, context, damageAction);
 
@@ -258,7 +258,7 @@ public class RelicTest
 		{
 			SourcePlayer = player,
 			Source = relic,
-			Target = opponent,
+			Targets = [opponent],
 		};
 
 		// Act - activate ability first time
@@ -351,14 +351,14 @@ public class RelicTest
 				{
 					SourcePlayer = player,
 					Source = relic,
-					Target = opponent
+					Targets = [opponent]
 				}
 			};
 			var context = new ActionContext()
 			{
 				SourcePlayer = player,
 				Source = relic,
-				Target = opponent
+				Targets = [opponent]
 			};
 			engine.Resolve(state, context, triggerAction);
 
@@ -403,7 +403,7 @@ public class RelicTest
 		{
 			SourcePlayer = player,
 			SourceCard = relicCard,
-			Target = player
+			Targets = [player]
 		};
 
 		// Act & Assert
@@ -442,7 +442,7 @@ public class RelicTest
 		{
 			SourcePlayer = player,
 			SourceCard = minionCard,
-			Target = player
+			Targets = [player]
 		};
 
 		// Act & Assert

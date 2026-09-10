@@ -16,7 +16,7 @@ public class SigilTest
 		var context = new ActionContext()
 		{
 			SourcePlayer = player1,
-			Target = player1
+			Targets = [player1]
 		};
 
 		Assert.AreEqual(0, player1.Sigils.Count, "No sigils initially");
@@ -124,14 +124,14 @@ public class SigilTest
 			{
 				SourcePlayer = player,
 				Source = minion1,
-				Target = opponent
+				Targets = [opponent]
 			}
 		};
 		engine.Resolve(state, new ActionContext()
 		{
 			SourcePlayer = player,
 			Source = minion1,
-			Target = opponent
+			Targets = [opponent]
 		}, triggerAction1);
 
 		healthAfterFirstAttack = opponent.Health;
@@ -146,14 +146,14 @@ public class SigilTest
 			{
 				SourcePlayer = player,
 				Source = minion2,
-				Target = opponent
+				Targets = [opponent]
 			}
 		};
 		engine.Resolve(state, new ActionContext()
 		{
 			SourcePlayer = player,
 			Source = minion2,
-			Target = opponent
+			Targets = [opponent]
 		}, triggerAction2);
 
 		// Assert - health should not change on second trigger
@@ -226,7 +226,7 @@ public class SigilTest
 		{
 			SourcePlayer = player2,
 			SourceCard = spell,
-			Target = player1
+			Targets = [player1]
 		}, new PlayCardAction() { Card = spell });
 
 		// Assert - sigil should NOT be removed (unlike a Secret)
@@ -271,7 +271,7 @@ public class SigilTest
 		{
 			SourcePlayer = player1,
 			SourceCard = spellCard,
-			Target = player1
+			Targets = [player1]
 		}, new PlayCardAction() { Card = spellCard });
 
 		// Assert

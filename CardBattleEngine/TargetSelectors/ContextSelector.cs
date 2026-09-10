@@ -10,8 +10,9 @@ public class ContextSelector : AffectedEntitySelectorBase
 
 	public override IEnumerable<IGameEntity> Select(GameState state, ActionContext context)
 	{
-		if (IncludeTarget && context.Target != null)
-			yield return context.Target;
+		if (IncludeTarget && context.Targets != null)
+			foreach (var t in context.Targets)
+				yield return t;
 
 		if (IncludeSource && context.Source != null)
 			yield return context.Source;
@@ -19,8 +20,10 @@ public class ContextSelector : AffectedEntitySelectorBase
 		if (IncludeSourcePlayer && context.SourcePlayer != null)
 			yield return context.SourcePlayer;
 
-		if (IncludeTargetOwner && context.Target?.Owner != null)
-			yield return context.Target.Owner;
+		if (IncludeTargetOwner)
+			foreach (var t in context.Targets ?? Enumerable.Empty<IGameEntity>())
+				if (t.Owner != null)
+					yield return t.Owner;
 
 		if (IncludeSummonedMinion && context.SummonedMinion != null)
 			yield return context.SummonedMinion;

@@ -7,11 +7,11 @@ public class StatValue : Value
 
 	public override int GetValue(GameState state, ActionContext context)
 	{
-		IGameEntity entity = context.Target;
+		IGameEntity entity = context.Targets?.FirstOrDefault();
 		switch (EntityContextProvider)
 		{
 			case ContextProvider.Target:
-				entity = context.Target;
+				entity = context.Targets?.FirstOrDefault();
 				break;
 			case ContextProvider.Source:
 				entity = context.Source;

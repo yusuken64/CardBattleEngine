@@ -67,11 +67,11 @@ public class CardBattleEngineBenchmark
 	//	}
 
 	//	engine.Resolve(gameState,
-	//		new ActionContext() 
+	//		new ActionContext()
 	//		{
 	//			SourcePlayer = p1,
-	//			Source = p1.Board[0], 
-	//			Target = p2.Board[0],
+	//			Source = p1.Board[0],
+	//			Targets = [p2.Board[0]],
 	//		}, new AttackAction());
 	//}
 
@@ -101,7 +101,7 @@ public class CardBattleEngineBenchmark
 	//		{
 	//			SourcePlayer = p1,
 	//			Source = p1.Board[0],
-	//			Target = p2.Board[0],
+	//			Targets = [p2.Board[0]],
 	//		}, new AttackAction());
 	//}
 
@@ -147,7 +147,7 @@ public class CardBattleEngineBenchmark
 	//		{
 	//			SourcePlayer = p1,
 	//			Source = p1.Board[0],
-	//			Target = p2.Board[0],
+	//			Targets = [p2.Board[0]],
 	//		}, new AttackAction());
 	//}
 
@@ -327,8 +327,8 @@ public class CardBattleEngineBenchmark
 			Source = context.Source == null ? null :
 				simState.GetEntityById(context.Source.Id),
 
-			Target = context.Target == null ? null :
-				simState.GetEntityById(context.Target.Id),
+			Targets = context.Targets is { Count: > 0 } ?
+				[simState.GetEntityById(context.Targets.FirstOrDefault().Id)] : null,
 		};
 	}
 

@@ -22,7 +22,6 @@ public class DestroyWeaponAction : GameActionBase
 			if (destroyWeaponTarget is not Player player)
 				yield break;
 
-			context.Target = player;
 			var weapon = player.EquippedWeapon;
 			if (weapon == null || weapon.TriggeredEffects == null)
 			{
@@ -60,7 +59,7 @@ public class DestroyWeaponAction : GameActionBase
 						{
 							SourcePlayer = weapon.Owner,
 							Source = weapon.Owner,
-							Target = target
+							Targets = [target]
 						});
 					}
 				}

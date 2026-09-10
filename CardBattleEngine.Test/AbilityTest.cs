@@ -36,7 +36,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = card,
-			Target = opponent,
+			Targets = [opponent],
 		};
 		engine.Resolve(state, actionContext, play);
 
@@ -95,7 +95,7 @@ public class AbilityTest
 		var damage = new DamageAction() { Damage = (Value)minionEntity.Health };
 		engine.Resolve(state, new ActionContext
 		{
-			Target = minionEntity,
+			Targets = [minionEntity],
 		}, damage);
 
 		// Assert
@@ -146,7 +146,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = abusiveCard,
-			Target = current.Board[0]
+			Targets = [current.Board[0]]
 		};
 		engine.Resolve(state, actionContext, playCardAction);
 
@@ -243,7 +243,7 @@ public class AbilityTest
 		{
 			SourcePlayer = current,
 			SourceCard = freezeMinionCard,
-			Target = enemyMinion,
+			Targets = [enemyMinion],
 		};
 
 		// Act
@@ -294,7 +294,7 @@ public class AbilityTest
 			var context = new ActionContext
 			{
 				Source = attacker,
-				Target = stealthMinion,
+				Targets = [stealthMinion],
 				SourcePlayer = opponent
 			};
 
@@ -306,7 +306,7 @@ public class AbilityTest
 		var attackContext = new ActionContext
 		{
 			Source = stealthMinion,
-			Target = opponent,
+			Targets = [opponent],
 			SourcePlayer = current
 		};
 		var attack = new AttackAction();
@@ -360,7 +360,7 @@ public class AbilityTest
 		var attackContext = new ActionContext
 		{
 			Source = chargeMinion,
-			Target = opponent,
+			Targets = [opponent],
 			SourcePlayer = current
 		};
 		Assert.IsTrue(attackAction.IsValid(state, attackContext, out string _), "Charge minion attack should be valid");
@@ -409,7 +409,7 @@ public class AbilityTest
 			new ActionContext()
 			{
 				SourcePlayer = opponent,
-				Target = divineMinion
+				Targets = [divineMinion]
 			},
 			new DamageAction() { Damage = (Value)1 });
 
@@ -421,7 +421,7 @@ public class AbilityTest
 			new ActionContext()
 			{
 				SourcePlayer = opponent,
-				Target = divineMinion
+				Targets = [divineMinion]
 			},
 			new DamageAction() { Damage = (Value)1 });
 
@@ -468,7 +468,7 @@ public class AbilityTest
 		var attackContext = new ActionContext
 		{
 			Source = poisonMinion,
-			Target = targetMinion,
+			Targets = [targetMinion],
 			SourcePlayer = current
 		};
 

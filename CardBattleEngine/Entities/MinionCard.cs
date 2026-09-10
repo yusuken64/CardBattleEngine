@@ -71,7 +71,7 @@ public class MinionCard : Card
 			}
 			else
 			{
-				targets = [context.Target];
+				targets = context.Targets is { Count: > 0 } ? context.Targets : [null];
 			}
 
 			foreach (var target in targets)
@@ -81,7 +81,7 @@ public class MinionCard : Card
 					SourceCard = null,
 					Source = context.SummonedMinion,
 					SourcePlayer = context.SourcePlayer,
-					Target = target,
+					Targets = [target],
 					PlayIndex = originalIndex
 				};
 

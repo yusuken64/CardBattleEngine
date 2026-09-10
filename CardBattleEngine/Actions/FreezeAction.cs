@@ -8,7 +8,8 @@ public class FreezeAction : GameActionBase
 	{
 		reason = null;
 		// Valid if the target exists and is alive
-		return context.Target != null && context.Target.IsAlive;
+		var single = context.Targets?.FirstOrDefault();
+		return single is { IsAlive: true };
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
@@ -17,14 +18,14 @@ public class FreezeAction : GameActionBase
 			yield break;
 
 		// Apply freeze
-		if (context.Target is Minion minion)
+		if (context.Targets?.FirstOrDefault() is Minion minion)
 		{
 			minion.IsFrozen = true;
 			minion.MissedAttackFromFrozen = false;
 			context.ResolvedStatusChanges.Add(
 				new StatusDelta(minion, StatusType.Freeze, true));
 		}
-		else if (context.Target is Player hero)
+		else if (context.Targets?.FirstOrDefault() is Player hero)
 		{
 			hero.IsFrozen = true;
 		}

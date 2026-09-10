@@ -182,12 +182,12 @@ namespace CardBattleEngine.Test
 					Source = current,
 					SourcePlayer = current,
 					SourceCard = weapon,
-					Target = current,
+					Targets = [current],
 				},
 				new PlayCardAction() { Card = weapon });
 
 			AttackAction attackAction = new AttackAction();
-			ActionContext attackContext = new() { Source = current, Target = oppoenent };
+			ActionContext attackContext = new() { Source = current, Targets = [oppoenent] };
 			var attackIsValid = attackAction.IsValid(gameState,
 				attackContext,
 				out _);
@@ -206,8 +206,8 @@ namespace CardBattleEngine.Test
 				Source = attackContext.Source == null ? null :
 				simState.GetEntityById(attackContext.Source.Id),
 
-				Target = attackContext.Target == null ? null :
-				simState.GetEntityById(attackContext.Target.Id),
+				Targets = attackContext.Targets?.FirstOrDefault() == null ? null :
+				[simState.GetEntityById(attackContext.Targets.FirstOrDefault().Id)],
 			};
 			var cloneAttackIsValid = attackAction.IsValid(simState, cloneContext, out _);
 
@@ -227,7 +227,7 @@ namespace CardBattleEngine.Test
 				{
 					Source = current,
 					SourcePlayer = current,
-					Target = current,
+					Targets = [current],
 				},
 				new AddStatModifierAction() 
 				{
@@ -236,7 +236,7 @@ namespace CardBattleEngine.Test
 				});
 
 			AttackAction attackAction = new AttackAction();
-			ActionContext attackContext = new() { Source = current, Target = oppoenent };
+			ActionContext attackContext = new() { Source = current, Targets = [oppoenent] };
 			var attackIsValid = attackAction.IsValid(gameState,
 				attackContext,
 				out _);
@@ -255,8 +255,8 @@ namespace CardBattleEngine.Test
 				Source = attackContext.Source == null ? null :
 				simState.GetEntityById(attackContext.Source.Id),
 
-				Target = attackContext.Target == null ? null :
-				simState.GetEntityById(attackContext.Target.Id),
+				Targets = attackContext.Targets?.FirstOrDefault() == null ? null :
+				[simState.GetEntityById(attackContext.Targets.FirstOrDefault().Id)],
 			};
 			var cloneAttackIsValid = attackAction.IsValid(simState, cloneContext, out _);
 
@@ -290,7 +290,7 @@ namespace CardBattleEngine.Test
 					Source = current,
 					SourcePlayer = current,
 					SourceCard = weaponCard,
-					Target = current,
+					Targets = [current],
 				},
 				new PlayCardAction() { Card = weaponCard });
 
@@ -299,7 +299,7 @@ namespace CardBattleEngine.Test
 			var originalId = weapon.Id;
 
 			engine.Resolve(gameState,
-				new ActionContext() { Source = current, SourcePlayer = current, Target = weapon },
+				new ActionContext() { Source = current, SourcePlayer = current, Targets = [weapon] },
 				new AddStatModifierAction()
 				{
 					AttackChange = (Value)3,

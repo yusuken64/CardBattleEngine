@@ -24,7 +24,7 @@ public class SpellTest
 		{
 			SourcePlayer = current,
 			SourceCard = spellCard,
-			Target = current
+			Targets = [current]
 		}, new PlayCardAction { Card = spellCard });
 
 		Assert.AreEqual(initialHandCount + 2, current.Hand.Count, "Player should have drawn three cards.");
@@ -54,7 +54,7 @@ public class SpellTest
 		{
 			SourcePlayer = current,
 			SourceCard = spellCard,
-			Target = enemyMinion,
+			Targets = [enemyMinion],
 		}, new PlayCardAction { Card = spellCard });
 
 		// Assert
@@ -91,7 +91,7 @@ public class SpellTest
 		{
 			SourcePlayer = current,
 			SourceCard = spellCard,
-			Target = null,
+			Targets = null,
 		}, new PlayCardAction { Card = spellCard });
 
 		// Assert - All enemy minions should have taken 5 damage
@@ -196,7 +196,7 @@ public class SpellTest
 			SourceCard = spell,
 			Source = current,
 			SourcePlayer = current,
-			Target = opponent.Board[0]
+			Targets = [opponent.Board[0]]
 		};
 
 		Assert.AreEqual(0, opponent.Hand.Count(), "Hand is empty");
@@ -280,7 +280,7 @@ public class SpellTest
 			state,
 			new ActionContext()
 			{
-				Target = current,
+				Targets = [current],
 				SourcePlayer = current,
 			},
 			new PlayCardAction()
@@ -290,12 +290,12 @@ public class SpellTest
 
 		Assert.IsTrue(current.Hand.Any(x => x.Name == "FireBall"));
 		Assert.AreEqual(1, current.Hand.Count());
-		
+
 		engine.Resolve(
 			state,
 			new ActionContext()
 			{
-				Target = current,
+				Targets = [current],
 				SourcePlayer = current,
 			},
 			new PlayCardAction()
@@ -322,7 +322,7 @@ public class SpellTest
 			state,
 			new ActionContext()
 			{
-				Target = current,
+				Targets = [current],
 				SourcePlayer = current,
 			},
 			new PlayCardAction()
@@ -337,7 +337,7 @@ public class SpellTest
 			state,
 			new ActionContext()
 			{
-				Target = current,
+				Targets = [current],
 				SourcePlayer = current,
 			},
 			new PlayCardAction()
@@ -417,11 +417,11 @@ public class SpellTest
 
 		engine.Resolve(
 			state,
-			new ActionContext() 
+			new ActionContext()
 			{
 				SourcePlayer = current,
 				Source = shadowFlame,
-				Target = current.Board[0],
+				Targets = [current.Board[0]],
 			},
 			new PlayCardAction()
 			{

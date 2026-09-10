@@ -16,14 +16,14 @@ public class PlayCardAction : GameActionBase
 		var validTargets = Card.ValidTargetSelector?.Select(state, actionContext.SourcePlayer, Card);
 		if (validTargets != null &&
 			validTargets.Any() &&
-			!validTargets.Contains(actionContext.Target))
+			!validTargets.Contains(actionContext.Targets?.FirstOrDefault()))
 		{
 			reason = "Invalid Target";
 			return false;
 		}
 
-		if (actionContext.Target != null &&
-			actionContext.Target is Minion minion &&
+		if (actionContext.Targets is { Count: > 0 } &&
+			actionContext.Targets?.FirstOrDefault() is Minion minion &&
 			(minion.IsStealth || minion.Elusive) &&
 			minion.Owner != actionContext.SourcePlayer)
 		{

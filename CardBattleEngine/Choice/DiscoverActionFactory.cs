@@ -14,7 +14,7 @@ public class DiscoverActionFactory : IActionFactory
 						new ActionContext()
 						{
 							SourcePlayer = sourcePlayer,
-							Target = item
+							Targets = [item]
 						});
 					break;
 				case DiscoverAction.Gain:

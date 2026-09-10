@@ -12,8 +12,8 @@ public class HeroPowerAction : GameActionBase
 			return false;
 		}
 
-		if (context.Target != null &&
-			context.Target is Minion minion &&
+		if (context.Targets is { Count: > 0 } &&
+			context.Targets?.FirstOrDefault() is Minion minion &&
 			(minion.IsStealth || minion.Elusive) &&
 			minion.Owner != context.SourcePlayer)
 		{
@@ -41,7 +41,7 @@ public class HeroPowerAction : GameActionBase
 			}
 			else
 			{
-				targets = [context.Target];
+				targets = context.Targets is { Count: > 0 } ? context.Targets : [null];
 			}
 
 			foreach (var target in targets)
@@ -50,7 +50,7 @@ public class HeroPowerAction : GameActionBase
 				{
 					SourcePlayer = context.SourcePlayer,
 					Source = context.Source,
-					Target = target,
+					Targets = [target],
 					SourceCard = context.SourceCard,
 				};
 

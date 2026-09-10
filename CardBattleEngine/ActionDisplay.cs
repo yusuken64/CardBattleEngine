@@ -10,7 +10,7 @@ public static class ActionDisplay
 	{
 		if (action is AttackAction)
 		{
-			return $"Attack: {DescribeEntity(context.Source)} -> {DescribeEntity(context.Target)}";
+			return $"Attack: {DescribeEntity(context.Source)} -> {DescribeEntity(context.Targets?.FirstOrDefault())}";
 		}
 
 		return action.ToString();

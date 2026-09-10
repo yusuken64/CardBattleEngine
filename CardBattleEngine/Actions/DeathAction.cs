@@ -7,22 +7,26 @@ public class DeathAction : GameActionBase
 	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
 		reason = null;
-		return actionContext.Target.IsAlive;
+		return actionContext.Targets?.FirstOrDefault()?.IsAlive == true;
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
 		// Kill target
-		actionContext.Target.IsAlive = false;
+		var firstTarget = actionContext.Targets?.FirstOrDefault();
+		if (firstTarget != null)
+		{
+			firstTarget.IsAlive = false;
+		}
 
-		if (actionContext.Target is Player player)
+		if (firstTarget is Player player)
 		{
 			yield return (new EndGameAction(), new ActionContext()
 			{
 				SourcePlayer = state.OpponentOf(player),
 			});
 		}
-		if (actionContext.Target is Minion minion)
+		if (firstTarget is Minion minion)
 		{
 			// Move to graveyard
 			int index = minion.Owner.Board.IndexOf(minion);
@@ -53,7 +57,7 @@ public class DeathAction : GameActionBase
 							{
 								SourcePlayer = minion.Owner,
 								Source = minion,
-								Target = target,
+								Targets = [target],
 								PlayIndex = index,
 							});
 					}
@@ -74,7 +78,7 @@ public class DeathAction : GameActionBase
 					});
 			}
 		}
-		if (actionContext.Target is Relic relic)
+		if (firstTarget is Relic relic)
 		{
 			relic.Owner.Board.Remove(relic);
 		}

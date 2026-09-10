@@ -65,6 +65,7 @@ public class ActionContext
 	public Card SourceCard;
 	public IGameEntity Source;
 	public List<IGameEntity> Targets;
+	public TargetRequirement PendingTargetRequirement;
 	public StatModifier Modifier;
 
 	public IAffectedEntitySelector AffectedEntitySelector;
@@ -81,6 +82,7 @@ public class ActionContext
 		this.SourceCard = context.SourceCard;
 		this.Source = context.Source;
 		this.Targets = context.Targets;
+		this.PendingTargetRequirement = context.PendingTargetRequirement;
 		this.Modifier = context.Modifier;
 		this._variables = context._variables == null ? null : new(context._variables);
 		this._affectedEntities = context._affectedEntities == null ? null : [.. context._affectedEntities];

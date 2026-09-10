@@ -5,7 +5,7 @@ public class AttackAction : GameActionBase
 
 	public override bool IsValid(GameState state, ActionContext context, out string reason)
 	{
-		return context.Source.AttackBehavior.CanAttack(context.Source, context.Target, state, out reason);
+		return context.Source.AttackBehavior.CanAttack(context.Source, context.Targets?.FirstOrDefault(), state, out reason);
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
@@ -24,7 +24,7 @@ public class AttackAction : GameActionBase
 			player.IsStealth = false;
 		}
 
-		return context.Source.AttackBehavior.GenerateDamageActions(context.Source, context.Target, state);
+		return context.Source.AttackBehavior.GenerateDamageActions(context.Source, context.Targets?.FirstOrDefault(), state);
 	}
 }
 

@@ -66,7 +66,7 @@ public class HistoryTest
 
 		// Arrange: temporary buff that expires on OnTurnEnd/Post, same pattern the
 		// engine uses for "until end of turn" effects (see AbilityTest.BattleCry_BuffMinion)
-		engine.Resolve(state, new ActionContext { Target = minion }, new AddStatModifierAction()
+		engine.Resolve(state, new ActionContext { Targets = [minion] }, new AddStatModifierAction()
 		{
 			AttackChange = (Value)2,
 			ExpirationTrigger = new ExpirationTrigger()

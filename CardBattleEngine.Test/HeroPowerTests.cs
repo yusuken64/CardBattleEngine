@@ -20,7 +20,7 @@ public class HeroPowerTests
 		{
 			SourcePlayer = current,
 			SourceHeroPower = current.HeroPower, // null
-			Target = opponent
+			Targets = [opponent]
 		};
 
 		// Should NOT be valid
@@ -62,7 +62,7 @@ public class HeroPowerTests
 		{
 			SourcePlayer = current,
 			SourceHeroPower = current.HeroPower,
-			Target = opponent
+			Targets = [opponent]
 		};
 
 		Assert.IsTrue(action.IsValid(state, context, out string _));

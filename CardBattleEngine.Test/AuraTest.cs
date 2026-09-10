@@ -87,7 +87,7 @@ public class AuraTest
 		// Remove aura minion (simulate death)
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = auraMurloc
+			Targets = [auraMurloc]
 		}, new DeathAction());
 
 		// Aura should be gone, so attack returns to normal
@@ -106,7 +106,7 @@ public class AuraTest
 		Minion minion = new(testMinion, current);
 		current.Board.Add(minion);
 
-		engine.Resolve(state, new ActionContext() { Target = minion }, new AddStatModifierAction()
+		engine.Resolve(state, new ActionContext() { Targets = [minion] }, new AddStatModifierAction()
 		{
 			AttackChange = (Value)1,
 			HealthChange = (Value)1,
@@ -134,7 +134,7 @@ public class AuraTest
 		// Act 1: +2/+2 (additive)
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new AddStatModifierAction
 			{
 				AttackChange = (Value)2,
@@ -150,7 +150,7 @@ public class AuraTest
 		// Act 2: Set attack to 1 (set, attack only)
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new AddStatModifierAction
 			{
 				AttackChange = (Value)1,
@@ -166,7 +166,7 @@ public class AuraTest
 		// Act 3: +3 attack (additive after set)
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new AddStatModifierAction
 			{
 				AttackChange = (Value)3,
@@ -182,7 +182,7 @@ public class AuraTest
 		// Act 4: Set health to 4 (set health only)
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new AddStatModifierAction
 			{
 				AttackChange = null,
@@ -215,7 +215,7 @@ public class AuraTest
 
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new DamageAction
 			{
 				Damage = (Value)3
@@ -227,7 +227,7 @@ public class AuraTest
 
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new AddStatModifierAction
 			{
 				HealthChange = (Value)1,
@@ -240,7 +240,7 @@ public class AuraTest
 
 		engine.Resolve(
 			state,
-			new ActionContext { Target = minion },
+			new ActionContext { Targets = [minion] },
 			new AddStatModifierAction
 			{
 				HealthChange = (Value)(-1),
@@ -324,7 +324,7 @@ public class AuraTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = murloc
+			Targets = [murloc]
 		}, new DamageAction()
 		{
 			Damage = (Value)1
@@ -334,7 +334,7 @@ public class AuraTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = murloc
+			Targets = [murloc]
 		}, new DamageAction()
 		{
 			Damage = (Value)1
@@ -344,7 +344,7 @@ public class AuraTest
 
 		engine.Resolve(state, new ActionContext()
 		{
-			Target = murloc
+			Targets = [murloc]
 		}, new DamageAction()
 		{
 			Damage = (Value)1

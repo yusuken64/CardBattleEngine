@@ -38,7 +38,7 @@ public class HealTests
 		{
 			SourcePlayer = lifestealMinion.Owner,
 			Source = lifestealMinion,
-			Target = dummy,
+			Targets = [dummy],
 		};
 
 		engine.Resolve(state, context, action);

@@ -35,7 +35,7 @@ public class CastSpellAction : GameActionBase
 					{
 						SourcePlayer = context.SourcePlayer,
 						Source = context.Source,
-						Target = target,
+						Targets = [target],
 						SourceCard = context.SourceCard,
 						AffectedEntitySelector = null,
 					};
@@ -50,7 +50,7 @@ public class CastSpellAction : GameActionBase
 				{
 					SourcePlayer = context.SourcePlayer,
 					Source = context.Source,
-					Target = null,
+					Targets = null,
 					SourceCard = context.SourceCard,
 					AffectedEntitySelector = selector,
 				};

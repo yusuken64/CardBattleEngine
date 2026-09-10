@@ -151,7 +151,8 @@ public static class GameStateVectorizer
 		};
 
 		int source = GetSourceIndex(ctx.Source, state);
-		int target = GetTargetIndex(ctx.Target, state);
+		// AI action space is intentionally single-target for now; multi-target cards will require future extension
+		int target = GetTargetIndex(ctx.Targets?.FirstOrDefault(), state);
 		int hand = GetHandIndex(ctx.SourceCard, state);
 
 		return
@@ -264,7 +265,7 @@ public static class GameStateVectorizer
 					new ActionContext
 					{
 						Source = source,
-						Target = target
+						Targets = target is null ? null : [target]
 					}
 				);
 
@@ -280,7 +281,7 @@ public static class GameStateVectorizer
 						new ActionContext
 						{
 							Source = card,
-							Target = target
+							Targets = target is null ? null : [target]
 						}
 					);
 				}
@@ -290,7 +291,7 @@ public static class GameStateVectorizer
 					new HeroPowerAction(),
 					new ActionContext
 					{
-						Target = target
+						Targets = target is null ? null : [target]
 					}
 				);
 

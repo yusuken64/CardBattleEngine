@@ -49,14 +49,14 @@ public class TargetTest
 		var canTargetOpponent = playCardAction.IsValid(state, new ActionContext()
 		{
 			Source = current,
-			Target = opponent
+			Targets = [opponent]
 		}, out _);
 
 		Assert.IsTrue(canTargetOpponent);
 		var canTargetStealthMinion = playCardAction.IsValid(state, new ActionContext()
 		{
 			Source = current,
-			Target = stealthMinion
+			Targets = [stealthMinion]
 		}, out _);
 
 		Assert.IsFalse(canTargetStealthMinion);
@@ -85,14 +85,14 @@ public class TargetTest
 		var canTargetOpponent = attackAction.IsValid(state, new ActionContext()
 		{
 			Source = current,
-			Target = opponent
+			Targets = [opponent]
 		}, out _);
 
 		Assert.IsTrue(canTargetOpponent);
 		var canTargetStealthMinion = attackAction.IsValid(state, new ActionContext()
 		{
 			Source = current,
-			Target = stealthMinion
+			Targets = [stealthMinion]
 		}, out _);
 
 		Assert.IsFalse(canTargetStealthMinion);
@@ -137,14 +137,14 @@ public class TargetTest
 		var canTargetOpponent = playCardAction.IsValid(state, new ActionContext()
 		{
 			Source = current,
-			Target = opponent
+			Targets = [opponent]
 		}, out _);
 
 		Assert.IsTrue(canTargetOpponent);
 		var canTargetElusiveMinion = playCardAction.IsValid(state, new ActionContext()
 		{
 			Source = current,
-			Target = elusiveMinion
+			Targets = [elusiveMinion]
 		}, out _);
 
 		Assert.IsFalse(canTargetElusiveMinion);

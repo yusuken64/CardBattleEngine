@@ -28,7 +28,7 @@ public class DiscoverTests
 
 		engine.Resolve(state, actions[0].Item2, actions[0].Item1);
 		var drawCardAction = actions[0].Item1 as DrawTargetCardFromDeckAction;
-		Assert.IsTrue(player.Hand.Contains(actions[0].Item2.Target));
+		Assert.IsTrue(player.Hand.Contains(actions[0].Item2.Targets?.FirstOrDefault()));
 	}
 
 	[TestMethod]

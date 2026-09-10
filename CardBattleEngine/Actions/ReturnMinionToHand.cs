@@ -9,7 +9,7 @@ public class ReturnMinionToCard : GameActionBase
 
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
-		if (context.Target is not Minion minion)
+		if (context.Targets?.FirstOrDefault() is not Minion minion)
 		{
 			reason = null;
 			return false;
@@ -28,7 +28,7 @@ public class ReturnMinionToCard : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (context.Target is Minion minion)
+		if (context.Targets?.FirstOrDefault() is Minion minion)
 		{
 			int index = minion.Owner.Board.IndexOf(minion);
 			minion.Owner.Board.Remove(minion);
@@ -54,7 +54,7 @@ public class ReturnMinionToCard : GameActionBase
 					new ActionContext(context)
 					{
 						SourcePlayer = owner,
-						Target = owner
+						Targets = [owner]
 					});
 
 				if (gainCard.action.IsValid(state, gainCard.context, out string _))
@@ -72,7 +72,7 @@ public class ReturnMinionToCard : GameActionBase
 					(new AddCardToDeckAction { Card = minion.OriginalCard.Clone() },
 					new ActionContext(context)
 					{
-						Target = owner
+						Targets = [owner]
 					});
 
 				if (addCard.action.IsValid(state, addCard.context, out var _))

@@ -16,7 +16,7 @@ public class SecretAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (context.Target is Player player)
+		if (context.Targets?.FirstOrDefault() is Player player)
 		{
 			player.Secrets.Add(Secret);
 			Secret.Owner = player;

@@ -21,7 +21,7 @@ public class EquipWeaponAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (context.Target is Player player)
+		if (context.Targets?.FirstOrDefault() is Player player)
 		{
 			player.EquipWeapon(Weapon);
 		}
@@ -37,7 +37,7 @@ public class EquipWeaponAction : GameActionBase
 				}
 				else
 				{
-					targets = [context.Target];
+					targets = context.Targets is { Count: > 0 } ? context.Targets : [null];
 				}
 
 				foreach (var target in targets)
@@ -47,7 +47,7 @@ public class EquipWeaponAction : GameActionBase
 						SourceCard = null,
 						Source = context.SummonedMinion,
 						SourcePlayer = context.SourcePlayer,
-						Target = target,
+						Targets = [target],
 					};
 
 					foreach (var gameAction in effect.GameActions)

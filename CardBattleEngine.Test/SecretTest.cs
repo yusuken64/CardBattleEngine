@@ -54,7 +54,7 @@ public class SecretTest
 		{
 			SourcePlayer = player1,
 			SourceCard = secretCard,
-			Target = player1,
+			Targets = [player1],
 		};
 
 		Assert.IsTrue(action.IsValid(state, actionContext, out string _));
@@ -87,7 +87,7 @@ public class SecretTest
 			SourcePlayer = player2,
 			Source = player2,
 			SourceCard = fireball,
-			Target = player1
+			Targets = [player1]
 		}, playFireball);
 
 		// Assert — spell should be canceled, Counterspell should trigger and disappear

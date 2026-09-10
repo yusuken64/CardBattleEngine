@@ -28,7 +28,7 @@ public class TriggerEffectAction : GameActionBase
 				Source = TriggerSource.Entity,
 				SourcePlayer = TriggerSource.Entity.Owner,
 				AffectedEntitySelector = TriggeredEffect.AffectedEntitySelector,
-				Target = context.Target,
+				Targets = context.Targets,
 				OriginalAction = context.OriginalAction,
 				OriginalContext = context.OriginalContext,
 				OriginalSource = context.Source,
@@ -49,7 +49,7 @@ public class TriggerEffectAction : GameActionBase
 				{
 					SourcePlayer = relic.Owner,
 					Source = relic,
-					Target = relic,
+					Targets = [relic],
 				});
 			}
 		}

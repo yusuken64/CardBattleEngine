@@ -201,7 +201,7 @@ public static class PlayerViewBuilder
 				Index = i,
 				ActionType = action.GetType().Name,
 				SourceEntityId = context.Source?.Id,
-				TargetEntityId = context.Target?.Id,
+				TargetEntityId = context.Targets?.FirstOrDefault()?.Id,
 				DisplayName = ActionDisplay.Describe(action, context),
 			});
 		}
@@ -217,10 +217,10 @@ public static class PlayerViewBuilder
 			PlayerId = entry.Player?.Id ?? Guid.Empty,
 			ActionType = entry.Action?.GetType().Name,
 			SourceId = context?.Source?.Id ?? context?.SourceCard?.Id,
-			TargetId = context?.Target?.Id,
+			TargetId = context?.Targets?.FirstOrDefault()?.Id,
 			SourceName = EntityName(context?.Source) ?? context?.SourceCard?.Name,
 			SourceCardId = EntityCardId(context?.Source) ?? EntityCardId(context?.SourceCard),
-			TargetName = EntityName(context?.Target),
+			TargetName = EntityName(context?.Targets?.FirstOrDefault()),
 			DamageDealt = context?.DamageDealt,
 			HealedAmount = context?.HealedAmount,
 		};

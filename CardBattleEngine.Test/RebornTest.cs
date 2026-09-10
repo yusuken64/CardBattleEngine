@@ -46,7 +46,7 @@ public class RebornTest
 		{
 			SourcePlayer = current,
 			Source = minion,
-			Target = minion
+			Targets = [minion]
 		};
 
 		var killAction = new DeathAction();

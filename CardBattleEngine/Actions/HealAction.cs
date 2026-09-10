@@ -8,11 +8,12 @@ public class HealAction : GameActionBase
 	public override bool IsValid(GameState gameState, ActionContext actionContext, out string reason)
 	{
 		reason = null;
+		var target = actionContext.Targets?.FirstOrDefault();
 		return
 			actionContext.AffectedEntitySelector != null ||
-			(actionContext.Target != null &&
-			 actionContext.Target.IsAlive &&
-			 actionContext.Target.Health < actionContext.Target.MaxHealth);
+			(target != null &&
+			 target.IsAlive &&
+			 target.Health < target.MaxHealth);
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)

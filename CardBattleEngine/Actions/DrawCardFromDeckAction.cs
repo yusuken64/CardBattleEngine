@@ -32,12 +32,14 @@ public class DrawTargetCardFromDeckAction : GameActionBase
 	public override bool IsValid(GameState state, ActionContext actionContext, out string reason)
 	{
 		reason = null;
-		return actionContext.SourcePlayer.Deck.Contains(actionContext.Target);
+		var single = actionContext.Targets?.FirstOrDefault();
+		return single != null && actionContext.SourcePlayer.Deck.Contains(single);
 	}
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext actionContext)
 	{
-		var card = actionContext.SourcePlayer.Deck.FirstOrDefault(x => x == actionContext.Target);
+		var single = actionContext.Targets?.FirstOrDefault();
+		var card = actionContext.SourcePlayer.Deck.FirstOrDefault(x => x == single);
 		if (card != null)
 		{
 			actionContext.SourcePlayer.Deck.Remove(card);
@@ -89,7 +91,7 @@ public class AddCardToDeckAction : GameActionBase
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		Player player;
-		if (context.Target is Player targetPlayer)
+		if (context.Targets?.FirstOrDefault() is Player targetPlayer)
 		{
 			player = targetPlayer;
 		}
@@ -107,7 +109,7 @@ public class AddCardToDeckAction : GameActionBase
 		if (!IsValid(state, actionContext, out var _)) { return []; }
 
 		Player player;
-		if (actionContext.Target is Player targetPlayer)
+		if (actionContext.Targets?.FirstOrDefault() is Player targetPlayer)
 		{
 			player = targetPlayer;
 		}

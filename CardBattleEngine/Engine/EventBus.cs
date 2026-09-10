@@ -25,7 +25,7 @@ public class EventBus
 				{
 					SourcePlayer = source.Entity.Owner,
 					Source = source.Entity,
-					Target = null,
+					Targets = null,
 				};
 
 				if (auraEffect.Condition != null && !auraEffect.Condition.Evaluate(effectContext))
@@ -78,7 +78,7 @@ public class EventBus
 				{
 					SourcePlayer = triggerSource.Entity.Owner,
 					Source = triggerSource.Entity,
-					Target = context.Target,
+					Targets = context.Targets,
 					SummonedMinion = context.SummonedMinion,
 					PlayIndex = context.PlayIndex,
 					SourceCard = context.SourceCard,
@@ -114,7 +114,7 @@ public class EventBus
 					{
 						Source = minion,
 						SourcePlayer = minion.Owner,
-						Target = minion,
+						Targets = [minion],
 						Modifier = effect.Item2,
 						AffectedEntitySelector = null
 					});

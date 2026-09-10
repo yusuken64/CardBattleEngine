@@ -51,7 +51,6 @@ public class DamageAction : GameActionBase
 			actionContext.DamageDealt = actualDamageDealt + armorBlocked;
 			actionContext.HealthDamageDealt = actualDamageDealt;
 			actionContext.ArmorDamageDealt = armorBlocked;
-			actionContext.Target = target;
 			actionContext.AffectedEntities.Add((target, actionContext.DamageDealt));
 
 			// Lifesteal: heal source for actual damage dealt
@@ -69,7 +68,7 @@ public class DamageAction : GameActionBase
 					{
 						SourcePlayer = attackingMinion.Owner,
 						Source = attackingMinion,
-						Target = attackingMinion.Owner
+						Targets = [attackingMinion.Owner]
 					});
 			}
 
@@ -93,7 +92,7 @@ public class DamageAction : GameActionBase
 				{
 					SourcePlayer = actionContext.SourcePlayer,
 					Source = target,
-					Target = target,
+					Targets = [target],
 					AffectedEntitySelector = actionContext.AffectedEntitySelector
 				});
 			}

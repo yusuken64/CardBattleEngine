@@ -83,7 +83,7 @@ public class CombatTest
 		var ctx1 = new ActionContext()
 		{
 			Source = wfMinion,
-			Target = opponent,
+			Targets = [opponent],
 			SourcePlayer = current
 		};
 		Assert.IsTrue(new AttackAction().IsValid(state, ctx1, out string _));
@@ -96,7 +96,7 @@ public class CombatTest
 		var ctx2 = new ActionContext()
 		{
 			Source = wfMinion,
-			Target = opponent,
+			Targets = [opponent],
 			SourcePlayer = current
 		};
 		Assert.IsTrue(new AttackAction().IsValid(state, ctx2, out string _),
@@ -110,7 +110,7 @@ public class CombatTest
 		var ctx3 = new ActionContext()
 		{
 			Source = wfMinion,
-			Target = opponent,
+			Targets = [opponent],
 			SourcePlayer = current
 		};
 		Assert.IsFalse(new AttackAction().IsValid(state, ctx3, out string _),
@@ -219,7 +219,7 @@ public class CombatTest
 			new ActionContext()
 			{
 				SourcePlayer = current,
-				Target = current.Board[1]
+				Targets = [current.Board[1]]
 			},
 			new DamageAction
 			{

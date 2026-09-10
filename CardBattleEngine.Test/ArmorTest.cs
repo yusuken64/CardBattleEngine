@@ -57,7 +57,7 @@ public class ArmorTest
 			new ActionContext()
 			{
 				Source = player2,
-				Target = player1.Board[0]
+				Targets = [player1.Board[0]]
 			},
 			new DamageAction() { Damage = (Value)1 });
 
@@ -68,7 +68,7 @@ public class ArmorTest
 			new ActionContext()
 			{
 				Source = player2,
-				Target = player1
+				Targets = [player1]
 			},
 			new DamageAction() { Damage = (Value)1 });
 
@@ -79,7 +79,7 @@ public class ArmorTest
 			new ActionContext()
 			{
 				Source = player2.Board[0],
-				Target = player1
+				Targets = [player1]
 			},
 			new DamageAction() { Damage = (Value)1 });
 

@@ -133,7 +133,7 @@ public class PlayerViewBuilderTests
 		{
 			SourcePlayer = player1,
 			SourceCard = secretCard,
-			Target = player1,
+			Targets = [player1],
 		}, new PlayCardAction { Card = secretCard });
 
 		var castEntries = state.History.Skip(historyBeforeCast).ToList();
@@ -160,7 +160,7 @@ public class PlayerViewBuilderTests
 		{
 			SourcePlayer = player2,
 			SourceCard = fireball,
-			Target = player1,
+			Targets = [player1],
 		}, new PlayCardAction { Card = fireball });
 
 		Assert.AreEqual(0, player1.Secrets.Count, "Secret should have resolved and been removed.");
@@ -253,7 +253,7 @@ public class PlayerViewBuilderTests
 			SourcePlayer = player1,
 			Source = spellCard,
 			SourceCard = spellCard,
-			Target = player1,
+			Targets = [player1],
 		}, new PlayCardAction { Card = spellCard });
 
 		var newEntries = state.History.Skip(historyBefore).ToList();
@@ -304,7 +304,7 @@ public class PlayerViewBuilderTests
 		{
 			SourcePlayer = player1,
 			SourceCard = secretCard,
-			Target = player1,
+			Targets = [player1],
 		}, new PlayCardAction { Card = secretCard });
 
 		var castEntries = state.History.Skip(historyBefore).ToList();

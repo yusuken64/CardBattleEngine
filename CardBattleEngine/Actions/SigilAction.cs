@@ -14,7 +14,7 @@ public class SigilAction : GameActionBase
 
 	public override IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context)
 	{
-		if (context.Target is Player player)
+		if (context.Targets?.FirstOrDefault() is Player player)
 		{
 			player.Sigils.Add(Sigil);
 			Sigil.Owner = player;

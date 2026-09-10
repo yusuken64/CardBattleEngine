@@ -17,7 +17,7 @@ public class FatigueAction : GameActionBase
 		{
 			SourcePlayer = context.SourcePlayer,
 			//Source = context.SourcePlayer,
-			Target = context.SourcePlayer
+			Targets = [context.SourcePlayer]
 		};
 		yield return (new DamageAction() { Damage = (Value)context.SourcePlayer.Fatigue }, actionContext);
 	}

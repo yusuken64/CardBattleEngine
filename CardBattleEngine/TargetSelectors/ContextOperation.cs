@@ -9,8 +9,9 @@ public class ContextOperation : ITargetOperation
 
 	public IEnumerable<IGameEntity> Apply(IEnumerable<IGameEntity> input, GameState state, ActionContext context)
 	{
-		if (IncludeTarget)
-			yield return context.Target;
+		if (IncludeTarget && context.Targets != null)
+			foreach (var t in context.Targets)
+				yield return t;
 
 		if (IncludeSource)
 			yield return context.Source;

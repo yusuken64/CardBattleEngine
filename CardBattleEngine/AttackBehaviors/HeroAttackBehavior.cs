@@ -101,7 +101,7 @@ public class HeroAttackBehavior : IAttackBehavior
 			{
 				SourcePlayer = hero,
 				Source = hero,
-				Target = target,
+				Targets = [target],
 				IsAttack = true,
 			});
 
@@ -120,7 +120,7 @@ public class HeroAttackBehavior : IAttackBehavior
 					{
 						SourcePlayer = hero,
 						Source = hero,
-						Target = hero
+						Targets = [hero]
 					});
 			}
 		}
@@ -134,7 +134,7 @@ public class HeroAttackBehavior : IAttackBehavior
 			}, new ActionContext()
 			{
 				SourcePlayer = defendingMinion.Owner,
-				Target = hero,
+				Targets = [hero],
 				Source = defendingMinion,
 			});
 		}
