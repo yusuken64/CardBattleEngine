@@ -31,9 +31,9 @@ public abstract class GameActionBase : IGameAction
 		{
 			targets = context.AffectedEntitySelector.Select(state, context);
 		}
-		else if (context.Target != null)
+		else if (context.Targets != null && context.Targets.Count > 0)
 		{
-			targets = [context.Target];
+			targets = context.Targets;
 		}
 		else if (context.SourcePlayer != null)
 		{
@@ -64,7 +64,7 @@ public class ActionContext
 	public Player SourcePlayer;
 	public Card SourceCard;
 	public IGameEntity Source;
-	public IGameEntity Target;
+	public List<IGameEntity> Targets;
 	public StatModifier Modifier;
 
 	public IAffectedEntitySelector AffectedEntitySelector;
@@ -80,7 +80,7 @@ public class ActionContext
 		this.SourcePlayer = context.SourcePlayer;
 		this.SourceCard = context.SourceCard;
 		this.Source = context.Source;
-		this.Target = context.Target;
+		this.Targets = context.Targets;
 		this.Modifier = context.Modifier;
 		this._variables = context._variables == null ? null : new(context._variables);
 		this._affectedEntities = context._affectedEntities == null ? null : [.. context._affectedEntities];
