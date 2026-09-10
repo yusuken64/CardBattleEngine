@@ -1,5 +1,15 @@
 ﻿using GameRunner;
+using CardBattleEngine;
 
+// Check for POC test mode via command line argument
+if (args.Length > 0 && args[0] == "--test-poc")
+{
+	// Run automated POC test
+	PocTestDriver.RunTests();
+	return;
+}
+
+// Normal tournament mode
 MonteCarloModel model = new MonteCarloModel("../../../Data/Model");
 OracleAgent.OracleBrain brain = new OracleAgent.OracleBrain()
 {
