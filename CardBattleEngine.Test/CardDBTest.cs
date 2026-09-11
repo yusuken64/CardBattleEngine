@@ -19,6 +19,20 @@ public class CardDBTest
 	}
 
 	[TestMethod]
+	public void LoadWeaponDBTest()
+	{
+		CardDatabase cardDatabase = new(DBPath);
+
+		Player owner = new Player("Test");
+		WeaponCard weapon = cardDatabase.GetWeaponCard("TestWeapon", owner);
+
+		Assert.IsNotNull(weapon);
+		Assert.AreEqual(3, weapon.Attack);
+		Assert.AreEqual(2, weapon.Durability);
+		Assert.AreEqual(2, weapon.ManaCost);
+	}
+
+	[TestMethod]
 	public void CreateMinionDefinitionTest()
 	{
 		MinionCard card = new MinionCard("SaveTest", 2, 2, 2);
@@ -243,25 +257,17 @@ public class CardDBTest
 		Assert.AreEqual(card.ManaCost, spellDef.Cost, "Mana cost should match");
 		Assert.AreEqual(CardType.Spell, spellDef.Type, "Type should be Spell");
 
-		// Check that SpellCastEffectDefinitions was serialized correctly
-		Assert.AreEqual(1, spellDef.SpellCastEffectDefinitions.Count, "Should have one SpellCastEffectDefinition");
-		var effectDef = spellDef.SpellCastEffectDefinitions[0];
+		// Check that SpellCastEffects were serialized/deserialized natively (no intermediate Definition DTO)
+		Assert.AreEqual(1, spellDef.SpellCastEffects.Count, "Should have one SpellCastEffect");
+		var effect = spellDef.SpellCastEffects[0];
 
-		// Verify the selector definition
-		Assert.IsNotNull(effectDef.AffectedEntitySelectorDefinition, "Effect should have a selector definition");
-		var selectorDef = effectDef.AffectedEntitySelectorDefinition!;
-		Assert.AreEqual("TargetOperationSelector", selectorDef.EntitySelectorTypeName, "Selector type name should match");
+		// Verify the selector round-tripped as a real, concrete IAffectedEntitySelector
+		Assert.IsInstanceOfType(effect.AffectedEntitySelector, typeof(TargetOperationSelector), "Selector type should match");
 
-		Assert.IsNotNull(selectorDef.Params, "Selector definition params should not be null");
-		//Assert.IsTrue(selectorDef.Params.ContainsKey("Operations"), "Selector should have Operations param");
-
-		// Check that the action definition is correct
-		Assert.AreEqual(1, effectDef.ActionDefintions.Count, "Should have one GameAction");
-		var damageActionDef = effectDef.ActionDefintions[0];
-		Assert.AreEqual("DamageAction", damageActionDef.GameActionTypeName, "Action type should be DamageAction");
-
-		Assert.IsTrue(damageActionDef.Params.ContainsKey("Damage"), "DamageAction should have Damage param");
-		//Assert.AreEqual(5, JsonParamHelper.GetValue<int>(damageActionDef.Params, "Damage"), "Damage value should be 5");
+		// Check that the action round-tripped as a real, concrete IGameAction
+		Assert.AreEqual(1, effect.GameActions.Count, "Should have one GameAction");
+		Assert.IsInstanceOfType(effect.GameActions[0], typeof(DamageAction), "Action type should be DamageAction");
+		Assert.AreEqual(5, ((DamageAction)effect.GameActions[0]).Damage.GetValue(null, null), "Damage value should be 5");
 	}
 
 
@@ -295,19 +301,93 @@ public class CardDBTest
 		Assert.AreEqual(CardType.Spell, spellDef.Type, "Type should be Spell");
 
 		// Check that SpellCastEffects were serialized and deserialized correctly
-		Assert.AreEqual(1, spellDef.SpellCastEffectDefinitions.Count, "Should have one SpellCastEffectDefinition");
+		Assert.AreEqual(1, spellDef.SpellCastEffects.Count, "Should have one SpellCastEffect");
 
-		var effectDef = spellDef.SpellCastEffectDefinitions[0];
-		Assert.IsNotNull(effectDef.ActionDefintions, "Action definitions should not be null");
-		Assert.AreEqual(2, effectDef.ActionDefintions.Count, "Should have two GameActions");
+		var effect = spellDef.SpellCastEffects[0];
+		Assert.IsNotNull(effect.GameActions, "Game actions should not be null");
+		Assert.AreEqual(2, effect.GameActions.Count, "Should have two GameActions");
 
-		var damageAction = effectDef.ActionDefintions[0];
-		var freezeAction = effectDef.ActionDefintions[1];
+		Assert.IsInstanceOfType(effect.GameActions[0], typeof(DamageAction), "First action should be DamageAction");
+		Assert.IsInstanceOfType(effect.GameActions[1], typeof(FreezeAction), "Second action should be FreezeAction");
+		Assert.AreEqual(3, ((DamageAction)effect.GameActions[0]).Damage.GetValue(null, null), "Damage value should be 3");
+	}
 
-		Assert.AreEqual("DamageAction", damageAction.GameActionTypeName, "First action should be DamageAction");
-		Assert.AreEqual("FreezeAction", freezeAction.GameActionTypeName, "Second action should be FreezeAction");
+	[TestMethod]
+	public void CreateWeaponDefinitionTest_RoundTrip()
+	{
+		WeaponCard card = new WeaponCard("TestSwordRoundTrip", cost: 3, attack: 4, durabilty: 2);
 
-		Assert.IsTrue(damageAction.Params.ContainsKey("Damage"), "DamageAction should have Damage param");
-		//Assert.AreEqual(3, JsonParamHelper.GetValue<int>(damageAction.Params, "Damage"), "Damage value should be 3");
+		var json = CardDatabase.CreateJsonFromWeaponCard(card, "SaveTestWeapon");
+		var loadedCard = CardDatabase.LoadCardFromJson(json);
+
+		Assert.IsNotNull(loadedCard, "Loaded card should not be null");
+		Assert.IsInstanceOfType(loadedCard, typeof(WeaponCardDefinition), "Loaded card should be a WeaponCardDefinition");
+
+		var weaponDef = (WeaponCardDefinition)loadedCard;
+
+		Assert.AreEqual("SaveTestWeapon", weaponDef.Id, "Card Id should match");
+		Assert.AreEqual(card.Name, weaponDef.Name, "Card name should match");
+		Assert.AreEqual(card.ManaCost, weaponDef.Cost, "Mana cost should match");
+		Assert.AreEqual(CardType.Weapon, weaponDef.Type, "Type should be Weapon");
+		Assert.AreEqual(4, weaponDef.Attack, "Attack should match");
+		Assert.AreEqual(2, weaponDef.Durability, "Durability should match");
+	}
+
+	[TestMethod]
+	public void BuildMinionCard_FromInlineDefinition_MatchesGetMinionCard()
+	{
+		var def = new MinionCardDefinition
+		{
+			Type = CardType.Minion,
+			Id = "InlineOnlyMinion",
+			Name = "Inline Only Minion",
+			Cost = 2,
+			Attack = 3,
+			Health = 4,
+			Tribes = new List<MinionTribe> { MinionTribe.Murloc },
+		};
+
+		var cardDatabase = new CardDatabase(DBPath);
+		var owner = new Player("Test");
+
+		var card = cardDatabase.BuildMinionCard(def, owner);
+
+		Assert.AreEqual("Inline Only Minion", card.Name);
+		Assert.AreEqual(2, card.ManaCost);
+		Assert.AreEqual(3, card.Attack);
+		Assert.AreEqual(4, card.Health);
+		Assert.IsTrue(card.MinionTribes.Contains(MinionTribe.Murloc));
+		Assert.AreEqual(owner, card.Owner);
+	}
+
+	[TestMethod]
+	public void DamageAction_SupportsNonConstantValueProvider_StatValue()
+	{
+		// Proves the functional gap in the old EmitParams/ConsumeParams scheme is fixed: DamageAction.Damage
+		// can now be any IValueProvider (e.g. "deal damage equal to source's attack"), not just a constant int.
+		var card = new MinionCard("StatValueBattlecryMinion", cost: 1, attack: 5, health: 1);
+		card.TriggeredEffects.Add(new TriggeredEffect()
+		{
+			EffectTrigger = EffectTrigger.Battlecry,
+			EffectTiming = EffectTiming.Post,
+			GameActions = new List<IGameAction>()
+			{
+				new DamageAction()
+				{
+					Damage = new StatValue { EntityStat = Stat.Attack, EntityContextProvider = ContextProvider.Source },
+				}
+			},
+		});
+
+		var json = CardDatabase.CreateFileFromMinionCard(card, ".\\Data\\", "StatValueBattlecryMinion");
+		var loadedCard = CardDatabase.LoadCardFromJson(json);
+
+		Assert.IsInstanceOfType(loadedCard, typeof(MinionCardDefinition));
+		var minionDef = (MinionCardDefinition)loadedCard;
+
+		Assert.AreEqual(1, minionDef.TriggeredEffects.Count);
+		var action = minionDef.TriggeredEffects[0].GameActions[0];
+		Assert.IsInstanceOfType(action, typeof(DamageAction));
+		Assert.IsInstanceOfType(((DamageAction)action).Damage, typeof(StatValue), "Damage should round-trip as a StatValue, not collapse to a constant");
 	}
 }

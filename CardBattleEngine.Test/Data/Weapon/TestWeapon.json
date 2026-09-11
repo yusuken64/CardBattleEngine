@@ -1,0 +1,9 @@
+{
+  "Attack": 3,
+  "Durability": 2,
+  "TriggeredEffects": [],
+  "Type": "Weapon",
+  "Id": "TestWeapon",
+  "Name": "TestWeapon",
+  "Cost": 2
+}

@@ -32,6 +32,7 @@ public class WeaponCard : Card
 		return new WeaponCard(Name, ManaCost, Attack, Durability)
 		{
 			Id = Id,
+			CardId = CardId,
 			Owner = Owner,
 			SpriteID = SpriteID,
 			Description = Description,

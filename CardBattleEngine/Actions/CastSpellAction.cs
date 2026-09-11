@@ -4,15 +4,6 @@ public class CastSpellAction : GameActionBase
 {
 	public override EffectTrigger EffectTrigger => EffectTrigger.SpellCast;
 
-	public override void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-	}
-
-	public override Dictionary<string, object> EmitParams()
-	{
-		return new();
-	}
-
 	public override bool IsValid(GameState gameState, ActionContext context, out string reason)
 	{
 		reason = null;

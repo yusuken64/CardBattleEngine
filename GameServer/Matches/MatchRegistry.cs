@@ -43,9 +43,7 @@ public class MatchRegistry
 			return false;
 		}
 
-		match = CreateMatchFromDecks(matchId, pending.HostConnectionId, pending.HostDeck, joinerConnectionId, joinerDeck);
-		error = null;
-		return true;
+		return TryCreateMatchFromDecks(matchId, pending.HostConnectionId, pending.HostDeck, joinerConnectionId, joinerDeck, out match, out error);
 	}
 
 	// Pairs this connection with whoever is already waiting and returns the created match, or - if no
@@ -65,7 +63,7 @@ public class MatchRegistry
 
 			var opponentDeck = _waiting[opponent];
 			_waiting.Remove(opponent);
-			return CreateMatchFromDecks(MatchId.New(), opponent, opponentDeck, connectionId, deck);
+			return TryCreateMatchFromDecks(MatchId.New(), opponent, opponentDeck, connectionId, deck, out var newMatch, out _) ? newMatch : null;
 		}
 	}
 
@@ -100,34 +98,136 @@ public class MatchRegistry
 		}
 	}
 
-	private Match CreateMatchFromDecks(MatchId id, string connection1, DecklistRequest deck1, string connection2, DecklistRequest deck2)
+	private bool TryMergeCustomDefinitions(
+		DecklistRequest deck1,
+		DecklistRequest deck2,
+		out Dictionary<string, MinionCardDefinition> minions,
+		out Dictionary<string, SpellCardDefinition> spells,
+		out Dictionary<string, WeaponCardDefinition> weapons,
+		out string? error)
 	{
+		minions = new Dictionary<string, MinionCardDefinition>();
+		spells = new Dictionary<string, SpellCardDefinition>();
+		weapons = new Dictionary<string, WeaponCardDefinition>();
+		error = null;
+
+		if (!TryMergeOne(deck1, "1", minions, spells, weapons, out error)) return false;
+		if (!TryMergeOne(deck2, "2", minions, spells, weapons, out error)) return false;
+
+		return true;
+	}
+
+	private bool TryMergeOne(
+		DecklistRequest deck,
+		string playerLabel,
+		Dictionary<string, MinionCardDefinition> minions,
+		Dictionary<string, SpellCardDefinition> spells,
+		Dictionary<string, WeaponCardDefinition> weapons,
+		out string? error)
+	{
+		foreach (var json in deck.CustomMinions)
+		{
+			if (!TryParseCustom<MinionCardDefinition>(json, "minion", playerLabel, minions, out error)) return false;
+		}
+
+		foreach (var json in deck.CustomSpells)
+		{
+			if (!TryParseCustom<SpellCardDefinition>(json, "spell", playerLabel, spells, out error)) return false;
+		}
+
+		foreach (var json in deck.CustomWeapons)
+		{
+			if (!TryParseCustom<WeaponCardDefinition>(json, "weapon", playerLabel, weapons, out error)) return false;
+		}
+
+		error = null;
+		return true;
+	}
+
+	private bool TryParseCustom<TDef>(
+		string json,
+		string kind,
+		string playerLabel,
+		Dictionary<string, TDef> target,
+		out string? error) where TDef : CardDefinition
+	{
+		CardDefinition? parsed;
+		try
+		{
+			parsed = CardDatabase.LoadCardFromJson(json);
+		}
+		catch (Exception ex)
+		{
+			error = $"Player {playerLabel} sent an invalid custom {kind} definition: {ex.Message}";
+			return false;
+		}
+
+		if (parsed is not TDef def || string.IsNullOrEmpty(def.Id))
+		{
+			error = $"Player {playerLabel} sent an invalid custom {kind} definition: could not parse as a {kind} with a non-empty Id.";
+			return false;
+		}
+
+		if (target.ContainsKey(def.Id))
+		{
+			error = $"Both players submitted a custom card with id '{def.Id}' - custom card ids must be unique within a match.";
+			return false;
+		}
+
+		target[def.Id] = def;
+		error = null;
+		return true;
+	}
+
+	private bool TryCreateMatchFromDecks(MatchId id, string connection1, DecklistRequest deck1, string connection2, DecklistRequest deck2, out Match? match, out string? error)
+	{
+		if (!TryMergeCustomDefinitions(deck1, deck2, out var customMinions, out var customSpells, out var customWeapons, out error))
+		{
+			match = null;
+			return false;
+		}
+
 		var player1 = new Player(deck1.PlayerName);
 		var player2 = new Player(deck2.PlayerName);
 
 		var rngSeed = (ulong)Random.Shared.NextInt64();
 
-		var gameState = MatchFactory.CreateMatch(
-			_cardDb,
-			player1,
-			deck1.Minions.Select(c => (c.CardId, c.Count)),
-			deck1.Spells.Select(c => (c.CardId, c.Count)),
-			player2,
-			deck2.Minions.Select(c => (c.CardId, c.Count)),
-			deck2.Spells.Select(c => (c.CardId, c.Count)),
-			rngSeed);
-
-		var match = new Match(id, gameState, new GameEngine())
+		try
 		{
-			ConnectionIdPlayer1 = connection1,
-			ConnectionIdPlayer2 = connection2,
-		};
+			var gameState = MatchFactory.CreateMatch(
+				_cardDb,
+				player1,
+				deck1.Minions.Select(c => (c.CardId, c.Count)),
+				deck1.Spells.Select(c => (c.CardId, c.Count)),
+				deck1.Weapons.Select(c => (c.CardId, c.Count)),
+				player2,
+				deck2.Minions.Select(c => (c.CardId, c.Count)),
+				deck2.Spells.Select(c => (c.CardId, c.Count)),
+				deck2.Weapons.Select(c => (c.CardId, c.Count)),
+				rngSeed,
+				customMinions,
+				customSpells,
+				customWeapons);
 
-		_matches[id] = match;
-		_connectionToMatch[connection1] = id;
-		_connectionToMatch[connection2] = id;
+			match = new Match(id, gameState, new GameEngine())
+			{
+				ConnectionIdPlayer1 = connection1,
+				ConnectionIdPlayer2 = connection2,
+			};
 
-		return match;
+			_matches[id] = match;
+			_connectionToMatch[connection1] = id;
+			_connectionToMatch[connection2] = id;
+
+			error = null;
+			return true;
+		}
+		catch (Exception ex)
+		{
+			match = null;
+			error = $"Failed to build match from decklists: {ex.Message}";
+			return false;
+		}
 	}
 
 	private record PendingMatch(string HostConnectionId, DecklistRequest HostDeck);

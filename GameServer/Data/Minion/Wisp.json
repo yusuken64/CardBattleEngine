@@ -2,7 +2,7 @@
   "Attack": 1,
   "Health": 1,
   "Tribe": [ "None" ],
-  "TriggeredEffectDefinitions": [],
+  "TriggeredEffects": [],
   "Type": "Minion",
   "Id": "Wisp",
   "Name": "Wisp",

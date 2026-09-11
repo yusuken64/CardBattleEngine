@@ -21,13 +21,4 @@ public class SelectWeaponOperation : ITargetOperation
 			}
 		}
 	}
-
-	public void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-	}
-
-	public Dictionary<string, object> EmitParams()
-	{
-		return [];
-	}
 }

@@ -3,9 +3,9 @@ namespace CardBattleEngine;
 // Builds a real (non-test) GameState from actual decklists and a caller-supplied RNG seed - unlike
 // GameFactory.CreateTestGame(), which hardcodes both the deck contents and the RNG seed (1) for
 // deterministic unit tests, this is what a game server uses to start an actual match. CardDatabase
-// has no unified "any card type" lookup (GetMinionCard/GetSpellCard are separate, each throwing
-// KeyNotFoundException on a miss), so minion/spell ids are taken as separate lists rather than
-// adding a new lookup method to CardDatabase.
+// has no unified "any card type" lookup (GetMinionCard/GetSpellCard/GetWeaponCard are separate, each
+// throwing KeyNotFoundException on a miss), so minion/spell/weapon ids are taken as separate lists
+// rather than adding a new lookup method to CardDatabase.
 public static class MatchFactory
 {
 	public static GameState CreateMatch(
@@ -13,13 +13,18 @@ public static class MatchFactory
 		Player player1,
 		IEnumerable<(string CardId, int Count)> minionDeck1,
 		IEnumerable<(string CardId, int Count)> spellDeck1,
+		IEnumerable<(string CardId, int Count)> weaponDeck1,
 		Player player2,
 		IEnumerable<(string CardId, int Count)> minionDeck2,
 		IEnumerable<(string CardId, int Count)> spellDeck2,
-		ulong rngSeed)
+		IEnumerable<(string CardId, int Count)> weaponDeck2,
+		ulong rngSeed,
+		IReadOnlyDictionary<string, MinionCardDefinition> customMinions = null,
+		IReadOnlyDictionary<string, SpellCardDefinition> customSpells = null,
+		IReadOnlyDictionary<string, WeaponCardDefinition> customWeapons = null)
 	{
-		AddToDeck(cardDb, player1, minionDeck1, spellDeck1);
-		AddToDeck(cardDb, player2, minionDeck2, spellDeck2);
+		AddToDeck(cardDb, player1, minionDeck1, spellDeck1, weaponDeck1, customMinions, customSpells, customWeapons);
+		AddToDeck(cardDb, player2, minionDeck2, spellDeck2, weaponDeck2, customMinions, customSpells, customWeapons);
 
 		var cardPool = player1.Deck.Concat(player2.Deck);
 
@@ -30,13 +35,20 @@ public static class MatchFactory
 		CardDatabase cardDb,
 		Player player,
 		IEnumerable<(string CardId, int Count)> minionDeck,
-		IEnumerable<(string CardId, int Count)> spellDeck)
+		IEnumerable<(string CardId, int Count)> spellDeck,
+		IEnumerable<(string CardId, int Count)> weaponDeck,
+		IReadOnlyDictionary<string, MinionCardDefinition> customMinions = null,
+		IReadOnlyDictionary<string, SpellCardDefinition> customSpells = null,
+		IReadOnlyDictionary<string, WeaponCardDefinition> customWeapons = null)
 	{
 		foreach (var (cardId, count) in minionDeck)
 		{
 			for (int i = 0; i < count; i++)
 			{
-				player.Deck.Add(cardDb.GetMinionCard(cardId, player));
+				var card = customMinions != null && customMinions.TryGetValue(cardId, out var minionDef)
+					? cardDb.BuildMinionCard(minionDef, player)
+					: cardDb.GetMinionCard(cardId, player);
+				player.Deck.Add(card);
 			}
 		}
 
@@ -44,7 +56,21 @@ public static class MatchFactory
 		{
 			for (int i = 0; i < count; i++)
 			{
-				player.Deck.Add(cardDb.GetSpellCard(cardId, player));
+				var card = customSpells != null && customSpells.TryGetValue(cardId, out var spellDef)
+					? cardDb.BuildSpellCard(spellDef, player)
+					: cardDb.GetSpellCard(cardId, player);
+				player.Deck.Add(card);
+			}
+		}
+
+		foreach (var (cardId, count) in weaponDeck)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				var card = customWeapons != null && customWeapons.TryGetValue(cardId, out var weaponDef)
+					? cardDb.BuildWeaponCard(weaponDef, player)
+					: cardDb.GetWeaponCard(cardId, player);
+				player.Deck.Add(card);
 			}
 		}
 	}

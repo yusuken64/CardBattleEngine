@@ -96,6 +96,7 @@ public class MinionCard : Card
 		return new MinionCard(Name, ManaCost, Attack, Health)
 		{
 			Id = Id,
+			CardId = CardId,
 			Owner = Owner,
 			IsStealth = IsStealth,
 			Elusive = Elusive,

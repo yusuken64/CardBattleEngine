@@ -2,34 +2,26 @@
   "Attack": 1,
   "Health": 1,
   "Tribes": [ "Murloc" ],
-  "TriggeredEffectDefinitions": [
+  "TriggeredEffects": [
     {
       "EffectTiming": "Post",
       "EffectTrigger": "SummonMinion",
-      "TargetType": "Self",
-      "TriggerConditionDefintion": {
-        "ConditionTypeName": "SummonedMinionCondition",
-        "Params": {
-          "MinionTribe": "Murloc",
-          "TeamRelationship": "Friendly",
-          "ExcludeSelf": true
-        }
+      "Condition": {
+        "$type": "CardBattleEngine.SummonedMinionCondition, CardBattleEngine",
+        "MinionTribe": "Murloc",
+        "MinionToMinionRelationship": "Friendly",
+        "ExcludeSelf": true
       },
-      "ActionDefintion": {
-        "GameActionTypeName": "AddStatModifierAction",
-        "Params": {
-          "AttackChange": 1,
-          "HealthChange": 0
+      "GameActions": [
+        {
+          "$type": "CardBattleEngine.AddStatModifierAction, CardBattleEngine",
+          "StatModifierType": 0,
+          "AttackChange": { "$type": "CardBattleEngine.ConstantValue, CardBattleEngine", "Number": 1 }
         }
-      },
-      "AffectedEntitySelectorDefinition": {
-        "EntitySelectorTypeName": "ContextSelector",
-        "Params": {
-          "IncludeTarget": false,
-          "IncludeSource": true,
-          "IncludeSourcePlayer": false,
-          "IncludeTargetOwner": false
-        }
+      ],
+      "AffectedEntitySelector": {
+        "$type": "CardBattleEngine.ContextSelector, CardBattleEngine",
+        "IncludeSource": true
       }
     }
   ],

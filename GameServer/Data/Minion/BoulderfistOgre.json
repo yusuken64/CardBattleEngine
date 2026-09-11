@@ -2,7 +2,7 @@
   "Attack": 6,
   "Health": 7,
   "Tribe": [ "None" ],
-  "TriggeredEffectDefinitions": [],
+  "TriggeredEffects": [],
   "Type": "Minion",
   "Id": "BoulderfistOgre",
   "Name": "Boulderfist Ogre",

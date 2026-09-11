@@ -35,20 +35,4 @@ public class SelectBoardEntitiesOperation : ITargetOperation
 			}
 		}
 	}
-
-	// Optional: serialization
-	public Dictionary<string, object> EmitParams()
-	{
-		return new Dictionary<string, object>
-		{
-			{ nameof(Side), Side.ToString() },
-			{ nameof(Group), Group.ToString() }
-		};
-	}
-
-	public void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-		Side = JsonParamHelper.GetEnum<TeamRelationship>(actionParam, nameof(Side), Side);
-		Group = JsonParamHelper.GetEnum<TargetGroup>(actionParam, nameof(Group), Group);
-	}
 }

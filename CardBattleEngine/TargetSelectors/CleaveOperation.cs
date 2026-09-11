@@ -29,21 +29,6 @@ public class CleaveOperation : ITargetOperation
 		if (index < board.Count - 1)
 			yield return board[index + 1];
 	}
-
-	// Serialization
-	public Dictionary<string, object> EmitParams()
-	{
-		return new Dictionary<string, object>
-		{
-			{ nameof(IncludeCenter), IncludeCenter }
-		};
-	}
-
-	public void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-		if (actionParam.TryGetValue(nameof(IncludeCenter), out var value))
-			IncludeCenter = Convert.ToBoolean(value);
-	}
 }
 
 public class AdjacentOperation : ITargetOperation
@@ -90,22 +75,5 @@ public class AdjacentOperation : ITargetOperation
 			if (index < board.Count - 1)
 				yield return board[index + 1];
 		}
-
-
-	}
-
-	// Serialization
-	public Dictionary<string, object> EmitParams()
-	{
-		return new Dictionary<string, object>
-		{
-			{ nameof(IncludeCenter), IncludeCenter }
-		};
-	}
-
-	public void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-		if (actionParam.TryGetValue(nameof(IncludeCenter), out var value))
-			IncludeCenter = Convert.ToBoolean(value);
 	}
 }

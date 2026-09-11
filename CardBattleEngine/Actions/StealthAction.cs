@@ -23,14 +23,4 @@ public class StealthAction : GameActionBase
 
 		yield break; // no side-effects
 	}
-
-	public override Dictionary<string, object> EmitParams()
-	{
-		return new Dictionary<string, object>();
-	}
-
-	public override void ConsumeParams(Dictionary<string, object> actionParam)
-	{
-		// Nothing to consume in this simple action
-	}
 }

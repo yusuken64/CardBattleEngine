@@ -9,4 +9,6 @@ public interface IMatchClient
 	Task OnMatchEnded(Guid? winnerPlayerId);
 	Task OnActionRejected(string reason);
 	Task OnMatchFound(Guid matchId);
+	Task OnCardArtRequested(Guid matchId, string cardId);
+	Task OnCardArtReceived(string cardId, byte[] imageBytes);
 }
