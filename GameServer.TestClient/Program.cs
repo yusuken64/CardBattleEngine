@@ -29,7 +29,7 @@ void CheckRedaction(PlayerGameView view, string who)
 		Fail($"{who}: opponent secret contents were exposed!");
 }
 
-Guid matchId = Guid.Empty;
+string matchId = string.Empty;
 bool autoPlayEnabled = false; // held off until the spoofed-action checks below finish, so they race against nothing.
 
 // Every engine Resolve() broadcasts to both players regardless of whether this player's own legal
@@ -89,7 +89,7 @@ await connectionB.StartAsync();
 var deckA = BuildDeckWithCustomMinion("Alice");
 var deckB = BuildDeck("Bob");
 
-matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", deckA);
+matchId = await connectionA.InvokeAsync<string>("CreateMatch", deckA);
 Console.WriteLine($"Match created: {matchId}");
 
 var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, deckB);

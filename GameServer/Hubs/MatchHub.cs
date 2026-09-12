@@ -16,13 +16,13 @@ public class MatchHub : Hub<IMatchClient>
 		_hubContext = hubContext;
 	}
 
-	public Task<Guid> CreateMatch(DecklistRequest myDeck)
+	public Task<string> CreateMatch(DecklistRequest myDeck)
 	{
 		var matchId = _registry.CreateMatch(Context.ConnectionId, myDeck);
 		return Task.FromResult(matchId.Value);
 	}
 
-	public Task<JoinResult> JoinMatch(Guid matchId, DecklistRequest myDeck)
+	public Task<JoinResult> JoinMatch(string matchId, DecklistRequest myDeck)
 	{
 		if (!_registry.TryJoinMatch(new MatchId(matchId), Context.ConnectionId, myDeck, out var match, out var error))
 		{
@@ -31,10 +31,10 @@ public class MatchHub : Hub<IMatchClient>
 
 		match!.DriverLoopTask = MatchDriver.Run(match, _hubContext, CancellationToken.None);
 
-		return Task.FromResult(new JoinResult { Success = true });
+		return Task.FromResult(new JoinResult { Success = true, MatchId = match.Id.Value });
 	}
 
-	public Task<PlayerGameView?> GetState(Guid matchId)
+	public Task<PlayerGameView?> GetState(string matchId)
 	{
 		if (!_registry.TryGet(new MatchId(matchId), out var match))
 		{
@@ -73,7 +73,7 @@ public class MatchHub : Hub<IMatchClient>
 		return Task.CompletedTask;
 	}
 
-	public Task RequestCardArt(Guid matchId, string cardId)
+	public Task RequestCardArt(string matchId, string cardId)
 	{
 		if (_registry.TryGet(new MatchId(matchId), out var match))
 		{
@@ -87,7 +87,7 @@ public class MatchHub : Hub<IMatchClient>
 		return Task.CompletedTask;
 	}
 
-	public Task SubmitCardArt(Guid matchId, string cardId, byte[] imageBytes)
+	public Task SubmitCardArt(string matchId, string cardId, byte[] imageBytes)
 	{
 		if (_registry.TryGet(new MatchId(matchId), out var match))
 		{
@@ -101,7 +101,7 @@ public class MatchHub : Hub<IMatchClient>
 		return Task.CompletedTask;
 	}
 
-	public Task<ActionResult> SubmitAction(Guid matchId, int actionIndex, int version)
+	public Task<ActionResult> SubmitAction(string matchId, int actionIndex, int version)
 	{
 		if (!_registry.TryGet(new MatchId(matchId), out var match))
 		{

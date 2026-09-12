@@ -26,24 +26,50 @@ public class MatchRegistry
 		_cardDb = cardDb;
 	}
 
+	private MatchId NewMatchId()
+	{
+		MatchId id;
+		do { id = MatchId.New(); }
+		while (_pendingMatches.ContainsKey(id) || _matches.ContainsKey(id));
+		return id;
+	}
+
 	public MatchId CreateMatch(string hostConnectionId, DecklistRequest hostDeck)
 	{
-		var id = MatchId.New();
-		_pendingMatches[id] = new PendingMatch(hostConnectionId, hostDeck);
-		_connectionToMatch[hostConnectionId] = id;
-		return id;
+		lock (_matchmakingLock)
+		{
+			if (_connectionToMatch.ContainsKey(hostConnectionId))
+				throw new InvalidOperationException("This connection already has a match.");
+			LeaveQueue(hostConnectionId);
+			var id = NewMatchId();
+			_pendingMatches[id] = new PendingMatch(hostConnectionId, hostDeck);
+			_connectionToMatch[hostConnectionId] = id;
+			return id;
+		}
 	}
 
 	public bool TryJoinMatch(MatchId matchId, string joinerConnectionId, DecklistRequest joinerDeck, out Match? match, out string? error)
 	{
-		if (!_pendingMatches.TryRemove(matchId, out var pending))
+		lock (_matchmakingLock)
 		{
-			match = null;
-			error = "No open match with that id.";
-			return false;
+			if (!_pendingMatches.TryGetValue(matchId, out var pending))
+			{
+				match = null;
+				error = "No open match with that id.";
+				return false;
+			}
+			if (_connectionToMatch.ContainsKey(joinerConnectionId))
+			{
+				match = null;
+				error = "This connection already has a match.";
+				return false;
+			}
+			if (!TryCreateMatchFromDecks(matchId, pending.HostConnectionId, pending.HostDeck, joinerConnectionId, joinerDeck, out match, out error))
+				return false;
+			_pendingMatches.TryRemove(matchId, out _);
+			LeaveQueue(joinerConnectionId);
+			return true;
 		}
-
-		return TryCreateMatchFromDecks(matchId, pending.HostConnectionId, pending.HostDeck, joinerConnectionId, joinerDeck, out match, out error);
 	}
 
 	// Pairs this connection with whoever is already waiting and returns the created match, or - if no
@@ -54,6 +80,9 @@ public class MatchRegistry
 	{
 		lock (_matchmakingLock)
 		{
+			if (_connectionToMatch.ContainsKey(connectionId))
+				throw new InvalidOperationException("This connection already has a match.");
+			if (_waiting.ContainsKey(connectionId)) return null;
 			var opponent = _waiting.Keys.FirstOrDefault();
 			if (opponent == null)
 			{
@@ -63,7 +92,7 @@ public class MatchRegistry
 
 			var opponentDeck = _waiting[opponent];
 			_waiting.Remove(opponent);
-			return TryCreateMatchFromDecks(MatchId.New(), opponent, opponentDeck, connectionId, deck, out var newMatch, out _) ? newMatch : null;
+			return TryCreateMatchFromDecks(NewMatchId(), opponent, opponentDeck, connectionId, deck, out var newMatch, out _) ? newMatch : null;
 		}
 	}
 
@@ -90,11 +119,15 @@ public class MatchRegistry
 
 	public void RemoveConnection(string connectionId)
 	{
-		LeaveQueue(connectionId);
-
-		if (_connectionToMatch.TryRemove(connectionId, out var matchId))
+		lock (_matchmakingLock)
 		{
-			_pendingMatches.TryRemove(matchId, out _);
+			LeaveQueue(connectionId);
+			if (_connectionToMatch.TryRemove(connectionId, out var matchId))
+			{
+				_pendingMatches.TryRemove(matchId, out _);
+				// Keep the code reserved while either player can still address the match.
+				if (!_connectionToMatch.Values.Contains(matchId)) _matches.TryRemove(matchId, out _);
+			}
 		}
 	}
 

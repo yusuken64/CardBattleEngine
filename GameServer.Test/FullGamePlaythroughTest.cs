@@ -23,6 +23,36 @@ namespace GameServer.Test;
 public class FullGamePlaythroughTest
 {
 	[TestMethod]
+	public async Task QuickMatch_SendsSameShortIdToBothClients()
+	{
+		var builder = WebApplication.CreateBuilder();
+		builder.WebHost.UseUrls("http://127.0.0.1:0");
+		builder.Logging.ClearProviders();
+		await using var app = ServerHost.Build(builder);
+		await app.StartAsync();
+		try
+		{
+			var url = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.First();
+			await using var a = new HubConnectionBuilder().WithUrl($"{url}/hubs/match").Build();
+			await using var b = new HubConnectionBuilder().WithUrl($"{url}/hubs/match").Build();
+			var foundA = new TaskCompletionSource<string>();
+			var foundB = new TaskCompletionSource<string>();
+			a.On<string>("OnMatchFound", id => foundA.TrySetResult(id));
+			b.On<string>("OnMatchFound", id => foundB.TrySetResult(id));
+			await a.StartAsync();
+			await b.StartAsync();
+			await a.InvokeAsync("JoinQueue", BuildDeck("Alice"));
+			await b.InvokeAsync("JoinQueue", BuildDeck("Bob"));
+			var idA = await foundA.Task.WaitAsync(TimeSpan.FromSeconds(10));
+			var idB = await foundB.Task.WaitAsync(TimeSpan.FromSeconds(10));
+			Assert.AreEqual(idA, idB);
+			StringAssert.Matches(idA, new System.Text.RegularExpressions.Regex("^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{2}$"));
+			Assert.IsNotNull(await a.InvokeAsync<PlayerGameView?>("GetState", idA));
+		}
+		finally { await app.StopAsync(); }
+	}
+
+	[TestMethod]
 	public async Task FirstOption_CanCompleteFullGame()
 	{
 		await RunGame(pickFirst: true);
@@ -68,7 +98,7 @@ public class FullGamePlaythroughTest
 				deckA.Minions.Add(new CardCount { CardId = "IntegrationTestOnlyMinion", Count = 1 });
 				deckA.CustomMinions.Add(json);
 
-				var matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", deckA);
+				var matchId = await connectionA.InvokeAsync<string>("CreateMatch", deckA);
 				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob"));
 				Assert.IsTrue(joinResult.Success, $"JoinMatch failed: {joinResult.Error}");
 
@@ -136,7 +166,7 @@ public class FullGamePlaythroughTest
 				deckB.Minions.Add(new CardCount { CardId = "ConflictingCard", Count = 1 });
 				deckB.CustomMinions.Add(jsonB);
 
-				var matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", deckA);
+				var matchId = await connectionA.InvokeAsync<string>("CreateMatch", deckA);
 				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, deckB);
 
 				Assert.IsFalse(joinResult.Success, "Expected JoinMatch to fail when both decks submit conflicting custom cards under the same id.");
@@ -183,7 +213,7 @@ public class FullGamePlaythroughTest
 			const string cardId = "CardArtRelayTestCard";
 			var receivedArt = new TaskCompletionSource<(string CardId, byte[] ImageBytes)>();
 
-			connectionB.On<Guid, string>("OnCardArtRequested", async (requestedMatchId, requestedCardId) =>
+			connectionB.On<string, string>("OnCardArtRequested", async (requestedMatchId, requestedCardId) =>
 			{
 				var blob = SHA256.HashData(Encoding.UTF8.GetBytes(requestedCardId));
 				await connectionB.InvokeAsync("SubmitCardArt", requestedMatchId, requestedCardId, blob);
@@ -196,7 +226,7 @@ public class FullGamePlaythroughTest
 
 			try
 			{
-				var matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", BuildDeck("Alice"));
+				var matchId = await connectionA.InvokeAsync<string>("CreateMatch", BuildDeck("Alice"));
 				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob"));
 				Assert.IsTrue(joinResult.Success, $"JoinMatch failed: {joinResult.Error}");
 
@@ -250,7 +280,7 @@ public class FullGamePlaythroughTest
 			var matchEndedB = new TaskCompletionSource<Guid?>();
 			var rng = new Random(12345);
 			var lastSubmittedVersion = new Dictionary<HubConnection, int?>();
-			Guid matchId = Guid.Empty;
+			string matchId = string.Empty;
 
 			void CheckRedaction(PlayerGameView view, string who)
 			{
@@ -330,7 +360,7 @@ public class FullGamePlaythroughTest
 
 			try
 			{
-				matchId = await connectionA.InvokeAsync<Guid>("CreateMatch", BuildDeck("Alice"));
+				matchId = await connectionA.InvokeAsync<string>("CreateMatch", BuildDeck("Alice"));
 				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob"));
 				Assert.IsTrue(joinResult.Success, $"JoinMatch failed: {joinResult.Error}");
 

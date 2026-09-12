@@ -56,12 +56,12 @@ public static class RemoteGameClient
 		PlayerGameView? latestView = null;
 		var viewSignal = new SemaphoreSlim(0);
 		var matchEnded = new TaskCompletionSource<Guid?>();
-		var matchFound = new TaskCompletionSource<Guid>();
+		var matchFound = new TaskCompletionSource<string>();
 
 		// Set once CreateOrJoinMatch resolves below - the closures here capture this variable (not
 		// its value at registration time), so requests sent from OnStateUpdated before that point are
-		// simply skipped by RequestArtForUnseenOpponentCards's Guid.Empty guard.
-		var activeMatchId = Guid.Empty;
+		// simply skipped by RequestArtForUnseenOpponentCards's empty match ID guard.
+		var activeMatchId = string.Empty;
 		var requestedCardArtIds = new HashSet<string>();
 
 		connection.On<PlayerGameView>("OnStateUpdated", view =>
@@ -88,12 +88,12 @@ public static class RemoteGameClient
 			viewSignal.Release();
 		});
 		connection.On<string>("OnActionRejected", reason => Console.WriteLine($"Action rejected: {reason}"));
-		connection.On<Guid>("OnMatchFound", id => matchFound.TrySetResult(id));
+		connection.On<string>("OnMatchFound", id => matchFound.TrySetResult(id));
 
 		// GamePlayer has no real card art to show - it exercises the same request/relay round trip a
 		// visual client would, but responds with a deterministic hash of the cardId instead of image
 		// bytes, so the requester can verify the exact bytes it gets back came from this cardId.
-		connection.On<Guid, string>("OnCardArtRequested", (requestMatchId, cardId) =>
+		connection.On<string, string>("OnCardArtRequested", (requestMatchId, cardId) =>
 			RespondToCardArtRequest(connection, requestMatchId, cardId));
 		connection.On<string, byte[]>("OnCardArtReceived", (cardId, imageBytes) =>
 			VerifyReceivedCardArt(cardId, imageBytes));
@@ -108,7 +108,7 @@ public static class RemoteGameClient
 			return;
 		}
 
-		activeMatchId = matchId.Value;
+		activeMatchId = matchId;
 
 		// Redraws just the idle-wait line once a second so it live-counts up between server pushes,
 		// rather than only ever updating when a broadcast happens to arrive.
@@ -169,7 +169,7 @@ public static class RemoteGameClient
 
 			lastHandledVersion = view.PromptVersion;
 
-			var result = await connection.InvokeAsync<ActionResult>("SubmitAction", matchId.Value, chosen.Index, view.PromptVersion.Value);
+			var result = await connection.InvokeAsync<ActionResult>("SubmitAction", matchId, chosen.Index, view.PromptVersion.Value);
 			if (!result.Success)
 			{
 				Console.WriteLine($"Action rejected: {result.Error}");
@@ -190,7 +190,7 @@ public static class RemoteGameClient
 		Console.ReadKey(true);
 	}
 
-	private static async Task<Guid?> CreateOrJoinMatch(HubConnection connection, string playerName, Task<Guid> matchFound)
+	private static async Task<string?> CreateOrJoinMatch(HubConnection connection, string playerName, Task<string> matchFound)
 	{
 		var deck = BuildDefaultDeck(playerName);
 
@@ -208,25 +208,25 @@ public static class RemoteGameClient
 
 		if (key is 'j' or 'J')
 		{
-			Console.Write("Enter match id: ");
+			Console.Write("Enter match code (e.g. K7MP-4X): ");
 			var input = Console.ReadLine();
-			if (!Guid.TryParse(input, out var matchId))
+			if (string.IsNullOrWhiteSpace(input))
 			{
 				Console.WriteLine("Invalid match id.");
 				return null;
 			}
 
-			var joinResult = await connection.InvokeAsync<JoinResult>("JoinMatch", matchId, deck);
+			var joinResult = await connection.InvokeAsync<JoinResult>("JoinMatch", input, deck);
 			if (!joinResult.Success)
 			{
 				Console.WriteLine($"Failed to join match: {joinResult.Error}");
 				return null;
 			}
 
-			return matchId;
+			return joinResult.MatchId;
 		}
 
-		var createdId = await connection.InvokeAsync<Guid>("CreateMatch", deck);
+		var createdId = await connection.InvokeAsync<string>("CreateMatch", deck);
 		Console.WriteLine($"Match created: {createdId}");
 		Console.WriteLine("Share this id with your opponent and wait for them to join...");
 		return createdId;
@@ -593,9 +593,9 @@ public static class RemoteGameClient
 	// requested here; opponent hand contents are never visible (PlayerViewBuilder nulls Opponent.Hand),
 	// so there is nothing else to request art for.
 	private static void RequestArtForUnseenOpponentCards(
-		HubConnection connection, Guid matchId, PlayerGameView view, HashSet<string> requestedCardArtIds)
+		HubConnection connection, string matchId, PlayerGameView view, HashSet<string> requestedCardArtIds)
 	{
-		if (matchId == Guid.Empty)
+		if (string.IsNullOrEmpty(matchId))
 		{
 			return;
 		}
@@ -625,7 +625,7 @@ public static class RemoteGameClient
 	}
 
 	private static async void RequestArtIfUnseen(
-		HubConnection connection, Guid matchId, string? cardId, HashSet<string> requestedCardArtIds)
+		HubConnection connection, string matchId, string? cardId, HashSet<string> requestedCardArtIds)
 	{
 		if (string.IsNullOrEmpty(cardId) || !requestedCardArtIds.Add(cardId))
 		{
@@ -646,7 +646,7 @@ public static class RemoteGameClient
 	// replies with a hash of cardId instead - a "verifiable blob" the requester can independently
 	// recompute from the cardId it asked for, proving the relay round trip delivered the right bytes
 	// for the right card rather than actually rendering anything.
-	private static async void RespondToCardArtRequest(HubConnection connection, Guid matchId, string cardId)
+	private static async void RespondToCardArtRequest(HubConnection connection, string matchId, string cardId)
 	{
 		byte[] blob = ComputeVerifiableArtBlob(cardId);
 
