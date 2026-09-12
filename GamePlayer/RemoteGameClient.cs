@@ -671,7 +671,7 @@ public static class RemoteGameClient
 
 	private static byte[] ComputeVerifiableArtBlob(string cardId) => SHA256.HashData(Encoding.UTF8.GetBytes(cardId));
 
-	private static DecklistRequest BuildDefaultDeck(string playerName)
+	public static DecklistRequest BuildDefaultDeck(string playerName)
 	{
 		var deck = new DecklistRequest
 		{

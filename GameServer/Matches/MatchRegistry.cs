@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Newtonsoft.Json.Linq;
 using CardBattleEngine;
 using GameServer.Contracts;
 
@@ -201,9 +202,17 @@ public class MatchRegistry
 			return false;
 		}
 
-		if (target.ContainsKey(def.Id))
+		if (target.TryGetValue(def.Id, out var existing))
 		{
-			error = $"Both players submitted a custom card with id '{def.Id}' - custom card ids must be unique within a match.";
+			// Shared cards are valid in both decks. Compare parsed definitions so
+			// whitespace and JSON property order do not turn identical cards into conflicts.
+			if (JToken.DeepEquals(JToken.Parse(CardDatabase.ToDefinitionJson(existing)),
+				JToken.Parse(CardDatabase.ToDefinitionJson(def))))
+			{
+				error = null;
+				return true;
+			}
+			error = $"Conflicting custom {kind} definitions for card id '{def.Id}'.";
 			return false;
 		}
 

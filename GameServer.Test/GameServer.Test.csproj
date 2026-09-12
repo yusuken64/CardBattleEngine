@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CardBattleEngine\CardBattleEngine.csproj" />
     <ProjectReference Include="..\GameServer\GameServer.csproj" />
+    <ProjectReference Include="..\GamePlayer\GamePlayer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
