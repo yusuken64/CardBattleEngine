@@ -12,6 +12,18 @@ public class HeroPowerAction : GameActionBase
 			return false;
 		}
 
+		var power = context.SourcePlayer.HeroPower;
+		var leader = power.LeaderCard ?? context.SourceCard;
+		if (power.CastRestriction != null && !power.CastRestriction.CanPlay(gameState, context.SourcePlayer, leader, out reason))
+			return false;
+		var target = context.Targets?.FirstOrDefault();
+		if (power.ValidTargetSelector != null && (target == null ||
+			!power.ValidTargetSelector.Select(gameState, context.SourcePlayer, leader).Any(x => x.Id == target.Id)))
+		{
+			reason = "Choose a valid hero power target";
+			return false;
+		}
+
 		if (context.Targets is { Count: > 0 } &&
 			context.Targets?.FirstOrDefault() is Minion minion &&
 			(minion.IsStealth || minion.Elusive) &&
@@ -51,7 +63,8 @@ public class HeroPowerAction : GameActionBase
 					SourcePlayer = context.SourcePlayer,
 					Source = context.Source,
 					Targets = [target],
-					SourceCard = context.SourceCard,
+					SourceCard = heroPower.LeaderCard ?? context.SourceCard,
+					SourceHeroPower = heroPower,
 				};
 
 				yield return (action, heroPowerActionContext);

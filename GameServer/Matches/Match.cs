@@ -18,6 +18,13 @@ public class Match
 
 	public Task? DriverLoopTask { get; set; }
 
+    // Published immutable snapshots: Hub reads never race the engine's mutable state.
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<MatchSeat, CardBattleEngine.View.PlayerGameView> _views = new();
+    public long StateRevision { get; set; }
+    public long PlaybackSequence { get; set; }
+    public CardBattleEngine.View.PlayerGameView? LatestView(MatchSeat seat) => _views.TryGetValue(seat, out var view) ? view : null;
+    public void PublishView(MatchSeat seat, CardBattleEngine.View.PlayerGameView view) => _views[seat] = view;
+
 	public Match(MatchId id, GameState gameState, GameEngine engine)
 	{
 		Id = id;

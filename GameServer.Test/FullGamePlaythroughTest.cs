@@ -52,6 +52,14 @@ public class FullGamePlaythroughTest
 		finally { await app.StopAsync(); }
 	}
 
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task LeaderPowers_CanBeSubmittedByBothClients(bool targeted)
+    {
+        await RunGame(pickFirst: true, withLeader: true, targetedPower: targeted);
+    }
+
 	[TestMethod]
 	public async Task FirstOption_CanCompleteFullGame()
 	{
@@ -254,7 +262,7 @@ public class FullGamePlaythroughTest
 		}
 	}
 
-	private async Task RunGame(bool pickFirst)
+	private async Task RunGame(bool pickFirst, bool withLeader = false, bool targetedPower = false)
 	{
 		var builder = WebApplication.CreateBuilder();
 		builder.WebHost.UseUrls("http://127.0.0.1:0");
@@ -274,12 +282,16 @@ public class FullGamePlaythroughTest
 			var actionTypesSeen = new HashSet<string>();
 			var playerIdsMulliganed = new HashSet<Guid>();
 			var cardIdsSeen = new List<string>();
+            var heroPowerUsers = new HashSet<Guid>();
 			var minionCardIdsSeen = new List<string>();
 			var redactionFailures = new List<string>();
 			var matchEndedA = new TaskCompletionSource<Guid?>();
 			var matchEndedB = new TaskCompletionSource<Guid?>();
 			var rng = new Random(12345);
 			var lastSubmittedVersion = new Dictionary<HubConnection, int?>();
+            var observationLock = new object();
+			var playbackSequence = new System.Collections.Concurrent.ConcurrentDictionary<string, long>();
+			var stateRevision = new System.Collections.Concurrent.ConcurrentDictionary<string, long>();
 			string matchId = string.Empty;
 
 			void CheckRedaction(PlayerGameView view, string who)
@@ -290,7 +302,24 @@ public class FullGamePlaythroughTest
 
 			void OnState(HubConnection connection, string who, TaskCompletionSource<Guid?> ended, PlayerGameView view)
 			{
+                lock (observationLock)
+                {
 				CheckRedaction(view, who);
+                if (withLeader && (view.Self.HeroPower?.LeaderCard == null || view.Opponent.HeroPower?.LeaderCard == null))
+                    redactionFailures.Add("Missing public leader power.");
+				long previous = playbackSequence.GetOrAdd(who, 0);
+				long revision = stateRevision.GetOrAdd(who, 0);
+				if (view.StateRevision <= revision) redactionFailures.Add($"{who}: state revisions must increase.");
+				stateRevision[who] = view.StateRevision;
+				foreach (var frame in view.PlaybackEvents)
+				{
+					if (frame.Sequence != ++previous) redactionFailures.Add($"{who}: missing or duplicate playback event.");
+					CheckRedaction(frame.After, who + " playback");
+                    if (frame.ActionType == "HeroPowerAction") heroPowerUsers.Add(frame.PlayerId);
+					if (frame.After.PlaybackEvents.Count != 0) redactionFailures.Add("Recursive playback payload.");
+				}
+				if (view.PlaybackSequence != previous) redactionFailures.Add($"{who}: watermark mismatch.");
+				playbackSequence[who] = previous;
 
 				foreach (var entry in view.NewHistory)
 				{
@@ -339,6 +368,8 @@ public class FullGamePlaythroughTest
 				lastSubmittedVersion[connection] = view.PromptVersion;
 
 				var chosenIndex = pickFirst ? 0 : rng.Next(view.LegalActions.Count);
+                if (withLeader && view.LegalActions.FirstOrDefault(x => x.ActionType == "HeroPowerAction") is { } powerOption)
+                    chosenIndex = powerOption.Index;
 
 				_ = connection.InvokeAsync<ActionResult>("SubmitAction", matchId, chosenIndex, view.PromptVersion.Value)
 					.ContinueWith(t =>
@@ -348,6 +379,7 @@ public class FullGamePlaythroughTest
 							redactionFailures.Add($"{who}: server rejected a legal action - {t.Result.Error}");
 						}
 					});
+                }
 			}
 
 			connectionA.On<PlayerGameView>("OnStateUpdated", view => OnState(connectionA, "PlayerA", matchEndedA, view));
@@ -360,8 +392,8 @@ public class FullGamePlaythroughTest
 
 			try
 			{
-				matchId = await connectionA.InvokeAsync<string>("CreateMatch", BuildDeck("Alice"));
-				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob"));
+				matchId = await connectionA.InvokeAsync<string>("CreateMatch", BuildDeck("Alice", withLeader, targetedPower));
+				var joinResult = await connectionB.InvokeAsync<JoinResult>("JoinMatch", matchId, BuildDeck("Bob", withLeader, targetedPower));
 				Assert.IsTrue(joinResult.Success, $"JoinMatch failed: {joinResult.Error}");
 
 				var completed = await Task.WhenAny(
@@ -372,11 +404,13 @@ public class FullGamePlaythroughTest
 					"Match did not complete within 30 seconds (likely stuck on an unsubmittable prompt).");
 
 				Assert.IsTrue(redactionFailures.Count == 0, string.Join(" | ", redactionFailures));
+				Assert.IsTrue(playbackSequence.Values.All(x => x > 0), "No playback events were delivered.");
 
 				Console.WriteLine("Action types exercised: " + string.Join(", ", actionTypesSeen.OrderBy(x => x)));
 
 				Assert.IsTrue(actionTypesSeen.Contains("SubmitMulliganAction"), "Mulligan was never submitted over the wire.");
 				Assert.IsTrue(actionTypesSeen.Contains("EndTurnAction"));
+                if (withLeader) Assert.AreEqual(2, heroPowerUsers.Count, "Both seats must use their hero power over SignalR.");
 				Assert.IsTrue(actionTypesSeen.Contains("PlayCardAction"));
 
 				// Verify both players submitted mulligans (regression guard for ENG-002)
@@ -399,10 +433,23 @@ public class FullGamePlaythroughTest
 		}
 	}
 
-	private static DecklistRequest BuildDeck(string name)
+	private static DecklistRequest BuildDeck(string name, bool withLeader = false, bool targeted = false)
 	{
+        var leader = new CardBattleEngine.MinionCard(name + " leader", 1, 1, 1);
+        leader.ValidTargetSelector = targeted ? new CardBattleEngine.EntityTypeSelector
+        { EntityTypes = CardBattleEngine.EntityType.Player, TeamRelationship = CardBattleEngine.TeamRelationship.Enemy } : null;
+        leader.MinionTriggeredEffects.Add(new CardBattleEngine.TriggeredEffect
+        {
+            EffectTrigger = CardBattleEngine.EffectTrigger.Battlecry,
+            AffectedEntitySelector = new CardBattleEngine.ContextSelector { IncludeSummonedMinion = !targeted, IncludeTarget = targeted },
+            GameActions = targeted
+                ? [new CardBattleEngine.DamageAction { Damage = (CardBattleEngine.Value)1 }]
+                : [new CardBattleEngine.GainArmorAction { Amount = (CardBattleEngine.Value)1 }],
+        });
 		return new DecklistRequest
 		{
+            LeaderDefinition = withLeader ? CardBattleEngine.CardDatabase.ToDefinitionJson(
+                CardBattleEngine.CardDatabase.ToMinionCardDefinition(leader, "leader")) : null,
 			PlayerName = name,
 			Minions = new List<CardCount>
 			{

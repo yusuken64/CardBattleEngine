@@ -1,4 +1,4 @@
-﻿namespace CardBattleEngine;
+namespace CardBattleEngine;
 
 // Basic effect/action that can be executed on a GameState
 public interface IGameAction
@@ -6,6 +6,7 @@ public interface IGameAction
 	EffectTrigger EffectTrigger { get; }
 	bool IsValid(GameState gameState, ActionContext context, out string reason);
 	IEnumerable<(IGameAction, ActionContext)> Resolve(GameState state, ActionContext context);
+	string PresentationEffectId { get; set; }
 	object CustomSFX { get; set; } //this will be used the client to assosiated SFX To Action when animated
 	IGameAction Clone();
 }
@@ -50,6 +51,7 @@ public abstract class GameActionBase : IGameAction
 			.Where(t => t != null && t.IsAlive && t.Health > 0)
 			.ToList();
 	}
+	public string PresentationEffectId { get; set; }
 	public object CustomSFX { get; set; }
 
 	public virtual IGameAction Clone()
@@ -65,6 +67,13 @@ public class ActionContext
 	public Card SourceCard;
 	public IGameEntity Source;
 	public List<IGameEntity> Targets;
+	// Compatibility for Unity's single-target authoring and interaction code.
+	[Newtonsoft.Json.JsonIgnore]
+	public IGameEntity Target
+	{
+		get => Targets?.FirstOrDefault();
+		set => Targets = value == null ? null : new List<IGameEntity> { value };
+	}
 	public TargetRequirement PendingTargetRequirement;
 	public StatModifier Modifier;
 

@@ -2,6 +2,9 @@ namespace CardBattleEngine.View;
 
 public class PlayerGameView
 {
+	public long StateRevision { get; set; }
+	public long PlaybackSequence { get; set; }
+	public List<PlaybackEventView> PlaybackEvents { get; set; } = new();
 	public Guid ViewerPlayerId { get; set; }
 	public int Turn { get; set; }
 	public Guid CurrentPlayerId { get; set; }
@@ -32,6 +35,7 @@ public class PublicPlayerView
 	public int Health { get; set; }
 	public int MaxHealth { get; set; }
 	public int Armor { get; set; }
+	public int Fatigue { get; set; }
 	public int Mana { get; set; }
 	public int MaxMana { get; set; }
 	public int Attack { get; set; }
@@ -84,6 +88,8 @@ public class MinionView
 	public bool HasLifeSteal { get; set; }
 	public bool HasReborn { get; set; }
 	public bool HasSummoningSickness { get; set; }
+	public bool HasDeathRattle { get; set; }
+	public bool HasTrigger { get; set; }
 }
 
 public class WeaponView
@@ -97,6 +103,7 @@ public class WeaponView
 
 public class HeroPowerView
 {
+	public CardView? LeaderCard { get; set; }
 	public string Name { get; set; }
 	public int ManaCost { get; set; }
 	public bool UsedThisTurn { get; set; }

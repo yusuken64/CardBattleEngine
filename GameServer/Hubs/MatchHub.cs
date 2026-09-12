@@ -47,10 +47,8 @@ public class MatchHub : Hub<IMatchClient>
 			return Task.FromResult<PlayerGameView?>(null);
 		}
 
-		var agent = match.AgentFor(seat.Value);
-		var currentOptions = agent.CurrentOptions;
-		var view = PlayerViewBuilder.Build(match.GameState, match.PlayerFor(seat.Value), null, currentOptions?.Options, currentOptions?.Version);
-		return Task.FromResult<PlayerGameView?>(view);
+        var view = match.LatestView(seat.Value);
+        return Task.FromResult(view);
 	}
 
 	public Task JoinQueue(DecklistRequest myDeck)

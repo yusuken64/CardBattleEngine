@@ -2,6 +2,7 @@ namespace GameServer.Contracts;
 
 public class DecklistRequest
 {
+	public string? LeaderDefinition { get; set; }
 	public string PlayerName { get; set; } = string.Empty;
 	public List<CardCount> Minions { get; set; } = new();
 	public List<CardCount> Spells { get; set; } = new();

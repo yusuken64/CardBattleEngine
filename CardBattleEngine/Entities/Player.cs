@@ -73,6 +73,7 @@ public class Player : IGameEntity, ITriggerSource
 			VariableSet = new VariableSet(VariableSet),
 		};
 
+		clone.HeroPower = HeroPower?.Clone(clone);
 		clone.EquippedWeapon = EquippedWeapon?.Clone();
 
 		// Deep copy the collections
@@ -136,6 +137,7 @@ public class Player : IGameEntity, ITriggerSource
 			VariableSet = new VariableSet(VariableSet),
 		};
 
+		clone.HeroPower = HeroPower?.Clone(clone);
 		clone.EquippedWeapon = EquippedWeapon?.Clone();
 
 		// Deep copy the collections

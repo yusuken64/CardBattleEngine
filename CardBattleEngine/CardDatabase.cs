@@ -28,7 +28,8 @@ public class CardDatabase
 			Tribes = card.MinionTribes?.ToList(),
 			CastRestriction = card.CastRestriction,
 			ValidTargetSelector = card.ValidTargetSelector,
-			TriggeredEffects = card.TriggeredEffects.ToList()
+			TriggeredEffects = card.TriggeredEffects.ToList(),
+			MinionTriggeredEffects = card.MinionTriggeredEffects.ToList()
 		};
 	}
 
@@ -42,6 +43,7 @@ public class CardDatabase
 			Cost = card.ManaCost,
 			CastRestriction = card.CastRestriction,
 			ValidTargetSelector = card.ValidTargetSelector,
+			PresentationEffectId = card.PresentationEffectId,
 			SpellCastEffects = card.SpellCastEffects.ToList()
 		};
 	}
@@ -213,6 +215,7 @@ public class CardDatabase
 		card.Owner = owner;
 		card.CardId = def.Id;
 		card.MinionTribes = def.Tribes?.ToList() ?? [];
+		card.MinionTriggeredEffects.AddRange(def.MinionTriggeredEffects.Select(e => e.Clone()));
 		card.CastRestriction = def.CastRestriction;
 		card.ValidTargetSelector = def.ValidTargetSelector;
 		card.TriggeredEffects.AddRange(def.TriggeredEffects.Select(e => e.Clone()));
@@ -276,6 +279,7 @@ public class CardDatabase
 		card.CardId = def.Id;
 		card.CastRestriction = def.CastRestriction;
 		card.ValidTargetSelector = def.ValidTargetSelector;
+		card.PresentationEffectId = def.PresentationEffectId;
 		card.SpellCastEffects.AddRange(def.SpellCastEffects);
 
 		return card;
@@ -294,6 +298,7 @@ public abstract class CardDefinition
 
 public class SpellCardDefinition : CardDefinition
 {
+	public string PresentationEffectId { get; set; }
 	public List<SpellCastEffect> SpellCastEffects { get; set; } = new();
 }
 
@@ -302,6 +307,7 @@ public class MinionCardDefinition : CardDefinition
 	public int Attack { get; set; }
 	public int Health { get; set; }
 	public List<string> Tribes { get; set; }
+	public List<TriggeredEffect> MinionTriggeredEffects { get; set; } = new();
 	public List<TriggeredEffect> TriggeredEffects { get; set; } = new();
 }
 

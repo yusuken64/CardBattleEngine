@@ -212,6 +212,14 @@ public class MatchRegistry
 		return true;
 	}
 
+	private HeroPower? BuildLeaderPower(DecklistRequest deck, Player player)
+	{
+		if (string.IsNullOrWhiteSpace(deck.LeaderDefinition)) return null;
+		if (CardDatabase.LoadCardFromJson(deck.LeaderDefinition) is not MinionCardDefinition leader || string.IsNullOrWhiteSpace(leader.Id))
+			throw new ArgumentException("Deck leader must be a minion definition with an Id.");
+		return HeroPower.FromLeader(_cardDb.BuildMinionCard(leader, player));
+	}
+
 	private bool TryCreateMatchFromDecks(MatchId id, string connection1, DecklistRequest deck1, string connection2, DecklistRequest deck2, out Match? match, out string? error)
 	{
 		if (!TryMergeCustomDefinitions(deck1, deck2, out var customMinions, out var customSpells, out var customWeapons, out error))
@@ -227,6 +235,8 @@ public class MatchRegistry
 
 		try
 		{
+			player1.HeroPower = BuildLeaderPower(deck1, player1);
+			player2.HeroPower = BuildLeaderPower(deck2, player2);
 			var gameState = MatchFactory.CreateMatch(
 				_cardDb,
 				player1,

@@ -1,4 +1,4 @@
-﻿
+
 namespace CardBattleEngine;
 
 public class SpellCard : Card
@@ -20,6 +20,7 @@ public class SpellCard : Card
 	public override IAttackBehavior AttackBehavior => null;
 	private int OriginalManaCost;
 
+	public string PresentationEffectId { get; set; }
 	public object CustomSFX { get; set; }
 
 	public override Card Clone()
@@ -27,6 +28,8 @@ public class SpellCard : Card
 		var spellCard = new SpellCard(Name, ManaCost)
 		{
 			Id = Id,
+			PresentationEffectId = PresentationEffectId,
+			CustomSFX = CustomSFX,
 			CardId = CardId,
 			Owner = Owner,
 			SpriteID = SpriteID,
@@ -51,7 +54,8 @@ public class SpellCard : Card
 		{
 			(new CastSpellAction()
 			{
-				CustomSFX = CustomSFX
+				CustomSFX = CustomSFX,
+				PresentationEffectId = PresentationEffectId
 			}, actionContext)
 		};
 	}

@@ -6,7 +6,7 @@ namespace CardBattleEngine.View;
 // player's own Hand/Deck rather than a public zone like the board) - see IsHiddenSecretCard/
 // CardGained handling below. Anything still only inside GameState.PendingChoice.Options is shown
 // only to PendingChoice.SourcePlayer (that's where Discover's real candidate cards live).
-public static class PlayerViewBuilder
+public static partial class PlayerViewBuilder
 {
 	public static PlayerGameView Build(
 		GameState state,
@@ -75,6 +75,7 @@ public static class PlayerViewBuilder
 			Health = player.Health,
 			MaxHealth = player.MaxHealth,
 			Armor = player.Armor,
+			Fatigue = player.Fatigue,
 			Mana = player.Mana,
 			MaxMana = player.MaxMana,
 			Attack = player.Attack,
@@ -126,6 +127,9 @@ public static class PlayerViewBuilder
 			HasLifeSteal = minion.HasLifeSteal,
 			HasReborn = minion.HasReborn,
 			HasSummoningSickness = minion.HasSummoningSickness,
+			HasDeathRattle = minion.TriggeredEffects.Any(e => e.EffectTrigger == EffectTrigger.Deathrattle),
+			HasTrigger = minion.TriggeredEffects.Any(e => e.EffectTrigger != EffectTrigger.Aura &&
+				e.EffectTrigger != EffectTrigger.Deathrattle && e.EffectTrigger != EffectTrigger.Battlecry),
 		};
 	}
 
@@ -145,6 +149,7 @@ public static class PlayerViewBuilder
 	{
 		return new HeroPowerView
 		{
+			LeaderCard = heroPower.LeaderCard == null ? null : BuildCardView(heroPower.LeaderCard),
 			Name = heroPower.Name,
 			ManaCost = heroPower.ManaCost,
 			UsedThisTurn = heroPower.UsedThisTurn,

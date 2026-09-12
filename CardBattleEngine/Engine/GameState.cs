@@ -204,6 +204,23 @@ public class GameState
 			}
 		}
 
+		if (player.HeroPower is { } power)
+		{
+			var heroAction = new HeroPowerAction();
+			IEnumerable<IGameEntity> targets = power.ValidTargetSelector == null
+				? new IGameEntity[] { null }
+				: power.ValidTargetSelector.Select(this, player, power.LeaderCard);
+			foreach (var target in targets)
+			{
+				var context = new ActionContext
+				{
+					Source = player, SourcePlayer = player, SourceCard = power.LeaderCard,
+					SourceHeroPower = power, Targets = target == null ? [] : [target],
+				};
+				if (heroAction.IsValid(this, context, out _)) actions.Add((heroAction, context));
+			}
+		}
+
 		// Always can end turn
 		actions.Add((
 			new EndTurnAction(),
