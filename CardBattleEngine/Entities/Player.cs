@@ -4,6 +4,7 @@ public class Player : IGameEntity, ITriggerSource
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 	public string Name { get; set; }
+	public string DeckTitle { get; set; } = string.Empty;
 	public List<Card> Deck { get; } = new List<Card>();
 	public List<Card> Hand { get; } = new List<Card>();
 	public List<BoardPermanent> Board { get; } = new List<BoardPermanent>();
@@ -59,6 +60,7 @@ public class Player : IGameEntity, ITriggerSource
 		var clone = new Player(Name)
 		{
 			Id = Id,
+			DeckTitle = DeckTitle,
 			MaxMana = MaxMana,
 			Health = Health,
 			MaxHealth = MaxHealth,
@@ -123,6 +125,7 @@ public class Player : IGameEntity, ITriggerSource
 		var clone = new Player(Name)
 		{
 			Id = Id,
+			DeckTitle = DeckTitle,
 			MaxMana = MaxMana,
 			Health = Health,
 			MaxHealth = MaxHealth,

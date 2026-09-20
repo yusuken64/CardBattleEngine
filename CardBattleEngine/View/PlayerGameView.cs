@@ -32,6 +32,7 @@ public class PublicPlayerView
 {
 	public Guid PlayerId { get; set; }
 	public string Name { get; set; }
+	public string DeckTitle { get; set; } = string.Empty;
 	public int Health { get; set; }
 	public int MaxHealth { get; set; }
 	public int Armor { get; set; }

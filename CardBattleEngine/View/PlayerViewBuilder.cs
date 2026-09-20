@@ -72,6 +72,7 @@ public static partial class PlayerViewBuilder
 		{
 			PlayerId = player.Id,
 			Name = player.Name,
+			DeckTitle = player.DeckTitle,
 			Health = player.Health,
 			MaxHealth = player.MaxHealth,
 			Armor = player.Armor,

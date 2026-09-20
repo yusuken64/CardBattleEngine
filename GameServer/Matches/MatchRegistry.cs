@@ -237,8 +237,8 @@ public class MatchRegistry
 			return false;
 		}
 
-		var player1 = new Player(deck1.PlayerName);
-		var player2 = new Player(deck2.PlayerName);
+		var player1 = new Player(deck1.PlayerName) { DeckTitle = deck1.DeckTitle ?? string.Empty };
+		var player2 = new Player(deck2.PlayerName) { DeckTitle = deck2.DeckTitle ?? string.Empty };
 
 		var rngSeed = (ulong)Random.Shared.NextInt64();
 
